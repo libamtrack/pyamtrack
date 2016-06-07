@@ -46,12 +46,8 @@ matrix:
             - TOXENV=packaging
             - PYPIUSER=grzanka
             #  pypi secured password (PYPIPASS variable), you need to update it to your own if you want to use it
-            - secure: "PYPI_PASS_ENCRYPTED_TO_BE_REPLACED"
+            - secure: "PUKOSRVf18nKaBakGxw/ch/n6MB10nRrmNkZKfezThO/nTczyDPSM+jtKVjt06tJFd3D1qIWwX4mOn9I5Y6qSvGGSOU6s8LzlWw6ss7AZKISy+dSOVM3ilb0gaTdIiSCUoX9zWThkOH+1L9c5QQ4BtPxyVQgGMpAE55zCmfCujTNW32rOU+KW40ArKe0o/v0x7mox3nzxqnc7tNk0It3NKD2K+JgR/JVR7Hc9UyVSpm3zZkUu2RR1G/4Mc1XilWzlmPFdEa6P7fyPzNfcmI3GGJiuiVoIv90LSJUyPCmQqweEHv4liEwGX5K7TpvPuWE1GH4R5aDLmX4hQFp8wBg2aAuoZ6hElET1Nw+QROyl2+EuGHRsvWDpdJTzAUfIA+lGb26A2OsLatP40IjDbPQkouUdJoh1yZ1UnbKKmiG+d/sDb+C2/kBnQN9rc3NxYMaA3Wo/hE+o8mcYeVtUo14JkPJYTTo70Pq9ZkI3K8tAutdRdTf2ocT16iLux9nkS5+lumaj++vgE9zzM0E12RSbz8w8czWxm0+GD3p3BkZFvdvWiaRm3gxpgvSqnC04AWd5c+Gp3FI6zf3SSpOOGJxy6fLw9jBLzWocb4h5BfVwQntbCSlOLqCYBDYtd/eAde1cC+nbDp7Icujcm4eLgZ5Xqs+PxXeGjgf3gW/TE11yFw="
             - PYPITESTUSER=grzanka
-            #  pypitest secured password (PYPITESTPASS variable), you need to update it to your own if you want to use it
-            - secure: "PYPITEST_PASS_ENCRYPTED_TO_BE_REPLACED"
-            #  Code Climate secured token (CODECLIMATE_REPO_TOKEN variable), you need to update it to your own if you want to use it
-            - secure: "CODE_CLIMATE_TOKEN_TO_BE_REPLACED"
         - os: osx
           language: generic
           env: TOXENV=py35
@@ -93,10 +89,6 @@ script:
   - if [[ $TRAVIS_OS_NAME == "osx" ]]; then travis_wait bash ./.travis/run_osx.sh ; fi
 
 after_success:
-  # deploy to both servers: test and normal
-  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_OS_NAME == "linux" ]] && [[ $TOXENV == "packaging" ]]; then bash .travis/deploy_package.sh pypitest ; fi
-  # send coverage data
-  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_OS_NAME == "linux" ]] && [[ $TOXENV == "packaging" ]]; then bash .travis/send_coverage.sh pypitest ; fi
   # deploy to normal if tag is present
   - if [[ $TRAVIS_TAG != "" ]] && [[ $TOXENV == "packaging" ]]; then bash .travis/deploy_package.sh pypi ; fi
 
