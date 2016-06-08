@@ -32,9 +32,9 @@ Overview
     :target: https://readthedocs.org/projects/pyamtrack
     :alt: Documentation Status
 
-.. |travis| image:: https://travis-ci.org/grzanka/pyamtrack.svg?branch=master
+.. |travis| image:: https://travis-ci.org/libamtrack/pyamtrack.svg?branch=master
     :alt: Travis-CI Build Status
-    :target: https://travis-ci.org/grzanka/pyamtrack
+    :target: https://travis-ci.org/libamtrack/pyamtrack
 
 .. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/grzanka/pyamtrack?branch=master&svg=true
     :alt: Appveyor Build Status
@@ -91,7 +91,7 @@ Features
 * TODO
 
 Credits
----------
+-------
 
 This package was created with Cookiecutter_ and the `grzanka/cookiecutter-pip-docker-versioneer`_ project template.
 

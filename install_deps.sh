@@ -8,38 +8,54 @@ set -o pipefail # Return value of a pipeline as the value of the last command to
                 # exit with a non-zero status, or zero if all commands in the
                 # pipeline exit successfully.
 
+libamtrack_compile() {
+    git clone https://github.com/libamtrack/library.git
+    cd library
+    mkdir m4
+    autoreconf --force --install
+    ./configure --prefix=$HOME/usr
+    make README
+    make -j4
+    make install
+    cd ../
+    ls $HOME/usr/lib/
+    mkdir -p pyamtrack/libs/
+    cp $HOME/usr/lib/libamtrack*so pyamtrack/libs/ || :
+    cp $HOME/usr/lib/libamtrack*dylib pyamtrack/libs/ || :
+}
+
 apt_install() {
     PYTHON_VERSION=$1
-    apt-get -q update
-    PYTHON2_CMD="apt-get install -y libblas-dev liblapack-dev gfortran"
-    PYTHON3_CMD="apt-get install -y libblas-dev liblapack-dev gfortran"
+    sudo apt-get -q update
+    PYTHON2_CMD="sudo apt-get install -y libgsl0-dev gfortran"
+    PYTHON3_CMD="sudo apt-get install -y libgsl0-dev gfortran"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 brew_install() {
     PYTHON_VERSION=$1
-#    brew update
-    PYTHON2_CMD="pwd"
-    PYTHON3_CMD="pwd"
+#   brew update
+    PYTHON2_CMD="brew install gsl"
+    PYTHON3_CMD="brew install gsl"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 yum_install() {
     PYTHON_VERSION=$1
-    yum update -y -q
-    PYTHON2_CMD="yum install -y -q TODO"
-    PYTHON3_CMD="yum install -y -q TODO"
+    sudo yum update -y -q
+    PYTHON2_CMD="sudo yum install -y -q TODO"
+    PYTHON3_CMD="sudo yum install -y -q TODO"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 dnf_install() {
     PYTHON_VERSION=$1
-    dnf update -y -q
-    PYTHON2_CMD="dnf install -y -q TODO"
-    PYTHON3_CMD="dnf install -y -q TODO"
+    sudo dnf update -y -q
+    PYTHON2_CMD="sudo dnf install -y -q TODO"
+    PYTHON3_CMD="sudo dnf install -y -q TODO"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
@@ -118,3 +134,5 @@ case "$OSTYPE" in
     echo "Unknown: $OSTYPE"
     ;;
 esac
+
+libamtrack_compile

@@ -31,7 +31,6 @@ if [[ $TOXENV == py27* ]] ; then exit 0; fi
 
 
 # For Python 3, first install pyenv
-brew update || brew update
 brew unlink pyenv && brew install pyenv && brew link pyenv
 
 # setup pyenv

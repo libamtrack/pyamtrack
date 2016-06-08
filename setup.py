@@ -1,4 +1,7 @@
 import setuptools
+import platform
+import os
+import sys
 from pkg_resources import parse_version
 try:
     import versioneer
@@ -22,6 +25,9 @@ setuptools.setup(
     name='pyamtrack',
     version=version,
     packages=['pyamtrack'],
+    package_data={
+        'pyamtrack' : ['libs/libamtrack.*so', 'libs/libamtrack.*dylib','libs/libamtrack.*dll']
+    },
     url='https://github.com/libamtrack/pyamtrack',
     license='GPL',
     author='Leszek Grzanka',
