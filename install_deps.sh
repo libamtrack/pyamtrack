@@ -26,36 +26,36 @@ libamtrack_compile() {
 
 apt_install() {
     PYTHON_VERSION=$1
-    apt-get -q update
-    PYTHON2_CMD="apt-get install -y libgsl0-dev gfortran"
-    PYTHON3_CMD="apt-get install -y libgsl0-dev gfortran"
+    sudo apt-get -q update
+    PYTHON2_CMD="sudo apt-get install -y libgsl0-dev gfortran"
+    PYTHON3_CMD="sudo apt-get install -y libgsl0-dev gfortran"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 brew_install() {
     PYTHON_VERSION=$1
-#    brew update
-    PYTHON2_CMD="brew install gsl"
-    PYTHON3_CMD="brew install gsl"
+#   sudo brew update
+    PYTHON2_CMD="sudo brew install gsl"
+    PYTHON3_CMD="sudo brew install gsl"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 yum_install() {
     PYTHON_VERSION=$1
-    yum update -y -q
-    PYTHON2_CMD="yum install -y -q TODO"
-    PYTHON3_CMD="yum install -y -q TODO"
+    sudo yum update -y -q
+    PYTHON2_CMD="sudo yum install -y -q TODO"
+    PYTHON3_CMD="sudo yum install -y -q TODO"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
 
 dnf_install() {
     PYTHON_VERSION=$1
-    dnf update -y -q
-    PYTHON2_CMD="dnf install -y -q TODO"
-    PYTHON3_CMD="dnf install -y -q TODO"
+    sudo dnf update -y -q
+    PYTHON2_CMD="sudo dnf install -y -q TODO"
+    PYTHON3_CMD="sudo dnf install -y -q TODO"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
 }
 
@@ -117,7 +117,7 @@ case "$OSTYPE" in
     ;;
   linux-gnu*) # Debian
     echo "Linux-gnu: $OSTYPE"
-    sudo apt_install $PYTHON_VERSION
+    apt_install $PYTHON_VERSION
 #    os_type
 #    lsb_release -si
 #    lsb_release -sr
