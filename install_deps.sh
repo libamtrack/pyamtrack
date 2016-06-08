@@ -35,7 +35,7 @@ apt_install() {
 
 brew_install() {
     PYTHON_VERSION=$1
-    brew update
+#    brew update
     PYTHON2_CMD="brew install gsl"
     PYTHON3_CMD="brew install gsl"
     choose_python_version "$PYTHON_VERSION" "$PYTHON2_CMD" "$PYTHON3_CMD"
