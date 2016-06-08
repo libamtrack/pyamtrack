@@ -1,8 +1,8 @@
   include *.rst
   include *.txt
   include *.py
-  include pyamtrack/libs
-  include pyamtrack/libs/libamtrack.*
+  exclude pyamtrack/libs
+  exclude pyamtrack/libs/libamtrack.*
   include LICENSE
   include requirements.txt
   include tests/requirements-test.txt
