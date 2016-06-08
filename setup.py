@@ -26,7 +26,7 @@ setuptools.setup(
     version=version,
     packages=['pyamtrack'],
     package_data={
-        'pyamtrack' : ['libs/libamtrack.*']
+        'pyamtrack' : ['libs/libamtrack.*so', 'libs/libamtrack.*dylib','libs/libamtrack.*dll']
     },
     url='https://github.com/libamtrack/pyamtrack',
     license='GPL',
