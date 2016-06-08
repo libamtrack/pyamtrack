@@ -8,9 +8,6 @@ pyamtrack
 .. image:: https://img.shields.io/travis/libamtrack/pyamtrack.svg
         :target: https://travis-ci.org/libamtrack/pyamtrack
 
-.. image:: https://readthedocs.org/projects/pyamtrack/badge/?version=latest
-        :target: https://readthedocs.org/projects/pyamtrack/?badge=latest
-        :alt: Documentation Status
 
 ========
 Overview
@@ -21,24 +18,14 @@ Overview
 .. list-table::
     :stub-columns: 1
 
-    * - docs
-      - |docs|
     * - tests
-      - |travis| |appveyor|
+      - |travis|
     * - package
       - |version| |downloads| |wheel| |supported-versions| |supported-implementations|
-
-.. |docs| image:: https://readthedocs.org/projects/pyamtrack/badge/?style=flat
-    :target: https://readthedocs.org/projects/pyamtrack
-    :alt: Documentation Status
 
 .. |travis| image:: https://travis-ci.org/libamtrack/pyamtrack.svg?branch=master
     :alt: Travis-CI Build Status
     :target: https://travis-ci.org/libamtrack/pyamtrack
-
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/github/grzanka/pyamtrack?branch=master&svg=true
-    :alt: Appveyor Build Status
-    :target: https://ci.appveyor.com/project/grzanka/pyamtrack
 
 .. |version| image:: https://img.shields.io/pypi/v/pyamtrack.svg?style=flat
     :alt: PyPI Package latest release
@@ -68,22 +55,9 @@ Python binding for libamtrack
 Installation
 ============
 
-::
+Stable version ::
 
     pip install pyamtrack
-
-
-:: Development version
-
-    pip install -i https://testpypi.python.org/pypi pyamtrack
-
-
-
-Documentation
-=============
-
-https://pyamtrack.readthedocs.io/
-
 
 Features
 --------
