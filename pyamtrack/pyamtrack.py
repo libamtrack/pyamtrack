@@ -37,14 +37,15 @@ from platform import system as os_system
 
 __status__ = 'Prototype'
 
+script_location = os.path.dirname(os.path.realpath(__file__))
+
 operating_system = os_system()
 if operating_system == 'Windows':
     libamtrack = ctypes.cdll.libamtrack
 elif operating_system == 'Darwin':
-    libamtrack = ctypes.cdll.LoadLibrary("libs/libamtrack.dylib")
+    libamtrack = ctypes.cdll.LoadLibrary(os.path.join(script_location,'libs','libamtrack.dylib'))
 else:
-    os.environ['LD_LIBRARY_PATH'] = 'libs/libamtrack.so'
-    libamtrack = ctypes.cdll.LoadLibrary("libs/libamtrack.so")
+    libamtrack = ctypes.cdll.LoadLibrary(os.path.join(script_location,'libs','libamtrack.so'))
 
 py_version = python_version()
 if int(py_version[0]) < 3 and int(py_version[2]) <= 5:

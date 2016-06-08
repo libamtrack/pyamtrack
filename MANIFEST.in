@@ -1,6 +1,7 @@
   include *.rst
   include *.txt
   include *.py
+  include libs/libamtrack.*
   include LICENSE
   include requirements.txt
   include tests/requirements-test.txt
@@ -18,4 +19,3 @@
   exclude appveyor.yml
   prune .travis
   prune install_deps.sh
-
