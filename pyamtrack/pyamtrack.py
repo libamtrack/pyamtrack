@@ -40,6 +40,8 @@ __status__ = 'Prototype'
 operating_system = os_system()
 if operating_system == 'Windows':
     libamtrack = ctypes.cdll.libamtrack
+elif operating_system == 'Darwin':
+    libamtrack = ctypes.cdll.LoadLibrary("libamtrack.dylib")
 else:
     os.environ['LD_LIBRARY_PATH'] = 'libamtrack.so'
     libamtrack = ctypes.cdll.LoadLibrary("libamtrack.so")

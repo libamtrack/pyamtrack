@@ -20,6 +20,7 @@ libamtrack_compile() {
     cd ../
     ls $HOME/usr/lib/
     cp $HOME/usr/lib/libamtrack.so .
+    cp $HOME/usr/lib/libamtrack.so data/
 }
 
 apt_install() {

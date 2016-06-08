@@ -5,7 +5,7 @@ import pyamtrack
 
 
 def get_momentum(E_MeV_u):
-    return pyamtrack.pyamtrack.AT_momentum_from_E_MeV_c_u_single(E_MeV_u)
+    return pyamtrack.AT_momentum_from_E_MeV_c_u_single(E_MeV_u)
 
 
 def main():
