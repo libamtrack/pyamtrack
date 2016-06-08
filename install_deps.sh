@@ -20,6 +20,7 @@ libamtrack_compile() {
     cd ../
     ls $HOME/usr/lib/
     cp $HOME/usr/lib/libamtrack.so .
+    mkdir -p data
     cp $HOME/usr/lib/libamtrack.so data/
 }
 
