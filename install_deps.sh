@@ -19,7 +19,7 @@ libamtrack_compile() {
     make install
     cd ../
     ls $HOME/usr/lib/
-    mkdir -p libs/
+    mkdir -p pyamtrack/libs/
     cp $HOME/usr/lib/libamtrack.* pyamtrack/libs/
 }
 
