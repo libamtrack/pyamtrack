@@ -1,7 +1,8 @@
   include *.rst
   include *.txt
   include *.py
-  include libs/libamtrack.*
+  include pyamtrack/libs
+  include pyamtrack/libs/libamtrack.*
   include LICENSE
   include requirements.txt
   include tests/requirements-test.txt
@@ -11,6 +12,7 @@
   recursive-include tests *.py
   include versioneer.py
   include pyamtrack/_version.py
+  include install_deps.sh
 
   exclude .gitkeep
   exclude .gitconfig
@@ -18,4 +20,3 @@
   exclude .travis.yml
   exclude appveyor.yml
   prune .travis
-  exclude install_deps.sh

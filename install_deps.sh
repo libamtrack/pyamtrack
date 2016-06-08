@@ -117,7 +117,7 @@ case "$OSTYPE" in
     ;;
   linux-gnu*) # Debian
     echo "Linux-gnu: $OSTYPE"
-    apt_install $PYTHON_VERSION
+    sudo apt_install $PYTHON_VERSION
 #    os_type
 #    lsb_release -si
 #    lsb_release -sr
