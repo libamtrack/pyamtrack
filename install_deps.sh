@@ -15,10 +15,11 @@ libamtrack_compile() {
     autoreconf --force --install
     ./configure --prefix=$HOME/usr
     make README
-    make -j2
+    make -j4
     make install
     cd ../
     ls $HOME/usr/lib/
+    cp $HOME/usr/lib/libamtrack.so .
 }
 
 apt_install() {
