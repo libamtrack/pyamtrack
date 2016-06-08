@@ -1,12 +1,11 @@
 import argparse
 import os
 import subprocess
-import pyamtrack
+from pyamtrack.pyamtrack import AT_momentum_from_E_MeV_c_u_single
 
 
 def get_momentum(E_MeV_u):
-    return pyamtrack.AT_momentum_from_E_MeV_c_u_single(E_MeV_u)
-
+    return AT_momentum_from_E_MeV_c_u_single(E_MeV_u)
 
 def main():
     """
