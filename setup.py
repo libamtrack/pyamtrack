@@ -1,4 +1,7 @@
 import setuptools
+import platform
+import os
+import sys
 from pkg_resources import parse_version
 try:
     import versioneer
@@ -18,10 +21,29 @@ if '*@' in parsed_version[1]:
 with open('README.rst') as readme_file:
     readme = readme_file.read()
 
+
+system = platform.system().lower()
+if system == 'windows':
+    ext = '.dll'
+elif system == 'darwin':
+    ext = '.dylib'
+else:
+    ext = '.so'
+
+lib_path = os.path.join('.', 'libs', "libamtrack" + ext)
+data_files = []
+if os.path.exists(lib_path):
+    # if system == 'windows':
+    #     install_libdir = os.path.join(sys.prefix, 'DLLs')
+    # else:
+    #     install_libdir = os.path.join(sys.prefix, 'lib')
+    data_files.append(('libs', [lib_path]))
+
 setuptools.setup(
     name='pyamtrack',
     version=version,
     packages=['pyamtrack'],
+    data_files=data_files,
     url='https://github.com/libamtrack/pyamtrack',
     license='GPL',
     author='Leszek Grzanka',

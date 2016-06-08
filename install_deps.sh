@@ -19,9 +19,8 @@ libamtrack_compile() {
     make install
     cd ../
     ls $HOME/usr/lib/
-    cp $HOME/usr/lib/libamtrack.so .
-    mkdir -p data
-    cp $HOME/usr/lib/libamtrack.so data/
+    mkdir -p libs/
+    cp $HOME/usr/lib/libamtrack.so libs/
 }
 
 apt_install() {

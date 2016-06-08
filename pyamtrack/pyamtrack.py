@@ -41,10 +41,10 @@ operating_system = os_system()
 if operating_system == 'Windows':
     libamtrack = ctypes.cdll.libamtrack
 elif operating_system == 'Darwin':
-    libamtrack = ctypes.cdll.LoadLibrary("libamtrack.dylib")
+    libamtrack = ctypes.cdll.LoadLibrary("libs/libamtrack.dylib")
 else:
-    os.environ['LD_LIBRARY_PATH'] = 'libamtrack.so'
-    libamtrack = ctypes.cdll.LoadLibrary("libamtrack.so")
+    os.environ['LD_LIBRARY_PATH'] = 'libs/libamtrack.so'
+    libamtrack = ctypes.cdll.LoadLibrary("libs/libamtrack.so")
 
 py_version = python_version()
 if int(py_version[0]) < 3 and int(py_version[2]) <= 5:
