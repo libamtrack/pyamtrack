@@ -19,7 +19,7 @@ include(FetchContent)
 FetchContent_Declare(
     libamtrack
     GIT_REPOSITORY https://github.com/libamtrack/library.git
-    GIT_TAG 261-add-an-option-for-the-compilation-of-cmake-so-that-examples-may-be-excluded-from-build  # Change to a stable version/tag
+    GIT_TAG master
 )
 
 # Set options before calling FetchContent_MakeAvailable
@@ -37,14 +37,6 @@ FetchContent_MakeAvailable(pybind11)
 
 # Find dependencies via vcpkg
 find_package(GSL REQUIRED)
-# if (WIN32)
-#     find_library(GETOPT_LIB NAMES getopt PATHS ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/lib)
-#     find_path(GETOPT_INCLUDE_DIR getopt.h PATHS ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/include)
-
-#     if (NOT GETOPT_LIB)
-#         message(FATAL_ERROR "getopt.lib not found! Make sure it's installed via vcpkg.")
-#     endif()
-# endif()
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 # Define Python extension module
@@ -53,9 +45,9 @@ pybind11_add_module(pyamtrack MODULE
 )
 
 # Ensure libamtrack is built before pyamtrack
-#add_dependencies(pyamtrack libamtrack)
+add_dependencies(pyamtrack amtrack)
 
-# Link against libamtrack, GSL, and getopt
+# Link against libamtrack, GSL
 target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 
 # Include directories
