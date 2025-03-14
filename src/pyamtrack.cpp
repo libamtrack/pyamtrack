@@ -8,7 +8,7 @@ double example_function(double x) {
     return x * 2.0;  // Replace with an actual libamtrack function
 }
 
-PYBIND11_MODULE(pymatrack, m) {
+PYBIND11_MODULE(pyamtrack, m) {
     m.doc() = "Python bindings for libamtrack";
     m.def("example_function", &example_function, "An example function");
 }
