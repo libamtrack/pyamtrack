@@ -26,7 +26,7 @@ cmake .. -DGSL_INCLUDE_DIR="../vcpkg_installed/x64-windows/include" -DGSL_LIBRAR
 
 ### **3. Build the Project**
 ```sh
-cmake --build . --config Release
+cmake --build . --config Release --parallel
 ```
 
 ### **4. Set `PYTHONPATH` to the Built Module**
