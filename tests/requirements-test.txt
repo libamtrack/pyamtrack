@@ -1,6 +1,0 @@
-versioneer
-pytest
-pytest-capturelog
-pytest-timeout
-pytest-xdist
-tox
