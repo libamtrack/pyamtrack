@@ -20,7 +20,7 @@ jobs:
       - name: Build & Install pyamtrack (Linux)
         run: |
           mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release 
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
           cmake --build . --parallel
           cmake --install . --prefix "${{ runner.temp }}/usr"
       
