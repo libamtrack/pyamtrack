@@ -28,13 +28,6 @@ jobs:
           cmake --build . --parallel
           cmake --install .
       
-      # - name: Run macOS Tests
-      #   run: |
-      #     export PATH="${{ runner.temp }}/usr/bin:$PATH"
-      #     export DYLD_LIBRARY_PATH="${{ runner.temp }}/usr/lib:$DYLD_LIBRARY_PATH"
-      #     amtrack_test
-      #     amtrack_demo
-
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:

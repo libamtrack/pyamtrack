@@ -1,0 +1,19 @@
+[build-system]
+requires = ["scikit-build-core", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pyamtrack"
+version = "0.1.0"
+description = "Python bindings for libamtrack"
+readme = "README.md"
+authors = [{ name = "Your Name", email = "your.email@example.com" }]
+license = { file = "LICENSE" }
+requires-python = ">=3.7"
+dependencies = ["numpy"]
+
+[tool.scikit-build]
+cmake.minimum-version = "3.16"
+cmake.verbose = true
+cmake.args = ["-DCMAKE_BUILD_TYPE=Release"]
+wheel.packages = ["src"]

@@ -64,3 +64,44 @@ endif()
 install(TARGETS pyamtrack
     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
 )
+
+# Define installation rules for Python packaging
+include(GNUInstallDirs)
+
+# Ensure module is installed in the correct site-packages directory
+install(TARGETS pyamtrack
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+)
+
+# Configure CMake export settings
+install(EXPORT pyamtrackTargets
+    FILE pyamtrackTargets.cmake
+    NAMESPACE pyamtrack::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+)
+
+# Add CMake package configuration
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pyamtrackConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+)
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+)
+
+# Create a package for Python (wheel)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+# Set RPATH for proper linkage
+set(CMAKE_INSTALL_RPATH "$ORIGIN")
