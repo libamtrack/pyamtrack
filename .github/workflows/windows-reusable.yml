@@ -69,7 +69,7 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: .\vcpkg\vcpkg.exe install
 
-      - name: Build & Install libamtrack (Windows)
+      - name: Build & Install pyamtrack (Windows)
         env:
           CMAKE_PREFIX_PATH: ${{ github.workspace }}/vcpkg_installed/x64-windows
           GSL_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
