@@ -15,7 +15,10 @@ jobs:
           fetch-depth: 0
 
       - name: Install system packages
-        run: sudo apt-get install -y --no-install-recommends libgsl-dev
+        run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip
+
+      - name: Install Python dependencies
+        run: pip install --upgrade build scikit-build-core pybind11 ninja
 
       - name: Build & Install pyamtrack (Linux)
         run: |
@@ -24,10 +27,16 @@ jobs:
           cmake --build . --parallel
           cmake --install .
       
-      - name: Upload Linux Artifact
+      - name: Build Python Wheel
+        run: |
+          python -m build
+
+      - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: libamtrack-linux
-          path: "${{ runner.temp }}/usr/"
+          path: |
+            ${{ runner.temp }}/usr/
+            dist/*.whl
           if-no-files-found: error
           retention-days: 5
