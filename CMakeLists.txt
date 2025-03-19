@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(pyamtrack LANGUAGES CXX C)
+project(pyamtrack VERSION 0.1.0 LANGUAGES CXX C)
 
 # Enable C++17 or later
 set(CMAKE_CXX_STANDARD 17)
@@ -60,16 +60,13 @@ if (WIN32)
     target_compile_definitions(pyamtrack PRIVATE -DAMTRACK_EXPORTS)
 endif()
 
-# Install the module
-install(TARGETS pyamtrack
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
-)
 
 # Define installation rules for Python packaging
 include(GNUInstallDirs)
 
 # Ensure module is installed in the correct site-packages directory
 install(TARGETS pyamtrack
+    EXPORT pyamtrackTargets  # Ensure this export is defined
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
 )
 
@@ -82,16 +79,18 @@ install(EXPORT pyamtrackTargets
 
 # Add CMake package configuration
 include(CMakePackageConfigHelpers)
+# Define the package version
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}  # This fixes the error
     COMPATIBILITY SameMajorVersion
 )
-
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pyamtrackConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
 )
+
 
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
