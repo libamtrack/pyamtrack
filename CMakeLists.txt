@@ -62,5 +62,5 @@ endif()
 
 # Install the module
 install(TARGETS pyamtrack
-    LIBRARY DESTINATION ${Python3_SITEARCH}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
 )
