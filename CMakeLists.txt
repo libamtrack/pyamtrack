@@ -65,10 +65,16 @@ endif()
 include(GNUInstallDirs)
 
 # Ensure module is installed in the correct site-packages directory
+#install(TARGETS pyamtrack
+#    EXPORT pyamtrackTargets  # Ensure this export is defined
+#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+#)
+
 install(TARGETS pyamtrack
     EXPORT pyamtrackTargets  # Ensure this export is defined
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+    LIBRARY DESTINATION ${Python3_SITEARCH}
 )
+
 
 # Configure CMake export settings
 install(EXPORT pyamtrackTargets
