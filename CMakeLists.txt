@@ -95,33 +95,33 @@ include(GNUInstallDirs)
 
 install(TARGETS pyamtrack
    EXPORT pyamtrackTargets
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+   LIBRARY DESTINATION pyamtrack
 )
 
 # Export CMake package configuration
-install(EXPORT pyamtrackTargets
-    FILE pyamtrackTargets.cmake
-    NAMESPACE pyamtrack::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-)
+#install(EXPORT pyamtrackTargets
+#    FILE pyamtrackTargets.cmake
+#    NAMESPACE pyamtrack::
+#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+#)
 
 # Generate and install package configuration files
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pyamtrackConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-)
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-)
+#write_basic_package_version_file(
+#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
+#    VERSION ${PROJECT_VERSION}
+#    COMPATIBILITY SameMajorVersion
+#)
+#configure_package_config_file(
+#    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pyamtrackConfig.cmake.in"
+#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
+#    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+#)
+#install(FILES
+#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
+#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
+#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
+#)
 
 # Adjust visibility settings for building Python packages
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)

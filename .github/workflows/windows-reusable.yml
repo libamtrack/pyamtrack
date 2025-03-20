@@ -88,6 +88,13 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: python -m build
 
+      - name: Test Wheel Installation
+        run: |
+          python -m venv venv
+          venv\Scripts\activate
+          pip install dist/*.whl
+          python -c "import pyamtrack; print(pyamtrack.__doc__)"
+
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
