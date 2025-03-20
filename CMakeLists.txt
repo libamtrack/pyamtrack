@@ -71,8 +71,8 @@ include(GNUInstallDirs)
 #)
 
 install(TARGETS pyamtrack
-    EXPORT pyamtrackTargets  # Ensure this export is defined
-    LIBRARY DESTINATION ${Python3_SITEARCH}
+    EXPORT pyamtrackTargets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages
 )
 
 
