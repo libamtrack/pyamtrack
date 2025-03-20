@@ -8,6 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enable position-independent code (PIC) for building shared libraries
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
+
+# Adjust visibility settings for building Python packages
+set(CMAKE_CXX_VISIBILITY_PRESET default)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN OFF)
+
+# Ensure the symbols are not hidden
+add_compile_options(-fvisibility=default)
+
 # Fetch libamtrack library from GitHub
 include(FetchContent)
 FetchContent_Declare(
@@ -69,6 +77,16 @@ FetchContent_MakeAvailable(pybind11)
 # Locate Python3 development environment
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
+# Set RPATH to the directory where libamtrack.so is installed
+set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+set(CMAKE_BUILD_RPATH "$ORIGIN/../lib")
+set(CMAKE_SKIP_BUILD_RPATH FALSE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
+# Ensure RPATH is not removed
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+
 # Build the pyamtrack Python extension module
 pybind11_add_module(pyamtrack MODULE
     src/pyamtrack.cpp  # Main binding source file
@@ -98,34 +116,8 @@ install(TARGETS pyamtrack
    LIBRARY DESTINATION pyamtrack
 )
 
-# Export CMake package configuration
-#install(EXPORT pyamtrackTargets
-#    FILE pyamtrackTargets.cmake
-#    NAMESPACE pyamtrack::
-#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-#)
-
 # Generate and install package configuration files
 include(CMakePackageConfigHelpers)
-#write_basic_package_version_file(
-#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
-#    VERSION ${PROJECT_VERSION}
-#    COMPATIBILITY SameMajorVersion
-#)
-#configure_package_config_file(
-#    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/pyamtrackConfig.cmake.in"
-#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
-#    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-#)
-#install(FILES
-#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
-#    "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
-#    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
-#)
-
-# Adjust visibility settings for building Python packages
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
 
 # Set RPATH to allow finding libraries from the installation path
-set(CMAKE_INSTALL_RPATH "$ORIGIN")
+#set(CMAKE_INSTALL_RPATH "$ORIGIN")
