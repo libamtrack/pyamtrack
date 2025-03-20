@@ -38,6 +38,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: libamtrack-macos
-          path: "${{ runner.temp }}/usr/"
+          path: dist/*.whl
           if-no-files-found: error
           retention-days: 5

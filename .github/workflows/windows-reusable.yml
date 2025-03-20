@@ -71,7 +71,7 @@ jobs:
 
       # - name: Build & Install pyamtrack (Windows)
       #   env:
-      #     VCPKG_ROOT: "${{ github.workspace }}"
+      #     VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
       #   working-directory: build
       #   shell: pwsh
       #   run: |
@@ -85,15 +85,13 @@ jobs:
   
       - name: Build Windows Wheel
         env:
-          VCPKG_ROOT: "${{ github.workspace }}"
+          VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: python -m build
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: libamtrack-windows
-          path: |
-            ${{ runner.temp }}/libamtrack/
-            dist/*.whl
+          path: dist/*.whl
           if-no-files-found: error
           retention-days: 5

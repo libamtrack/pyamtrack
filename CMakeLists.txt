@@ -22,17 +22,17 @@ set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
 # Set GSL paths for Windows using VCPKG environment variable
 if (WIN32)
-    # Check if VCPKG_ROOT environment variable is set
-    if (NOT DEFINED ENV{VCPKG_ROOT})
-        message(FATAL_ERROR "VCPKG_ROOT environment variable is not set.")
+    # Check if VCPKG_INSTALLED_DIR environment variable is set
+    if (NOT DEFINED ENV{VCPKG_INSTALLED_DIR})
+        message(FATAL_ERROR "VCPKG_INSTALLED_DIR environment variable is not set.")
     endif()
 
-    message(STATUS "VCPKG_ROOT (env variable): $ENV{VCPKG_ROOT}")
+    message(STATUS "VCPKG_INSTALLED_DIR (env variable): $ENV{VCPKG_INSTALLED_DIR}")
 
     # Set GSL include and library paths for VCPKG installation
-    set(GSL_INCLUDE_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/include")
-    set(GSL_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gsl.lib")
-    set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gslcblas.lib")
+    set(GSL_INCLUDE_DIR "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/include")
+    set(GSL_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gsl.lib")
+    set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gslcblas.lib")
     message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
     message(STATUS "Using GSL library: ${GSL_LIBRARY}")
     message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
