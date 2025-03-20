@@ -21,24 +21,23 @@ jobs:
       - name: Install system packages
         run: brew install gsl
 
-      - name: Build & Install pyamtrack (macOS)
-        run: |
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
-          cmake --build . --parallel
-          cmake --install .
-      
-      # - name: Run macOS Tests
+      # - name: Build & Install pyamtrack (macOS)
       #   run: |
-      #     export PATH="${{ runner.temp }}/usr/bin:$PATH"
-      #     export DYLD_LIBRARY_PATH="${{ runner.temp }}/usr/lib:$DYLD_LIBRARY_PATH"
-      #     amtrack_test
-      #     amtrack_demo
+      #     mkdir build && cd build
+      #     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
+      #     cmake --build . --parallel
+      #     cmake --install .
+
+      - name: Install Python dependencies
+        run: pip install --upgrade build
+  
+      - name: Build MacOS Wheel
+        run: python -m build
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
           name: libamtrack-macos
-          path: "${{ runner.temp }}/usr/"
+          path: dist/*.whl
           if-no-files-found: error
           retention-days: 5

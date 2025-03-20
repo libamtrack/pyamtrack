@@ -1,70 +1,72 @@
-# Building and Testing `pyamtrack` on Windows
+# Building and Installing `pyamtrack` on Linux
 
 ## **Prerequisites**
 Ensure you have the following installed:
-- **CMake** (3.16 or later)
-- **Ninja** build system
 - **Python 3** (with development headers)
-- **vcpkg** (for dependency management, including GSL)
+- **CMake** (3.16 or later)
+- **Ninja** (recommended for faster builds)
+- **GSL** (GNU Scientific Library)
 - **Git** (for fetching dependencies)
-- **A C++ Compiler** (MSVC, Clang, or MinGW)
 
-## **Compilation Instructions**
+## **Installation Instructions**
 
-Follow these steps to build and test the `pyamtrack` Python module:
+Follow these steps to build and install the `pyamtrack` Python module as a wheel package.
 
-### **1. Create and Enter the Build Directory**
+### **1. Create a Virtual Environment**
 ```sh
-mkdir build
-cd build
+python3 -m venv venv
 ```
 
-### **2. Configure the Build with CMake**
+### **2. Activate the Virtual Environment**
 ```sh
-cmake .. -DGSL_INCLUDE_DIR="../vcpkg_installed/x64-windows/include" -DGSL_LIBRARY="../vcpkg_installed/x64-windows/lib/gsl.lib" -DGSL_CBLAS_LIBRARY="../vcpkg_installed/x64-windows/lib/gslcblas.lib" -G "Ninja"
+source venv/bin/activate
 ```
 
-### **3. Build the Project**
+### **3. Install Build Dependencies**
 ```sh
-cmake --build . --config Release --parallel
+pip install build
 ```
 
-### **4. Set `PYTHONPATH` to the Built Module**
+### **4. Build the Wheel Package**
 ```sh
-set PYTHONPATH=%cd%\Release;%PYTHONPATH%
+python -m build
 ```
 
-### **5. Test the Python Module**
-Run the following command to verify that the module is working:
+### **5. Install the Built Wheel**
+```sh
+pip install dist/*.whl
+```
+
+### **6. Test the Python Module**
 ```sh
 python -c "import pyamtrack; print(pyamtrack.__doc__)"
 ```
+
 Expected output:
 ```
 Python bindings for libamtrack
 ```
 
-## **Troubleshooting**
-- If you get an `ImportError`, make sure:
-  - The module was built in `build/Release`
-  - `PYTHONPATH` is correctly set
-  - You are using the correct Python version
-- If `pyamtrack.pyd` is missing, try a **clean rebuild**:
-  ```sh
-  rmdir /s /q build  # Delete the build directory
-  mkdir build && cd build
-  cmake .. -G "Ninja"
-  cmake --build . --config Release
-  ```
-
-## **Installation**
-To permanently install the module:
+## **Uninstallation**
+### **Remove the Installed Package**
 ```sh
-cmake --install .
+pip uninstall pyamtrack
 ```
 
-Now you can import `pyamtrack` from any Python script:
+## **Rebuilding the Package**
+### **Clean Previous Builds**
+```sh
+rm -rf build dist
+```
+
+### **Rebuild the Wheel**
+```sh
+python -m build
+```
+
+Now you can use `pyamtrack` in your Python scripts:
 ```python
 import pyamtrack
 print(pyamtrack.example_function(10))
 ```
+
