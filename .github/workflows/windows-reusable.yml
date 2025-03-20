@@ -71,9 +71,10 @@ jobs:
 
       - name: Build & Install pyamtrack (Windows)
         env:
-          CMAKE_PREFIX_PATH: ${{ github.workspace }}/vcpkg_installed/x64-windows
-          GSL_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
-          GETOPT_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
+#          CMAKE_PREFIX_PATH: ${{ github.workspace }}/vcpkg_installed/x64-windows
+          VCPKG_ROOT: "${{ github.workspace }}"
+#          GSL_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
+#          GETOPT_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
         working-directory: build
         shell: pwsh
         run: |
@@ -86,6 +87,8 @@ jobs:
         run: pip install --upgrade build
   
       - name: Build Windows Wheel
+        env:
+          VCPKG_ROOT: "${{ github.workspace }}"
         run: python -m build
 
       - name: Upload Windows Artifact
