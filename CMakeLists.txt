@@ -22,6 +22,11 @@ set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
 # Set GSL paths for Windows using VCPKG environment variable
 if (WIN32)
+    # Check if VCPKG_ROOT environment variable is set
+    if (NOT DEFINED ENV{VCPKG_ROOT})
+        message(FATAL_ERROR "VCPKG_ROOT environment variable is not set.")
+    endif()
+
     message(STATUS "VCPKG_ROOT (env variable): $ENV{VCPKG_ROOT}")
 
     # Set GSL include and library paths for VCPKG installation
@@ -44,10 +49,11 @@ if (WIN32)
         IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
     )
-else(
+else()
+    # Try to find GSL on non-Windows systems
     find_package(GSL REQUIRED)
-)
 endif()
+
 
 # Make libamtrack available for linking
 FetchContent_MakeAvailable(libamtrack)
@@ -77,7 +83,7 @@ target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 # Include libamtrack and GSL header directories
 target_include_directories(pyamtrack PRIVATE
     ${libamtrack_SOURCE_DIR}/include
-    ${GSL_INCLUDE_DIRS}
+#    ${GSL_INCLUDE_DIRS}
 )
 
 # Define export symbols for Windows shared libraries
