@@ -20,12 +20,8 @@ FetchContent_Declare(
 # (they require getopt, which is not needed here and adds extra dependencies)
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
-# Manually create GSL imported targets since they are not automatically available
-add_library(GSL::gsl UNKNOWN IMPORTED)
-add_library(GSL::gslcblas UNKNOWN IMPORTED)
-
 # Set GSL paths for Windows using VCPKG environment variable
-if (WIN32 AND DEFINED ENV{VCPKG_ROOT})
+if (WIN32)
     message(STATUS "VCPKG_ROOT (env variable): $ENV{VCPKG_ROOT}")
 
     # Set GSL include and library paths for VCPKG installation
@@ -35,15 +31,22 @@ if (WIN32 AND DEFINED ENV{VCPKG_ROOT})
     message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
     message(STATUS "Using GSL library: ${GSL_LIBRARY}")
     message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
+
+    # Manually create GSL imported targets since they are not automatically available
     # Configure the GSL targets with include and library paths
+    add_library(GSL::gsl UNKNOWN IMPORTED)
     set_target_properties(GSL::gsl PROPERTIES
         IMPORTED_LOCATION "${GSL_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
     )
+    add_library(GSL::gslcblas UNKNOWN IMPORTED)
     set_target_properties(GSL::gslcblas PROPERTIES
         IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
     )
+else(
+    find_package(GSL REQUIRED)
+)
 endif()
 
 # Make libamtrack available for linking

@@ -82,6 +82,9 @@ jobs:
           cmake --build . --parallel --config Release
           cmake --install . --prefix "$INSTALL_DIR" --config Release
 
+      - name: Install Python dependencies
+        run: pip install --upgrade build
+  
       - name: Build Windows Wheel
         run: python -m build
 
