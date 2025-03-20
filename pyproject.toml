@@ -16,4 +16,5 @@ dependencies = ["numpy"]
 cmake.minimum-version = "3.16"
 cmake.verbose = true
 cmake.args = ["-DCMAKE_BUILD_TYPE=Release"]
+
 wheel.packages = ["src"]

@@ -1,18 +1,23 @@
 cmake_minimum_required(VERSION 3.16)
 project(pyamtrack VERSION 0.1.0 LANGUAGES CXX C)
 
-# Enable C++17 or later
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 17) # Enable C++17 or later
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Enable position-independent code for shared library compilation
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# Use vcpkg toolchain if available
-if (DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
+message(STATUS "ENV:VCPKG_ROOT: $ENV{VCPKG_ROOT}")
 
+# Set GSL paths using environment variables
+if (WIN32 AND DEFINED ENV{VCPKG_ROOT})
+    set(GSL_INCLUDE_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/include")
+    set(GSL_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gsl.lib")
+    set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gslcblas.lib")
+    message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
+    message(STATUS "Using GSL library: ${GSL_LIBRARY}")
+    message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
+endif()
 
 # Fetch libamtrack
 include(FetchContent)
@@ -22,7 +27,8 @@ FetchContent_Declare(
     GIT_TAG master
 )
 
-# Set options before calling FetchContent_MakeAvailable
+# Disable building examples and tests for libamtrack 
+# (as they are not needed for pyamtrack and depend on getopt)
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
 FetchContent_MakeAvailable(libamtrack)
@@ -35,8 +41,25 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
-# Find dependencies via vcpkg
-find_package(GSL REQUIRED)
+set(GSL_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows")
+
+message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
+message(STATUS "Using GSL library: ${GSL_LIBRARY}")
+message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
+
+# Define the GSL targets manually since they don't exist
+add_library(GSL::gsl UNKNOWN IMPORTED)
+set_target_properties(GSL::gsl PROPERTIES
+    IMPORTED_LOCATION "${GSL_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
+)
+
+add_library(GSL::gslcblas UNKNOWN IMPORTED)
+set_target_properties(GSL::gslcblas PROPERTIES
+    IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
+)
+
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 # Define Python extension module
@@ -53,6 +76,7 @@ target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 # Include directories
 target_include_directories(pyamtrack PRIVATE
     ${libamtrack_SOURCE_DIR}/include  # Ensure libamtrack headers are available
+    ${GSL_INCLUDE_DIRS}
 )
 
 # Ensure Windows DLL exports symbols correctly
@@ -65,16 +89,10 @@ endif()
 include(GNUInstallDirs)
 
 # Ensure module is installed in the correct site-packages directory
-#install(TARGETS pyamtrack
-#    EXPORT pyamtrackTargets  # Ensure this export is defined
-#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
-#)
-
 install(TARGETS pyamtrack
-    EXPORT pyamtrackTargets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/python3.12/site-packages
+   EXPORT pyamtrackTargets  # Ensure this export is defined
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
 )
-
 
 # Configure CMake export settings
 install(EXPORT pyamtrackTargets
@@ -85,10 +103,11 @@ install(EXPORT pyamtrackTargets
 
 # Add CMake package configuration
 include(CMakePackageConfigHelpers)
+
 # Define the package version
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}  # This fixes the error
+    VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 configure_package_config_file(
@@ -96,7 +115,6 @@ configure_package_config_file(
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
 )
-
 
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
