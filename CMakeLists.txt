@@ -7,17 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Enable position-independent code for shared library compilation
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-message(STATUS "ENV:VCPKG_ROOT: $ENV{VCPKG_ROOT}")
-
-# Set GSL paths using environment variables
-if (WIN32 AND DEFINED ENV{VCPKG_ROOT})
-    set(GSL_INCLUDE_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/include")
-    set(GSL_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gsl.lib")
-    set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gslcblas.lib")
-    message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
-    message(STATUS "Using GSL library: ${GSL_LIBRARY}")
-    message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
-endif()
 
 # Fetch libamtrack
 include(FetchContent)
@@ -31,6 +20,34 @@ FetchContent_Declare(
 # (as they are not needed for pyamtrack and depend on getopt)
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
+# Set GSL paths using environment variables
+if (WIN32 AND DEFINED ENV{VCPKG_ROOT})
+
+    # Check if VCPKG_ROOT is set and use it to find GSL
+    message(STATUS "VCPKG_ROOT (env variable): $ENV{VCPKG_ROOT}")
+
+    # Set GSL include and library paths
+    set(GSL_INCLUDE_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/include")
+    set(GSL_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gsl.lib")
+    set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows/lib/gslcblas.lib")
+    message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
+    message(STATUS "Using GSL library: ${GSL_LIBRARY}")
+    message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
+
+    # Define the GSL targets manually since they don't exist
+    add_library(GSL::gsl UNKNOWN IMPORTED)
+    set_target_properties(GSL::gsl PROPERTIES
+        IMPORTED_LOCATION "${GSL_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
+    )
+
+    add_library(GSL::gslcblas UNKNOWN IMPORTED)
+    set_target_properties(GSL::gslcblas PROPERTIES
+        IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
+    )
+endif()
+
 FetchContent_MakeAvailable(libamtrack)
 
 # Fetch pybind11
@@ -40,25 +57,6 @@ FetchContent_Declare(
     GIT_TAG v2.13.6  # Ensure this is an appropriate stable version
 )
 FetchContent_MakeAvailable(pybind11)
-
-set(GSL_DIR "$ENV{VCPKG_ROOT}/vcpkg_installed/x64-windows")
-
-message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
-message(STATUS "Using GSL library: ${GSL_LIBRARY}")
-message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
-
-# Define the GSL targets manually since they don't exist
-add_library(GSL::gsl UNKNOWN IMPORTED)
-set_target_properties(GSL::gsl PROPERTIES
-    IMPORTED_LOCATION "${GSL_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
-)
-
-add_library(GSL::gslcblas UNKNOWN IMPORTED)
-set_target_properties(GSL::gslcblas PROPERTIES
-    IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
-)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
@@ -116,6 +114,7 @@ configure_package_config_file(
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/pyamtrack
 )
 
+# Install the package configuration files
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/pyamtrackConfigVersion.cmake"

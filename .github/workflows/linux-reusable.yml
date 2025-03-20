@@ -28,8 +28,7 @@ jobs:
           cmake --install .
       
       - name: Build Python Wheel
-        run: |
-          python -m build
+        run: python -m build
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4

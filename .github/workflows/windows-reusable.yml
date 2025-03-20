@@ -82,10 +82,15 @@ jobs:
           cmake --build . --parallel --config Release
           cmake --install . --prefix "$INSTALL_DIR" --config Release
 
+      - name: Build Windows Wheel
+        run: python -m build
+
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
           name: libamtrack-windows
-          path: ${{ runner.temp }}/libamtrack/
+          path: |
+            ${{ runner.temp }}/libamtrack/
+            dist/*.whl
           if-no-files-found: error
           retention-days: 5
