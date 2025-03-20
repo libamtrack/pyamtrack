@@ -83,7 +83,6 @@ target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 # Include libamtrack and GSL header directories
 target_include_directories(pyamtrack PRIVATE
     ${libamtrack_SOURCE_DIR}/include
-#    ${GSL_INCLUDE_DIRS}
 )
 
 # Define export symbols for Windows shared libraries
@@ -93,9 +92,10 @@ endif()
 
 # Set installation paths and rules for Python packaging
 include(GNUInstallDirs)
+
 install(TARGETS pyamtrack
    EXPORT pyamtrackTargets
-   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/lib/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}/site-packages
 )
 
 # Export CMake package configuration
