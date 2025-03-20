@@ -24,7 +24,7 @@ source venv/bin/activate
 
 ### **3. Install Build Dependencies**
 ```sh
-pip install build scikit-build-core pybind11 ninja
+pip install build
 ```
 
 ### **4. Build the Wheel Package**

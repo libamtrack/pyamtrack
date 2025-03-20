@@ -69,19 +69,16 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: .\vcpkg\vcpkg.exe install
 
-      - name: Build & Install pyamtrack (Windows)
-        env:
-#          CMAKE_PREFIX_PATH: ${{ github.workspace }}/vcpkg_installed/x64-windows
-          VCPKG_ROOT: "${{ github.workspace }}"
-#          GSL_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
-#          GETOPT_DIR: ${{ github.workspace }}/vcpkg_installed/x64-windows
-        working-directory: build
-        shell: pwsh
-        run: |
-          $INSTALL_DIR = "${{ runner.temp }}\libamtrack"
-          cmake .. -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
-          cmake --build . --parallel --config Release
-          cmake --install . --prefix "$INSTALL_DIR" --config Release
+      # - name: Build & Install pyamtrack (Windows)
+      #   env:
+      #     VCPKG_ROOT: "${{ github.workspace }}"
+      #   working-directory: build
+      #   shell: pwsh
+      #   run: |
+      #     $INSTALL_DIR = "${{ runner.temp }}\libamtrack"
+      #     cmake .. -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
+      #     cmake --build . --parallel --config Release
+      #     cmake --install . --prefix "$INSTALL_DIR" --config Release
 
       - name: Install Python dependencies
         run: pip install --upgrade build
