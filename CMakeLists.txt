@@ -56,11 +56,17 @@ if(WIN32)
   set(GSL_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gsl.lib")
   set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gslcblas.lib")
 
+  # Define the paths for the runtime DLLs (assuming they are in the bin folder).
+  set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
+  set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
+
   message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
   message(STATUS "Using GSL library: ${GSL_LIBRARY}")
   message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
+  message(STATUS "Using GSL DLL: ${GSL_DLL}")
+  message(STATUS "Using GSL CBLAS DLL: ${GSL_CBLAS_DLL}")
 
-  # Create imported targets for GSL libraries.
+  # Manually create imported targets for GSL libraries.
   add_library(GSL::gsl UNKNOWN IMPORTED)
   set_target_properties(GSL::gsl PROPERTIES
     IMPORTED_LOCATION "${GSL_LIBRARY}"
@@ -106,7 +112,7 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 # Install the _core module into the pyamtrack directory.
 install(TARGETS _core DESTINATION pyamtrack)
 
-# Install the libamtrack shared library into the same package directory.
+# Install the libamtrack shared library (amtrack.dll) into the same package directory.
 if(WIN32)
   install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
 else()
@@ -115,6 +121,11 @@ else()
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
   )
+endif()
+
+# Install the GSL DLLs on Windows so they are present in the package folder.
+if(WIN32)
+  install(FILES "${GSL_DLL}" "${GSL_CBLAS_DLL}" DESTINATION pyamtrack)
 endif()
 
 # Set the proper RPATH for the _core target based on the platform.
