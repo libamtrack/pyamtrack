@@ -21,13 +21,6 @@ jobs:
       - name: Install system packages
         run: brew install gsl
 
-      # - name: Build & Install pyamtrack (macOS)
-      #   run: |
-      #     mkdir build && cd build
-      #     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
-      #     cmake --build . --parallel
-      #     cmake --install .
-
       - name: Install Python dependencies
         run: pip install --upgrade build
   
