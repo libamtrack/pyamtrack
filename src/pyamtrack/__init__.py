@@ -3,8 +3,8 @@ import os
 import sys
 import ctypes
 
-# # Determine the directory where the pyamtrack package is installed.
-# package_dir = os.path.abspath(os.path.dirname(__file__))
+# Determine the directory where the pyamtrack package is installed.
+package_dir = os.path.abspath(os.path.dirname(__file__))
 # print("pyamtrack package directory:", package_dir)
 # print("Contents of pyamtrack package directory:", os.listdir(package_dir))
 
