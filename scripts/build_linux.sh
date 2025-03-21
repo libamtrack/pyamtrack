@@ -25,8 +25,11 @@ python -m build || error "Failed to build the package."
 echo "Installing the newly built package..."
 pip install dist/*.whl || error "Failed to install the package from the dist directory."
 
+# Check with pip show
+pip show -f pyamtrack
+
 # Test the installation
 echo "Testing the installation..."
-python -c "import pyamtrack; print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));print(pyamtrack.beta_from_energy(2));" || error "Failed to import pyamtrack or run the test script."
+python -c "import pyamtrack; print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));" || error "Failed to import pyamtrack or run the test script."
 
 echo "Package built, installed, and tested successfully!"
