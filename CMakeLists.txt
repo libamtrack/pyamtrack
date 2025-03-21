@@ -68,10 +68,10 @@ add_dependencies(pyamtrack amtrack)
 # Link libraries to the pyamtrack module
 target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 
-# Include libamtrack headers
-target_include_directories(pyamtrack PRIVATE
-    ${libamtrack_SOURCE_DIR}/include
-)
+# # Include libamtrack headers
+# target_include_directories(pyamtrack PRIVATE
+#     ${libamtrack_SOURCE_DIR}/include
+# )
 
 # Install the pyamtrack module and the libamtrack shared library
 install(TARGETS pyamtrack DESTINATION .)
@@ -82,7 +82,10 @@ install(TARGETS amtrack
 )
 
 
-# Ensure that the runtime library path (RPATH) is set correctly in the built module
-set_target_properties(pyamtrack PROPERTIES
-    INSTALL_RPATH "$ORIGIN/lib"
-)
+if(WIN32)
+  # On Windows, RPATH is not applicable.
+elseif(APPLE)
+  set_target_properties(pyamtrack PROPERTIES INSTALL_RPATH "@loader_path/lib")
+else()
+  set_target_properties(pyamtrack PROPERTIES INSTALL_RPATH "$ORIGIN/lib")
+endif()
