@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.15...3.29)
 project(pyamtrack VERSION 0.1.0 LANGUAGES CXX C)
 
+# Enable RPATH to include the installation directory
+set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
+# Enable pybind11 Python support
 set(PYBIND11_FINDPYTHON ON)
 find_package(pybind11 CONFIG REQUIRED)
 
@@ -13,8 +18,10 @@ FetchContent_Declare(
 )
 
 # Disable unnecessary examples and tests from libamtrack
-# (they require getopt, which is not needed here and adds extra dependencies)
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+
+# Ensure that the libamtrack library is properly built
+set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
 # Set GSL paths for Windows using VCPKG environment variable
 if (WIN32)
@@ -34,7 +41,6 @@ if (WIN32)
     message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
 
     # Manually create GSL imported targets since they are not automatically available
-    # Configure the GSL targets with include and library paths
     add_library(GSL::gsl UNKNOWN IMPORTED)
     set_target_properties(GSL::gsl PROPERTIES
         IMPORTED_LOCATION "${GSL_LIBRARY}"
@@ -50,19 +56,33 @@ else()
     find_package(GSL REQUIRED)
 endif()
 
-# Make libamtrack available for linking
+# Fetch and make libamtrack available
 FetchContent_MakeAvailable(libamtrack)
 
+# Add the pyamtrack Python module using pybind11
 pybind11_add_module(pyamtrack src/pyamtrack.cpp)
 
 # Ensure libamtrack is built before pyamtrack
 add_dependencies(pyamtrack amtrack)
 
+# Link libraries to the pyamtrack module
 target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 
-# Include libamtrack and GSL header directories
+# Include libamtrack headers
 target_include_directories(pyamtrack PRIVATE
     ${libamtrack_SOURCE_DIR}/include
 )
 
+# Install the pyamtrack module and the libamtrack shared library
 install(TARGETS pyamtrack DESTINATION .)
+install(TARGETS amtrack
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+)
+
+
+# Ensure that the runtime library path (RPATH) is set correctly in the built module
+set_target_properties(pyamtrack PROPERTIES
+    INSTALL_RPATH "$ORIGIN/lib"
+)
