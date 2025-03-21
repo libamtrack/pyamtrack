@@ -39,7 +39,7 @@ jobs:
           python3 -m venv venv
           source venv/bin/activate
           pip install dist/*.whl
-          python -c "import pyamtrack; print(pyamtrack.__doc__)"
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4

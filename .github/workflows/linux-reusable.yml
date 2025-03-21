@@ -28,7 +28,7 @@ jobs:
           python3 -m venv testenv
           source testenv/bin/activate
           pip install dist/*.whl
-          python -c "import pyamtrack; print('Successfully imported pyamtrack')"
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4

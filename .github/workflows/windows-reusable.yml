@@ -92,8 +92,8 @@ jobs:
         run: |
           python -m venv venv
           venv\Scripts\activate
-          pip install dist/*.whl
-          python -c "import pyamtrack; print(pyamtrack.__doc__)"
+          pip install dist\*.whl
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
