@@ -1,0 +1,39 @@
+name: "CodeQL Analysis"
+permissions:
+  contents: read
+  pull-requests: write
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [ 'cpp' ]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          # Use manual build mode so we can run our own build command
+          build-mode: manual
+
+      - name: Build project
+        run: |
+          mkdir build
+          cd build
+          # Configure your project; this will pick up the updated pybind11 from your CMakeLists.txt.
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          # Build your project
+          make -j$(nproc)
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v3

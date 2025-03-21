@@ -15,20 +15,22 @@ jobs:
           fetch-depth: 0
 
       - name: Install system packages
-        run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip
+        run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
 
-      - name: Install Python dependencies
+      - name: Install Python build tools
         run: pip install --upgrade build
-
-      # - name: Build & Install pyamtrack (Linux)
-      #   run: |
-      #     mkdir build && cd build
-      #     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
-      #     cmake --build . --parallel
-      #     cmake --install .
 
       - name: Build Python Wheel
         run: python -m build
+
+      - name: Install and Test Python Wheel
+        run: |
+          python3 -m venv testenv
+          source testenv/bin/activate
+          pip install dist/*.whl
+          pip show -f pyamtrack
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
+          python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
 
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v4

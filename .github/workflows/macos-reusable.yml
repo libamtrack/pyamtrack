@@ -21,18 +21,20 @@ jobs:
       - name: Install system packages
         run: brew install gsl
 
-      # - name: Build & Install pyamtrack (macOS)
-      #   run: |
-      #     mkdir build && cd build
-      #     cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
-      #     cmake --build . --parallel
-      #     cmake --install .
-
       - name: Install Python dependencies
         run: pip install --upgrade build
   
       - name: Build MacOS Wheel
         run: python -m build
+
+      - name: Test Wheel Installation
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install dist/*.whl
+          pip show -f pyamtrack
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
+          python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4

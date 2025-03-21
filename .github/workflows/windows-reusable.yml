@@ -69,17 +69,6 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: .\vcpkg\vcpkg.exe install
 
-      # - name: Build & Install pyamtrack (Windows)
-      #   env:
-      #     VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
-      #   working-directory: build
-      #   shell: pwsh
-      #   run: |
-      #     $INSTALL_DIR = "${{ runner.temp }}\libamtrack"
-      #     cmake .. -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 17 2022" -A x64
-      #     cmake --build . --parallel --config Release
-      #     cmake --install . --prefix "$INSTALL_DIR" --config Release
-
       - name: Install Python dependencies
         run: pip install --upgrade build
   
@@ -87,6 +76,23 @@ jobs:
         env:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: python -m build
+
+      - name: Test Wheel Installation
+        shell: pwsh
+        run: |
+          python -m venv venv
+          .\venv\Scripts\Activate.ps1
+          # Find the first wheel file that matches the pattern in the dist folder.
+          $wheel = Get-ChildItem -Path "dist\pyamtrack-*.whl" | Select-Object -First 1
+          if (-not $wheel) {
+              Write-Error "No wheel file matching 'dist\pyamtrack-*.whl' found!"
+          } else {
+              pip install $wheel.FullName
+          }
+          pip show -f pyamtrack
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
+          python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
+
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
