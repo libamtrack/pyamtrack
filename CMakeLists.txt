@@ -42,58 +42,22 @@ set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 ###############################################################################
 # Configure GSL dependency
 ###############################################################################
-if(WIN32)
-  # Use VCPKG for GSL on Windows.
-  if(NOT DEFINED ENV{VCPKG_INSTALLED_DIR})
-    message(FATAL_ERROR "VCPKG_INSTALLED_DIR environment variable is not set.")
-  endif()
+FetchContent_Declare(
+  gsl
+  GIT_REPOSITORY https://github.com/ampl/gsl.git
+  GIT_TAG v2.7.0
+)
 
-  set(GSL_INCLUDE_DIR "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/include")
-  set(GSL_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gsl.lib")
-  set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gslcblas.lib")
-  set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
-  set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
+set(GSL_BUILD_TESTS OFF CACHE BOOL "Disable GSL tests" FORCE)
+set(GSL_BUILD_DOCS OFF CACHE BOOL "Disable GSL documentation" FORCE)
+set(NO_AMPL_BINDINGS 1 CACHE BOOL "Disable AMPL bindings" FORCE)
+set(GSL_DISABLE_TESTS 1 CACHE BOOL "Disable GSL tests" FORCE)
+set(DOCUMENTATION OFF CACHE BOOL "Disable GSL documentation" FORCE)
 
-  # Create imported targets.
-  add_library(GSL::gsl UNKNOWN IMPORTED)
-  set_target_properties(GSL::gsl PROPERTIES
-    IMPORTED_LOCATION "${GSL_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
-  )
+FetchContent_MakeAvailable(gsl)
 
-  add_library(GSL::gslcblas UNKNOWN IMPORTED)
-  set_target_properties(GSL::gslcblas PROPERTIES
-    IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
-  )
-
-else()
-  # On macOS and Linux, use ExternalProject to compile GSL with shared libraries.
-  include(ExternalProject)
-
-  ExternalProject_Add(gsl
-      URL https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz
-      PREFIX ${CMAKE_BINARY_DIR}/gsl
-      CONFIGURE_COMMAND ./configure --prefix=${CMAKE_BINARY_DIR}/gsl/install --enable-shared --disable-static
-      BUILD_COMMAND make -j$(nproc)
-      INSTALL_COMMAND make install
-  )
-
-  add_library(GSL::gsl SHARED IMPORTED)
-  set_target_properties(GSL::gsl PROPERTIES
-      IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/gsl/install/lib/libgsl.so
-      INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/gsl/install/include
-  )
-
-  add_library(GSL::gslcblas SHARED IMPORTED)
-  set_target_properties(GSL::gslcblas PROPERTIES
-      IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/gsl/install/lib/libgslcblas.so
-      INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/gsl/install/include
-  )
-
-  add_dependencies(GSL::gsl gsl)
-  add_dependencies(GSL::gslcblas gsl)
-endif()
+add_library(GSL::gsl ALIAS gsl)
+add_library(GSL::gslcblas ALIAS gsl)
 
 ###############################################################################
 # Build libamtrack and the Python module (_core)
@@ -101,6 +65,8 @@ endif()
 FetchContent_MakeAvailable(libamtrack)
 
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
+
+add_dependencies(amtrack GSL::gsl GSL::gslcblas)
 
 add_dependencies(_core amtrack)
 
@@ -120,18 +86,11 @@ install(TARGETS _core DESTINATION pyamtrack)
 
 if(WIN32)
   install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
-  install(FILES "${GSL_DLL}" "${GSL_CBLAS_DLL}" DESTINATION pyamtrack)
 else()
   install(TARGETS amtrack
     LIBRARY DESTINATION pyamtrack
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
-  )
-
-  install(FILES
-    ${CMAKE_BINARY_DIR}/gsl/install/lib/libgsl.so
-    ${CMAKE_BINARY_DIR}/gsl/install/lib/libgslcblas.so
-    DESTINATION pyamtrack
   )
 endif()
 
