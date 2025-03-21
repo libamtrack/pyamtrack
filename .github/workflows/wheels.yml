@@ -63,7 +63,7 @@ jobs:
         CIBW_ARCHS_LINUX: auto64
         CIBW_ARCHS_WINDOWS: auto ARM64
         CIBW_BEFORE_ALL_LINUX: bash scripts/build_gsl.sh
-        CIBW_BUILD: cp312-* cp313-*
+        CIBW_BUILD: cp312-manylinux* cp313-manylinux*
 
     - name: Verify clean directory
       run: git diff --exit-code
