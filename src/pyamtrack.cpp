@@ -3,9 +3,9 @@
 
 namespace py = pybind11;
 
-// extern "C" {
-//     #include "AT_PhysicsRoutines.h"  // Include libamtrack header
-// }
+extern "C" {
+    #include "AT_PhysicsRoutines.h"  // Include libamtrack header
+}
 
 // // Wrapper function for AT_beta_from_E_single (from libamtrack)
 // double beta_from_energy(double E_MeV_u) {
