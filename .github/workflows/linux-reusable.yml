@@ -15,7 +15,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install system packages
-        run: sudo apt-get install -y --no-install-recommends python3-pip python3-venv
+        run: sudo apt-get install -y --no-install-recommends python3-pip python3-venv libgsl-dev
 
       - name: Install Python build tools
         run: pip install --upgrade build

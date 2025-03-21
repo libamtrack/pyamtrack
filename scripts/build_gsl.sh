@@ -1,6 +1,7 @@
 #!/bin/bash
 
 yum uninstall gsl-devel -y
+yum install -y wget
 
 GSL_VERSION=2.7
 GSL_URL=https://ftp.gnu.org/gnu/gsl/gsl-${GSL_VERSION}.tar.gz
