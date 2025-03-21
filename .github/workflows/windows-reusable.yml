@@ -93,6 +93,7 @@ jobs:
           python -m venv venv
           venv\Scripts\activate
           pip install dist\pyamtrack-0.1.0-cp39-cp39-win_amd64.whl
+          pip show -f pyamtrack
           python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
 
       - name: Upload Windows Artifact

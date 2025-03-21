@@ -1,3 +1,5 @@
+#include <Python.h>
+#include <frameobject.h>
 #include <pybind11/pybind11.h>
 #include <cmath>  // For additional mathematical operations
 

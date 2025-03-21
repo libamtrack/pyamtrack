@@ -75,11 +75,17 @@ target_link_libraries(pyamtrack PRIVATE amtrack GSL::gsl GSL::gslcblas)
 
 # Install the pyamtrack module and the libamtrack shared library
 install(TARGETS pyamtrack DESTINATION .)
-install(TARGETS amtrack
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
-  ARCHIVE DESTINATION lib
-)
+
+if(WIN32)
+  # On Windows, install the dependent DLL (amtrack.dll) in the same folder as the Python module.
+  install(TARGETS amtrack RUNTIME DESTINATION .)
+else()
+  install(TARGETS amtrack
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    ARCHIVE DESTINATION lib
+  )
+endif()
 
 
 if(WIN32)
