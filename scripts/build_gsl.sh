@@ -3,17 +3,26 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
-# Function to uninstall gsl-devel package
+# Function to uninstall gsl-devel package if it's installed
 uninstall_gsl_devel() {
     if command -v yum &>/dev/null; then
-        yum remove gsl-devel -y
+        if rpm -q gsl-devel &>/dev/null; then
+            yum remove gsl-devel -y
+        else
+            echo "gsl-devel is not installed. Skipping uninstallation."
+        fi
     elif command -v apk &>/dev/null; then
-        apk del gsl gsl-dev
+        if apk info --installed gsl &>/dev/null; then
+            apk del gsl gsl-dev
+        else
+            echo "gsl is not installed. Skipping uninstallation."
+        fi
     else
-        echo "Neither yum nor apk is available. Cannot uninstall gsl-devel."
+        echo "Neither yum nor apk is available. Cannot uninstall GSL."
         exit 1
     fi
 }
+
 
 # Function to install wget
 install_wget() {
