@@ -18,7 +18,6 @@ find_package(pybind11 CONFIG REQUIRED)
 # Configure RPATH for non-Windows platforms
 ###############################################################################
 if(NOT WIN32)
-  # Set the install RPATH to the directory containing the executable/library.
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
   set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
@@ -44,29 +43,18 @@ set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 # Configure GSL dependency
 ###############################################################################
 if(WIN32)
-  # On Windows, use VCPKG-installed GSL.
+  # Use VCPKG for GSL on Windows.
   if(NOT DEFINED ENV{VCPKG_INSTALLED_DIR})
     message(FATAL_ERROR "VCPKG_INSTALLED_DIR environment variable is not set.")
   endif()
 
-  message(STATUS "VCPKG_INSTALLED_DIR (env variable): $ENV{VCPKG_INSTALLED_DIR}")
-
-  # Define paths for GSL include and library files.
   set(GSL_INCLUDE_DIR "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/include")
   set(GSL_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gsl.lib")
   set(GSL_CBLAS_LIBRARY "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/lib/gslcblas.lib")
-
-  # Define the paths for the runtime DLLs (assuming they are in the bin folder).
   set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
   set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
 
-  message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
-  message(STATUS "Using GSL library: ${GSL_LIBRARY}")
-  message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
-  message(STATUS "Using GSL DLL: ${GSL_DLL}")
-  message(STATUS "Using GSL CBLAS DLL: ${GSL_CBLAS_DLL}")
-
-  # Manually create imported targets for GSL libraries.
+  # Create imported targets.
   add_library(GSL::gsl UNKNOWN IMPORTED)
   set_target_properties(GSL::gsl PROPERTIES
     IMPORTED_LOCATION "${GSL_LIBRARY}"
@@ -78,24 +66,44 @@ if(WIN32)
     IMPORTED_LOCATION "${GSL_CBLAS_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${GSL_INCLUDE_DIR}"
   )
+
 else()
-  # On non-Windows systems, try to locate GSL using find_package.
-  find_package(GSL REQUIRED)
+  # On macOS and Linux, use ExternalProject to compile GSL with shared libraries.
+  include(ExternalProject)
+
+  ExternalProject_Add(gsl
+      URL https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz
+      PREFIX ${CMAKE_BINARY_DIR}/gsl
+      CONFIGURE_COMMAND ./configure --prefix=${CMAKE_BINARY_DIR}/gsl/install --enable-shared --disable-static
+      BUILD_COMMAND make -j$(nproc)
+      INSTALL_COMMAND make install
+  )
+
+  add_library(GSL::gsl SHARED IMPORTED)
+  set_target_properties(GSL::gsl PROPERTIES
+      IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/gsl/install/lib/libgsl.so
+      INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/gsl/install/include
+  )
+
+  add_library(GSL::gslcblas SHARED IMPORTED)
+  set_target_properties(GSL::gslcblas PROPERTIES
+      IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/gsl/install/lib/libgslcblas.so
+      INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR}/gsl/install/include
+  )
+
+  add_dependencies(GSL::gsl gsl)
+  add_dependencies(GSL::gslcblas gsl)
 endif()
 
 ###############################################################################
 # Build libamtrack and the Python module (_core)
 ###############################################################################
-# Make libamtrack available.
 FetchContent_MakeAvailable(libamtrack)
 
-# Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
-# Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
 
-# Link _core against required libraries.
 target_link_libraries(_core PRIVATE
   pybind11::headers
   amtrack
@@ -103,34 +111,32 @@ target_link_libraries(_core PRIVATE
   GSL::gslcblas
 )
 
-# Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 ###############################################################################
 # Installation configuration
 ###############################################################################
-# Install the _core module into the pyamtrack directory.
 install(TARGETS _core DESTINATION pyamtrack)
 
-# Install the libamtrack shared library (amtrack.dll) into the same package directory.
 if(WIN32)
   install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
+  install(FILES "${GSL_DLL}" "${GSL_CBLAS_DLL}" DESTINATION pyamtrack)
 else()
   install(TARGETS amtrack
     LIBRARY DESTINATION pyamtrack
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
   )
+
+  install(FILES
+    ${CMAKE_BINARY_DIR}/gsl/install/lib/libgsl.so
+    ${CMAKE_BINARY_DIR}/gsl/install/lib/libgslcblas.so
+    DESTINATION pyamtrack
+  )
 endif()
 
-# Install the GSL DLLs on Windows so they are present in the package folder.
 if(WIN32)
-  install(FILES "${GSL_DLL}" "${GSL_CBLAS_DLL}" DESTINATION pyamtrack)
-endif()
-
-# Set the proper RPATH for the _core target based on the platform.
-if(WIN32)
-  # RPATH is not used on Windows.
+  # No RPATH needed on Windows.
 elseif(APPLE)
   set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
 else()
