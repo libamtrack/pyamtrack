@@ -2,7 +2,7 @@ name: Wheels
 permissions:
   contents: read
   pull-requests: write
-  
+
 on:
   workflow_dispatch:
   pull_request:
@@ -61,6 +61,7 @@ jobs:
       env:
         CIBW_ENABLE: cpython-prerelease
         CIBW_ARCHS_WINDOWS: auto ARM64
+        CIBW_BEFORE_BUILD_LINUX: bash scripts/build_gsl.sh
 
     - name: Verify clean directory
       run: git diff --exit-code
