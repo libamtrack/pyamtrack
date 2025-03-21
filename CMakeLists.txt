@@ -17,7 +17,7 @@ include(FetchContent)
 FetchContent_Declare(
     libamtrack
     GIT_REPOSITORY https://github.com/libamtrack/library.git
-    GIT_TAG master
+    GIT_TAG improve_build
 )
 
 # Disable unnecessary examples and tests from libamtrack
