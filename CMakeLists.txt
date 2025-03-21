@@ -29,7 +29,7 @@ include(FetchContent)
 FetchContent_Declare(
   libamtrack
   GIT_REPOSITORY https://github.com/libamtrack/library.git
-  GIT_TAG master
+  GIT_TAG 264-check-linking-to-cmake-gsl
 )
 
 # Disable building examples and installation of libamtrack.
@@ -93,6 +93,7 @@ else()
     ARCHIVE DESTINATION pyamtrack
   )
 endif()
+
 
 if(WIN32)
   # No RPATH needed on Windows.
