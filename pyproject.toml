@@ -16,5 +16,5 @@ license = { file = "LICENSE" }
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"
 
-[tool.cibuildwheel]
-build-frontend = "build[uv]"
+#[tool.cibuildwheel]
+#build-frontend = "build[uv]"
