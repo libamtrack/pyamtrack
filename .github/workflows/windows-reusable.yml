@@ -39,42 +39,42 @@ jobs:
           .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
         shell: pwsh
 
-      - name: Restore vcpkg deps cache
-        id: cache-vcpkg-deps
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/vcpkg_cache
-          key: vcpkg-deps-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-deps-${{ runner.os }}-
+      # - name: Restore vcpkg deps cache
+      #   id: cache-vcpkg-deps
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ github.workspace }}/vcpkg_cache
+      #     key: vcpkg-deps-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+      #     restore-keys: vcpkg-deps-${{ runner.os }}-
 
-      - name: Restore vcpkg installed cache
-        id: cache-vcpkg-installed
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/vcpkg_installed
-          key: vcpkg-installed-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
-          restore-keys: vcpkg-installed-${{ runner.os }}-
+      # - name: Restore vcpkg installed cache
+      #   id: cache-vcpkg-installed
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ${{ github.workspace }}/vcpkg_installed
+      #     key: vcpkg-installed-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
+      #     restore-keys: vcpkg-installed-${{ runner.os }}-
 
-      - name: Create vcpkg directories if needed
-        if: steps.cache-vcpkg-deps.outputs.cache-hit != 'true' || steps.cache-vcpkg-installed.outputs.cache-hit != 'true'
-        run: |
-          mkdir -Force "${{ github.workspace }}/vcpkg_cache"
-          mkdir -Force "${{ github.workspace }}/vcpkg_installed"
-        shell: pwsh
+      # - name: Create vcpkg directories if needed
+      #   if: steps.cache-vcpkg-deps.outputs.cache-hit != 'true' || steps.cache-vcpkg-installed.outputs.cache-hit != 'true'
+      #   run: |
+      #     mkdir -Force "${{ github.workspace }}/vcpkg_cache"
+      #     mkdir -Force "${{ github.workspace }}/vcpkg_installed"
+      #   shell: pwsh
 
-      - name: Install vcpkg dependencies
-        if: steps.cache-vcpkg-deps.outputs.cache-hit != 'true' || steps.cache-vcpkg-installed.outputs.cache-hit != 'true'
-        env:
-          VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
-          VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
-        run: .\vcpkg\vcpkg.exe install
+      # - name: Install vcpkg dependencies
+      #   if: steps.cache-vcpkg-deps.outputs.cache-hit != 'true' || steps.cache-vcpkg-installed.outputs.cache-hit != 'true'
+      #   env:
+      #     VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_cache
+      #     VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+      #   run: .\vcpkg\vcpkg.exe install
 
       - name: Install Python dependencies
         run: pip install --upgrade build
   
       - name: Build Windows Wheel
-        env:
-          VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
+        # env:
+        #   VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: python -m build
 
       - name: Test Wheel Installation
