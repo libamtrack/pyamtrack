@@ -48,6 +48,14 @@ FetchContent_Declare(
   GIT_TAG v2.7.0
 )
 
+# Set GSL installation directories
+set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/pyamtrack)
+set(GSL_CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+set(GSL_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
+set(GSL_LIBRARY_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(GSL_CMAKE_CONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/gsl-2.7)
+set(GSL_PKGCONFIG_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+
 set(GSL_BUILD_TESTS OFF CACHE BOOL "Disable GSL tests" FORCE)
 set(GSL_BUILD_DOCS OFF CACHE BOOL "Disable GSL documentation" FORCE)
 set(NO_AMPL_BINDINGS 1 CACHE BOOL "Disable AMPL bindings" FORCE)
@@ -83,6 +91,12 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 # Installation configuration
 ###############################################################################
 install(TARGETS _core DESTINATION pyamtrack)
+install(TARGETS gsl gslcblas
+  LIBRARY DESTINATION pyamtrack
+  ARCHIVE DESTINATION pyamtrack
+  RUNTIME DESTINATION pyamtrack
+  INCLUDES DESTINATION pyamtrack/include
+)
 
 if(WIN32)
   install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
