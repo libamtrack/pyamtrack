@@ -23,6 +23,8 @@ FetchContent_Declare(
 # Disable unnecessary examples and tests from libamtrack
 set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
 
+set(LIBAMTRACK_INSTALL OFF CACHE BOOL "Disable amtrack installation" FORCE)
+
 # Ensure that the libamtrack library is properly built
 set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
