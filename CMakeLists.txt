@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.15...3.29)
 project(pyamtrack VERSION 0.1.0 LANGUAGES CXX C)
 
-# Enable RPATH to include the installation directory
-set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
-set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+if(NOT WIN32)
+  # Enable RPATH to include the installation directory on Unix/Apple platforms
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+endif()
+
 
 # Enable pybind11 Python support
 set(PYBIND11_FINDPYTHON ON)
@@ -78,7 +81,7 @@ install(TARGETS pyamtrack DESTINATION .)
 
 if(WIN32)
   # On Windows, install the dependent DLL (amtrack.dll) in the same folder as the Python module.
-  install(TARGETS amtrack RUNTIME DESTINATION .)
+#   install(TARGETS amtrack RUNTIME DESTINATION .)
 else()
   install(TARGETS amtrack
     LIBRARY DESTINATION lib
