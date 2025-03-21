@@ -12,4 +12,4 @@ tar -xvf ${GSL_TAR}
 cd ${GSL_DIR}
 ./configure 
 make -j
-sudo make install
+make install
