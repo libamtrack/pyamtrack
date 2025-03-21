@@ -3,11 +3,36 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Function to uninstall gsl-devel package
+uninstall_gsl_devel() {
+    if command -v yum &>/dev/null; then
+        yum remove gsl-devel -y
+    elif command -v apk &>/dev/null; then
+        apk del gsl gsl-dev
+    else
+        echo "Neither yum nor apk is available. Cannot uninstall gsl-devel."
+        exit 1
+    fi
+}
+
+# Function to install wget
+install_wget() {
+    if command -v yum &>/dev/null; then
+        yum install -y wget
+    elif command -v apk &>/dev/null; then
+        apk add wget
+    else
+        echo "Neither yum nor apk is available. Cannot install wget."
+        exit 1
+    fi
+}
+
 # Uninstall gsl-devel package if it's installed
-yum remove gsl-devel -y
+uninstall_gsl_devel
 
 # Install wget if it's not already installed
-yum install -y wget
+install_wget
+
 
 # Define the version of GSL to install
 GSL_VERSION=2.7
