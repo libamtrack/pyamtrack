@@ -83,7 +83,7 @@ install(TARGETS pyamtrack DESTINATION .)
 
 if(WIN32)
   # On Windows, install the dependent DLL (amtrack.dll) in the same folder as the Python module.
-#   install(TARGETS amtrack RUNTIME DESTINATION .)
+  install(TARGETS amtrack RUNTIME DESTINATION .)
 else()
   install(TARGETS amtrack
     LIBRARY DESTINATION lib
