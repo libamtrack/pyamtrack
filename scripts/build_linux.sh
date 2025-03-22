@@ -32,4 +32,6 @@ pip show -f pyamtrack
 echo "Testing the installation..."
 python -c "import pyamtrack; print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2)); print(pyamtrack.beta_from_energy(2));" || error "Failed to import pyamtrack or run the test script."
 
+python -c "import pyamtrack; print(pyamtrack.electron_range(100));" || error "Failed to import pyamtrack or run the test script."
+
 echo "Package built, installed, and tested successfully!"

@@ -15,3 +15,6 @@ license = { file = "LICENSE" }
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"
+
+[tool.cibuildwheel.linux]
+before-all = "./scripts/build_gsl.sh"
