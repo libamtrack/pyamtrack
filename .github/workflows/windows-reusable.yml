@@ -92,7 +92,7 @@ jobs:
           pip show -f pyamtrack
           python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack)); print(pyamtrack.calculate_velocity(2));"
           python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
-
+          python -c "import pyamtrack; print(pyamtrack.electron_range(150));"
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
