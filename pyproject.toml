@@ -15,3 +15,8 @@ license = { file = "LICENSE" }
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"
+
+[tool.cibuildwheel.linux]
+before-all = "./scripts/build_gsl.sh"
+build = "cp311-manylinux* cp312-manylinux* cp313-manylinux*"
+archs = ["auto64"]
