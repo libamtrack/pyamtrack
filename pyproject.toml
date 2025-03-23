@@ -22,6 +22,6 @@ build = "cp311-manylinux* cp312-manylinux* cp313-manylinux*"
 archs = ["auto64"]
 
 [tool.cibuildwheel.windows]
-before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl_windows.ps1"
+before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
 build = "cp311-win_amd64 cp312-win_amd64 cp313-win_amd64"
 environment = { VCPKG_INSTALLED_DIR = "C:/vcpkg_installed" }
