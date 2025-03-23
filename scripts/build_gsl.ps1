@@ -14,7 +14,7 @@ if (-Not (Test-Path "$workspace\vcpkg")) {
 
 # Install dependencies using vcpkg
 $env:VCPKG_DEFAULT_BINARY_CACHE = $vcpkgCache
-$env:VCPKG_INSTALLED_DIR = $vcpkgInstalled
+$env:VCPKG_INSTALLED_DIR = "$workspace/vcpkg_installed"
 & "$workspace\vcpkg\vcpkg.exe" install
 
 Write-Output "VCPKG setup completed."
