@@ -22,8 +22,6 @@ skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
 
 [tool.cibuildwheel.linux]
 before-all = "./scripts/build_gsl.sh"
-build = "cp311-manylinux* cp312-manylinux* cp313-manylinux*"
 
 [tool.cibuildwheel.windows]
 before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
-build = "cp311-win_amd64 cp312-win_amd64 cp313-win_amd64"
