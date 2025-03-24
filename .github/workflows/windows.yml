@@ -4,17 +4,14 @@ permissions:
   pull-requests: write
 
 on:
-  workflow_call:
-    inputs:
-      linux_status:
-        description: 'Status of the Linux Build job'
-        required: true
-        type: string
+    workflow_dispatch:
+    push:
+      branches:
+       - master
 
 jobs:
   build_and_test_windows:
     runs-on: windows-latest
-    if: ${{ inputs.linux_status == 'success' }}
     steps:
       - uses: actions/checkout@v4
         with:
