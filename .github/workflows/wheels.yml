@@ -59,7 +59,8 @@ jobs:
 
     - uses: pypa/cibuildwheel@v2.22
       env:
-        CIBW_ENVIRONMENT: VCPKG_INSTALLED_DIR="${{ github.workspace }}/vcpkg_installed"
+        CIBW_ENVIRONMENT_WINDOWS: VCPKG_INSTALLED_DIR=${{ github.workspace }}/vcpkg_installed
+        CIBW_TEST_COMMAND: python -c "import pyamtrack; print(pyamtrack.electron_range(100));"
 
     - name: Verify clean directory
       run: git diff --exit-code
