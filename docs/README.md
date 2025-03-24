@@ -70,3 +70,29 @@ import pyamtrack
 print(pyamtrack.beta_from_energy(150))
 ```
 
+### Building with cibuildwheel (on Linux)
+
+```sh
+pip install cibuildwheel
+```
+
+```sh
+cibuildwheel --only "cp312-manylinux_x86_64"
+```
+
+To test installed package type in `venv`:
+
+```sh
+pip install wheelhouse/*whl
+```
+
+Then
+
+```python
+>>> import pyamtrack
+>>> pyamtrack.electron_range(120)
+0.0006700734300203331
+>>> pyamtrack.__version__
+'0.14.1'
+>>> 
+```
