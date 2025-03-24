@@ -5,7 +5,7 @@ import ctypes
 
 try:
     import pyamtrack._version as v
-    __version__ = v.__version__
+    __version__ = v.version
 except ImportError:
     __version__ = "0.0.0"  # Fallback version
 
@@ -34,6 +34,6 @@ if sys.platform == "win32":
         except OSError as e:
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
-from ._core import __doc__, __version__, calculate_velocity, beta_from_energy, electron_range
+from ._core import __doc__, calculate_velocity, beta_from_energy, electron_range
 
 __all__ = ["__doc__", "__version__", "calculate_velocity", "beta_from_energy", "electron_range"]
