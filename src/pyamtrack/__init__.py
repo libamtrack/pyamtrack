@@ -2,7 +2,7 @@ from __future__ import annotations
 import os
 import sys
 import ctypes
-import ._version as v
+import pyamtrack._version as v
 
 __version__ = v.__version__
 
