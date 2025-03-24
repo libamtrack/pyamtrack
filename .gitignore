@@ -269,3 +269,6 @@ pyrightconfig.json
 vcpkg
 vcpkg_installed
 usr
+
+# Ignore auto-generated version file
+src/pyamtrack/_version.py

@@ -109,6 +109,8 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 ###############################################################################
 # Installation configuration
 ###############################################################################
+message(STATUS "Project version: ${PROJECT_VERSION}")
+
 # Install the _core module into the pyamtrack directory.
 install(TARGETS _core DESTINATION pyamtrack)
 

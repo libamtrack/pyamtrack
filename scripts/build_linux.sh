@@ -34,4 +34,6 @@ python -c "import pyamtrack; print(dir(pyamtrack)); print(pyamtrack.calculate_ve
 
 python -c "import pyamtrack; print(pyamtrack.electron_range(100));" || error "Failed to import pyamtrack or run the test script."
 
+python -c "import pyamtrack; print(pyamtrack.__version__);" || error "Failed to import pyamtrack or run the test script."
+
 echo "Package built, installed, and tested successfully!"
