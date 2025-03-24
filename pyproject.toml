@@ -23,5 +23,8 @@ skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
 [tool.cibuildwheel.linux]
 before-all = "./scripts/build_gsl.sh"
 
+[tool.cibuildwheel.macos]
+before-all = "./scripts/build_gsl.sh"
+
 [tool.cibuildwheel.windows]
 before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
