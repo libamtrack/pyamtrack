@@ -16,12 +16,13 @@ license = { file = "LICENSE" }
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"
 
+[tool.cibuildwheel]
+archs = ["auto64"]
+
 [tool.cibuildwheel.linux]
 before-all = "./scripts/build_gsl.sh"
 build = "cp311-manylinux* cp312-manylinux* cp313-manylinux*"
-archs = ["auto64"]
 
 [tool.cibuildwheel.windows]
 before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
 build = "cp311-win_amd64 cp312-win_amd64 cp313-win_amd64"
-#environment = { VCPKG_INSTALLED_DIR = "D:/a/pyamtrack/pyamtrack/vcpkg_installed" }

@@ -55,11 +55,9 @@ jobs:
       with:
         submodules: true
 
-    - uses: astral-sh/setup-uv@v4
-
     - uses: pypa/cibuildwheel@v2.22
       env:
-        CIBW_ENVIRONMENT_WINDOWS: VCPKG_INSTALLED_DIR=""D:/a/pyamtrack/pyamtrack/vcpkg_installed/x64-windows/include""
+        CIBW_ENVIRONMENT_WINDOWS: VCPKG_INSTALLED_DIR="D:/a/pyamtrack/pyamtrack/vcpkg_installed/"
         CIBW_TEST_COMMAND: python -c "import pyamtrack; print(pyamtrack.electron_range(100));"
 
     - name: Verify clean directory
