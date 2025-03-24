@@ -2,9 +2,13 @@ from __future__ import annotations
 import os
 import sys
 import ctypes
-import pyamtrack._version as v
 
-__version__ = v.__version__
+try:
+    import pyamtrack._version as v
+    __version__ = v.__version__
+except ImportError:
+    __version__ = "0.0.0"  # Fallback version
+
 
 # Determine the directory where the pyamtrack package is installed.
 package_dir = os.path.abspath(os.path.dirname(__file__))
