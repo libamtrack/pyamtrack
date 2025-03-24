@@ -2,6 +2,13 @@ from __future__ import annotations
 import os
 import sys
 import ctypes
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("package-name")
+except PackageNotFoundError:
+    # package is not installed
+    pass
 
 # Determine the directory where the pyamtrack package is installed.
 package_dir = os.path.abspath(os.path.dirname(__file__))
