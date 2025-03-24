@@ -18,6 +18,7 @@ minimum-version = "build-system.requires"
 
 [tool.cibuildwheel]
 archs = ["auto64"]
+skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
 
 [tool.cibuildwheel.linux]
 before-all = "./scripts/build_gsl.sh"
