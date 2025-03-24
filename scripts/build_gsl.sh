@@ -66,10 +66,10 @@ GSL_TAR="${GSL_DIR}.tar.gz"
 
 # Download and extract GSL
 echo "Downloading GSL version ${GSL_VERSION}..."
-wget -O "${GSL_TAR}" "${GSL_URL}"
+wget -q -O "${GSL_TAR}" "${GSL_URL}"
 
 echo "Extracting GSL..."
-tar -xvf "${GSL_TAR}"
+tar -xf "${GSL_TAR}"
 
 # Build and install GSL
 cd "${GSL_DIR}"
