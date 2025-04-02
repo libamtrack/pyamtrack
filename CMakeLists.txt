@@ -92,16 +92,28 @@ FetchContent_MakeAvailable(libamtrack)
 # Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
+# Set the C++ standard for the _core target.
+add_library(beta_from_energy src/beta_from_energy.cpp)
+
 # Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
 
-# Link _core against required libraries.
+# Link _core and beta_from_energy against required libraries.
 target_link_libraries(_core PRIVATE
+  pybind11::headers
+  amtrack
+  beta_from_energy  # Ensure beta_from_energy is linked here
+  GSL::gsl
+  GSL::gslcblas
+)
+target_link_libraries(beta_from_energy PRIVATE
   pybind11::headers
   amtrack
   GSL::gsl
   GSL::gslcblas
 )
+
+target_include_directories(beta_from_energy PRIVATE ${Python_INCLUDE_DIRS})
 
 # Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
@@ -117,8 +129,16 @@ install(TARGETS _core DESTINATION pyamtrack)
 # Install the libamtrack shared library (amtrack.dll) into the same package directory.
 if(WIN32)
   install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
+  install(TARGETS beta_from_energy RUNTIME DESTINATION pyamtrack)
 else()
   install(TARGETS amtrack
+    LIBRARY DESTINATION pyamtrack
+    RUNTIME DESTINATION pyamtrack
+    ARCHIVE DESTINATION pyamtrack
+  )
+
+    # Install the beta_from_energy shared library into the pyamtrack directory.
+  install(TARGETS beta_from_energy
     LIBRARY DESTINATION pyamtrack
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
