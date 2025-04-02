@@ -80,8 +80,7 @@ print(pyamtrack.beta_from_energy(150))
 
 ### Building with cibuildwheel (on Linux)
 
-The command below downloads and compiles GSL, it make take much longer. 
-
+The command below downloads and compiles GSL, it may take much longer.
 ```sh
 pip install cibuildwheel
 ```
