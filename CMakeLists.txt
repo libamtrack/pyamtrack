@@ -122,6 +122,16 @@ target_link_libraries(converters PRIVATE
   GSL::gslcblas
 )
 
+# Add this block to explicitly link Python on Windows
+if(WIN32)
+  # Ensure Python library is linked
+  target_link_libraries(converters PRIVATE ${Python_LIBRARIES})
+
+  # Ensure _core also links against Python
+  target_link_libraries(_core PRIVATE ${Python_LIBRARIES})
+  target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
+endif()
+
 target_include_directories(converters PRIVATE ${Python_INCLUDE_DIRS})
 
 # Pass the project version as a preprocessor definition.
