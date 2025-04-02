@@ -10,7 +10,7 @@ readme = "README.md"
 authors = [{ name = "Your Name", email = "your.email@example.com" }]
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-#dependencies = ["numpy"]
+dependencies = ["numpy"]
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
@@ -27,6 +27,8 @@ write_to = "src/pyamtrack/_version.py"
 [tool.cibuildwheel]
 archs = ["auto64"]
 skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
+test-requires = "pytest"
+test-command = "pytest {project}/tests"
 
 [tool.cibuildwheel.linux]
 before-all = "./scripts/build_gsl.sh"

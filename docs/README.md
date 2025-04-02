@@ -28,8 +28,16 @@ pip install build
 ```
 
 ### **4. Build the Wheel Package**
+
+Clean all previously generated packages:
+
 ```sh
-python -m build
+rm -rf dist/
+```
+
+The command below assumes that GSL is installed in your OS.
+```sh
+python -m build --wheel
 ```
 
 ### **5. Install the Built Wheel**
@@ -39,7 +47,7 @@ pip install dist/*.whl
 
 ### **6. Test the Python Module**
 ```sh
-python -c "import pyamtrack; print(pyamtrack.__doc__)"
+python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150))"
 ```
 
 Expected output:
@@ -61,7 +69,7 @@ rm -rf build dist
 
 ### **Rebuild the Wheel**
 ```sh
-python -m build
+python -m build --wheel
 ```
 
 Now you can use `pyamtrack` in your Python scripts:
@@ -72,6 +80,7 @@ print(pyamtrack.beta_from_energy(150))
 
 ### Building with cibuildwheel (on Linux)
 
+The command below downloads and compiles GSL, it may take much longer.
 ```sh
 pip install cibuildwheel
 ```

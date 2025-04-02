@@ -44,6 +44,16 @@ jobs:
           python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
           python -c "import pyamtrack; print(pyamtrack.electron_range(150));"
 
+      - name: Install pytest and test dependencies
+        run: |
+          source venv/bin/activate
+          pip install pytest
+
+      - name: Run pytest
+        run: |
+          source venv/bin/activate
+          pytest tests/
+
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
         with:
