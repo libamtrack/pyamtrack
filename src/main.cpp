@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>  // Include NumPy support
 #include <pybind11/stl.h>    // Include support for Python lists
+#include <cstddef>           // Include for std::ptrdiff_t
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -29,7 +30,7 @@ py::object beta_from_energy(py::object input) {
         py::array_t<double> result(energies.size());
         auto res = result.mutable_unchecked<1>();
 
-        for (ssize_t i = 0; i < r.size(); i++) {
+        for (std::ptrdiff_t i = 0; i < r.size(); i++) {  // Use std::ptrdiff_t instead of ssize_t
             res(i) = beta_from_energy_single(r(i));
         }
 
@@ -47,6 +48,7 @@ py::object beta_from_energy(py::object input) {
         throw std::invalid_argument("Input must be a float, int, NumPy array, or a Python list of numbers.");
     }
 }
+
 PYBIND11_MODULE(_core, m) {
     m.doc() = "Python bindings for libamtrack";
 
