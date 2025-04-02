@@ -26,7 +26,7 @@ def test_beta_negative_energy():
 def test_beta_non_float_energy():
     """Test the beta_from_energy function with non-floating point energy."""
     energy = "100"  # Invalid type
-    with pytest.raises(TypeError, match="beta_from_energy\\(\\): incompatible function arguments"):
+    with pytest.raises(ValueError, match="Input must be a float, int, NumPy array, or a Python list of numbers"):
         pyamtrack.beta_from_energy(energy)
 
 def test_beta_increasing_energy():
