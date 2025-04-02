@@ -60,6 +60,10 @@ if(WIN32)
   set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
   set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
 
+  # Normalize paths to use forward slashes
+  file(TO_CMAKE_PATH "${GSL_DLL}" GSL_DLL)
+  file(TO_CMAKE_PATH "${GSL_CBLAS_DLL}" GSL_CBLAS_DLL)
+
   message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
   message(STATUS "Using GSL library: ${GSL_LIBRARY}")
   message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
