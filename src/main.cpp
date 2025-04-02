@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "beta_from_energy.h"
+#include "converters/beta_from_energy.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -7,7 +7,6 @@
 namespace py = pybind11;
 
 extern "C" {
-    #include "AT_PhysicsRoutines.h"
     #include "AT_ElectronRange.h"
 }
 
