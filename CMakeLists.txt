@@ -94,9 +94,9 @@ endif()
 FetchContent_MakeAvailable(libamtrack)
 
 # Add dynamic lookup for macOS to resolve Python symbols at runtime.
-if(APPLE)
-  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-endif()
+# if(APPLE)
+#   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+# endif()
 
 
 # Create the Python module from the source file.
