@@ -26,13 +26,21 @@ PYBIND11_MODULE(_core, m) {
         )pbdoc"
     );
 
-    m.def("calculate_velocity", [](double beta) {
-        const double speed_of_light = 299792458.0;
-        return beta * speed_of_light;
-    }, "Calculate velocity from beta (m/s)");
+    m.def(
+        "electron_range",
+        &electron_range,
+        py::arg("input"),
+        py::return_value_policy::automatic,
+        R"pbdoc(
+        Calculate electron range (m).
 
-    // Use the function from the new implementation
-    m.def("electron_range", &electron_range, "Calculate electron range (m)");
+        Parameters:
+            input (float | int | numpy.ndarray | list): The energy per nucleon in MeV/u. Can be a single value, a NumPy array, or a Python list.
+
+        Returns:
+            float | numpy.ndarray | list: The calculated electron range(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
+        )pbdoc"
+    );
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);

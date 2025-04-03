@@ -18,8 +18,9 @@ def test_electron_range_zero_energy():
 def test_electron_range_negative_energy():
     """Test the electron_range function with negative energy."""
     energy = -10.0  # MeV/u
-    with pytest.raises(ValueError, match="Energy must be non-negative"):
-        pyamtrack.electron_range(energy)
+    # check if range is not-a-number (NaN)
+    range_m = pyamtrack.electron_range(energy)
+    assert np.isnan(range_m), "Electron range should be NaN for negative energy"
 
 def test_electron_range_numpy_array():
     """Test the electron_range function with a NumPy array."""
