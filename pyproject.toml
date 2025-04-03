@@ -26,11 +26,18 @@ classifiers = [
   "Intended Audience :: Science/Research",
 ]
 
+[project.urls]
+Homepage = "https://libamtrack.github.io/"
+Documentation = "https://libamtrack.github.io/docs/python/"
+Repository = "https://github.com/libamtrack/pyamtrack.git"
+Issues = "https://github.com/libamtrack/pyamtrack/issues"
+
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
 minimum-version = "build-system.requires"
 metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
 sdist.include = ["src/pyamtrack/_version.py"]
+
 wheel.exclude = ["share/libamtrack/VERSION", "include/AT_Version.h", "lib/cmake/**"]
 
 [tool.setuptools_scm]

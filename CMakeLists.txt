@@ -11,7 +11,10 @@ project(
 ###############################################################################
 # Locate Python and pybind11
 ###############################################################################
+# Find Python interpreter, development headers, and library.
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+
+# Find pybind11 for Python bindings.
 find_package(pybind11 CONFIG REQUIRED)
 
 ###############################################################################
@@ -22,23 +25,6 @@ if(NOT WIN32)
   set(CMAKE_INSTALL_RPATH "$ORIGIN")
   set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
-
-###############################################################################
-# Fetch and configure libamtrack from GitHub
-###############################################################################
-include(FetchContent)
-FetchContent_Declare(
-  libamtrack
-  GIT_REPOSITORY https://github.com/libamtrack/library.git
-  GIT_TAG master
-)
-
-# Disable building examples and installation of libamtrack.
-set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
-set(LIBAMTRACK_INSTALL OFF CACHE BOOL "Disable amtrack installation" FORCE)
-
-# Ensure that libamtrack is built as shared libraries.
-set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
 
 ###############################################################################
 # Configure GSL dependency
@@ -60,7 +46,7 @@ if(WIN32)
   set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
   set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
 
-  # Normalize paths to use forward slashes
+  # Normalize paths to use forward slashes for compatibility.
   file(TO_CMAKE_PATH "${GSL_DLL}" GSL_DLL)
   file(TO_CMAKE_PATH "${GSL_CBLAS_DLL}" GSL_CBLAS_DLL)
 
@@ -88,11 +74,32 @@ else()
 endif()
 
 ###############################################################################
-# Build libamtrack and the Python module (_core)
+# Fetch and configure libamtrack from GitHub
 ###############################################################################
-# Make libamtrack available.
+# Fetch the libamtrack library from its GitHub repository.
+include(FetchContent)
+FetchContent_Declare(
+  libamtrack
+  GIT_REPOSITORY https://github.com/libamtrack/library.git
+  GIT_TAG master
+)
+
+# Disable building examples and installation of libamtrack.
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+set(LIBAMTRACK_INSTALL OFF CACHE BOOL "Disable amtrack installation" FORCE)
+
+# Ensure that libamtrack is built as shared libraries.
+set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
+
+# Make libamtrack available for the project.
 FetchContent_MakeAvailable(libamtrack)
 
+# Link libamtrack against GSL libraries.
+target_link_libraries(amtrack PRIVATE GSL::gsl GSL::gslcblas)
+
+###############################################################################
+# Build the Python module (_core) and converters library
+###############################################################################
 # Add dynamic lookup for macOS to resolve Python symbols at runtime.
 if(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
@@ -101,10 +108,10 @@ endif()
 # Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
-# Use GLOB to include all .cpp files in the src/converters directory
+# Use GLOB to include all .cpp files in the src/converters directory.
 file(GLOB CONVERTER_SOURCES src/converters/*.cpp)
 
-# Create the converters library
+# Create the converters library.
 add_library(converters ${CONVERTER_SOURCES})
 
 # Ensure that _core is built after libamtrack.
@@ -125,15 +132,15 @@ target_link_libraries(converters PRIVATE
   GSL::gslcblas
 )
 
-# Add this block to explicitly link Python on Windows
+# Add this block to explicitly link Python on Windows.
 if(WIN32)
-  # Ensure Python library is linked
+  # Ensure Python library is linked.
   target_link_libraries(converters PRIVATE ${Python_LIBRARIES})
-
-  # Ensure _core also links against Python
   target_link_libraries(_core PRIVATE ${Python_LIBRARIES})
   target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
 endif()
+
+# Include Python headers for converters.
 target_include_directories(converters PRIVATE ${Python_INCLUDE_DIRS})
 
 # Pass the project version as a preprocessor definition.
@@ -163,7 +170,9 @@ if(WIN32)
   install(FILES "${GSL_DLL}" "${GSL_CBLAS_DLL}" DESTINATION pyamtrack)
 endif()
 
-# Set the proper RPATH for the _core target based on the platform.
+###############################################################################
+# Configure RPATH for installed targets
+###############################################################################
 if(WIN32)
   # RPATH is not used on Windows.
 elseif(APPLE)
