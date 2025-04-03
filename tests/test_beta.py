@@ -74,3 +74,9 @@ def test_beta_invalid_python_list():
     energies = ["invalid", 100.0]  # Mixed types
     with pytest.raises(RuntimeError, match=r"Unable to cast Python instance of type <class 'str'> to C\+\+ type.*"):
         pyamtrack.beta_from_energy(energies)
+
+def test_beta_from_energy_60_MeV_u():
+    """Test the beta_from_energy function for 60 MeV/u."""
+    energy = 60.0  # MeV/u
+    beta = pyamtrack.beta_from_energy(energy)
+    assert beta < 0.5, "Beta should be smaller than 0.5 for 60 MeV/u"
