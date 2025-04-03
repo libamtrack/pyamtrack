@@ -29,9 +29,9 @@ pip install pyamtrack==0.14.1a2
 
 Here's a quick example demonstrating how to use pyamtrack (ongoing development release):
 ```python
-import pyamtrack
+from pyamtrack.converters import beta_from_energy
 
-print(pyamtrack.beta_from_energy(150))
+print(beta_from_energy(150))
 ```
 
 ### Documentation

@@ -45,6 +45,10 @@ version_scheme = "post-release"
 local_scheme = "node-and-date"
 write_to = "src/pyamtrack/_version.py"
 
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["pyamtrack", "pyamtrack.*"]
+
 [tool.cibuildwheel]
 archs = ["auto64"]
 skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
@@ -59,3 +63,4 @@ before-all = "sudo env MACOSX_DEPLOYMENT_TARGET=11.0 ./scripts/build_gsl.sh"
 
 [tool.cibuildwheel.windows]
 before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
+

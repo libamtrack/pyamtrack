@@ -111,9 +111,6 @@ python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 # Use GLOB to include all .cpp files in the src/converters directory.
 file(GLOB CONVERTER_SOURCES src/converters/*.cpp)
 
-# Add the new energy_from_beta.cpp file explicitly
-list(APPEND CONVERTER_SOURCES src/converters/energy_from_beta.cpp)
-
 # Create the converters library.
 add_library(converters ${CONVERTER_SOURCES})
 

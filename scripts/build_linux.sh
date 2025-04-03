@@ -19,7 +19,7 @@ pip uninstall pyamtrack --yes || error "Failed to uninstall the pyamtrack packag
 
 # Build the package
 echo "Building the package..."
-python -m build || error "Failed to build the package."
+python -m build --wheel || error "Failed to build the package."
 
 # Install the newly built package
 echo "Installing the newly built package..."
