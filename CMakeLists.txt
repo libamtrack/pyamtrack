@@ -60,6 +60,10 @@ if(WIN32)
   set(GSL_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gsl.dll")
   set(GSL_CBLAS_DLL "$ENV{VCPKG_INSTALLED_DIR}/x64-windows/bin/gslcblas.dll")
 
+  # Normalize paths to use forward slashes
+  file(TO_CMAKE_PATH "${GSL_DLL}" GSL_DLL)
+  file(TO_CMAKE_PATH "${GSL_CBLAS_DLL}" GSL_CBLAS_DLL)
+
   message(STATUS "Using GSL include directory: ${GSL_INCLUDE_DIR}")
   message(STATUS "Using GSL library: ${GSL_LIBRARY}")
   message(STATUS "Using GSL CBLAS library: ${GSL_CBLAS_LIBRARY}")
@@ -89,19 +93,48 @@ endif()
 # Make libamtrack available.
 FetchContent_MakeAvailable(libamtrack)
 
+# Add dynamic lookup for macOS to resolve Python symbols at runtime.
+if(APPLE)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
+
 # Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
+
+# Use GLOB to include all .cpp files in the src/converters directory
+file(GLOB CONVERTER_SOURCES src/converters/*.cpp)
+
+# Create the converters library
+add_library(converters ${CONVERTER_SOURCES})
 
 # Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
 
-# Link _core against required libraries.
+# Link _core and converters against required libraries.
 target_link_libraries(_core PRIVATE
+  pybind11::headers
+  amtrack
+  converters
+  GSL::gsl
+  GSL::gslcblas
+)
+target_link_libraries(converters PRIVATE
   pybind11::headers
   amtrack
   GSL::gsl
   GSL::gslcblas
 )
+
+# Add this block to explicitly link Python on Windows
+if(WIN32)
+  # Ensure Python library is linked
+  target_link_libraries(converters PRIVATE ${Python_LIBRARIES})
+
+  # Ensure _core also links against Python
+  target_link_libraries(_core PRIVATE ${Python_LIBRARIES})
+  target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
+endif()
+target_include_directories(converters PRIVATE ${Python_INCLUDE_DIRS})
 
 # Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
@@ -116,9 +149,9 @@ install(TARGETS _core DESTINATION pyamtrack)
 
 # Install the libamtrack shared library (amtrack.dll) into the same package directory.
 if(WIN32)
-  install(TARGETS amtrack RUNTIME DESTINATION pyamtrack)
+  install(TARGETS amtrack converters RUNTIME DESTINATION pyamtrack)
 else()
-  install(TARGETS amtrack
+  install(TARGETS amtrack converters
     LIBRARY DESTINATION pyamtrack
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
@@ -134,7 +167,7 @@ endif()
 if(WIN32)
   # RPATH is not used on Windows.
 elseif(APPLE)
-  set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
+  set_target_properties(_core converters PROPERTIES INSTALL_RPATH "@loader_path")
 else()
-  set_target_properties(_core PROPERTIES INSTALL_RPATH "$ORIGIN")
+  set_target_properties(_core converters PROPERTIES INSTALL_RPATH "$ORIGIN")
 endif()
