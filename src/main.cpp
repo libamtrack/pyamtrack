@@ -1,14 +1,11 @@
 #include <pybind11/pybind11.h>
 #include "converters/beta_from_energy.h"
+#include "stopping/electron_range.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-
-extern "C" {
-    #include "AT_ElectronRange.h"
-}
 
 PYBIND11_MODULE(_core, m) {
     m.doc() = "Python bindings for libamtrack";
@@ -34,9 +31,8 @@ PYBIND11_MODULE(_core, m) {
         return beta * speed_of_light;
     }, "Calculate velocity from beta (m/s)");
 
-    m.def("electron_range", [](double E_MeV_u) {
-        return AT_max_electron_range_m(E_MeV_u, 1, 7);
-    }, "Calculate electron range (m)");
+    // Use the function from the new implementation
+    m.def("electron_range", &electron_range, "Calculate electron range (m)");
 
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
