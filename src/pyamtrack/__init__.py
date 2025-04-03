@@ -34,6 +34,8 @@ if sys.platform == "win32":
         except OSError as e:
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
-from ._core import __doc__, beta_from_energy, electron_range
+from ._core import electron_range
+from . import converters
 
-__all__ = ["__doc__", "__version__", "beta_from_energy", "electron_range"]
+__all__ = ["__doc__", "__version__", "electron_range"]
+__all__.append("converters")
