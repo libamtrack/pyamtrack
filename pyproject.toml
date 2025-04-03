@@ -25,6 +25,12 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Intended Audience :: Science/Research",
 ]
+urls = { 
+  "Homepage" = "https://libamtrack.github.io/",
+  "Documentation" = "https://libamtrack.github.io/docs/python/",
+  "Source Code" = "https://github.com/libamtrack/pyamtrack",
+  "Issue Tracker" = "https://github.com/libamtrack/pyamtrack/issues"
+}
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
