@@ -27,27 +27,6 @@ if(NOT WIN32)
 endif()
 
 ###############################################################################
-# Fetch and configure libamtrack from GitHub
-###############################################################################
-# Fetch the libamtrack library from its GitHub repository.
-include(FetchContent)
-FetchContent_Declare(
-  libamtrack
-  GIT_REPOSITORY https://github.com/libamtrack/library.git
-  GIT_TAG master
-)
-
-# Disable building examples and installation of libamtrack.
-set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
-set(LIBAMTRACK_INSTALL OFF CACHE BOOL "Disable amtrack installation" FORCE)
-
-# Ensure that libamtrack is built as shared libraries.
-set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
-
-# Make libamtrack available for the project.
-FetchContent_MakeAvailable(libamtrack)
-
-###############################################################################
 # Configure GSL dependency
 ###############################################################################
 if(WIN32)
@@ -93,6 +72,30 @@ else()
   # On non-Windows systems, try to locate GSL using find_package.
   find_package(GSL REQUIRED)
 endif()
+
+###############################################################################
+# Fetch and configure libamtrack from GitHub
+###############################################################################
+# Fetch the libamtrack library from its GitHub repository.
+include(FetchContent)
+FetchContent_Declare(
+  libamtrack
+  GIT_REPOSITORY https://github.com/libamtrack/library.git
+  GIT_TAG master
+)
+
+# Disable building examples and installation of libamtrack.
+set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+set(LIBAMTRACK_INSTALL OFF CACHE BOOL "Disable amtrack installation" FORCE)
+
+# Ensure that libamtrack is built as shared libraries.
+set(BUILD_SHARED_LIBS ON CACHE INTERNAL "Build shared libraries")
+
+# Make libamtrack available for the project.
+FetchContent_MakeAvailable(libamtrack)
+
+# Link libamtrack against GSL libraries.
+target_link_libraries(amtrack PRIVATE GSL::gsl GSL::gslcblas)
 
 ###############################################################################
 # Build the Python module (_core) and converters library
