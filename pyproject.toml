@@ -24,7 +24,6 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Physics",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
 ]
 
 [tool.scikit-build]
