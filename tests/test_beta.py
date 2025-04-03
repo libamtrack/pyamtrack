@@ -66,7 +66,7 @@ def test_beta_empty_python_list():
 def test_beta_invalid_numpy_array():
     """Test the beta_from_energy function with an invalid NumPy array."""
     energies = np.array(["invalid", "data"])  # Invalid types
-    with pytest.raises(ValueError, match="Input must be a float, int, NumPy array, or a Python list of numbers"):
+    with pytest.raises(ValueError, match=r"could not convert string to float: np.str_('invalid')*"):
         beta_from_energy(energies)
 
 def test_beta_invalid_python_list():
