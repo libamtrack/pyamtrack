@@ -5,7 +5,7 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "pyamtrack"
 dynamic = ["version"]
-description = "Python bindings for libamtrack"
+description = "Python bindings for the libamtrack library"
 readme = "README.md"
 authors = [{ name = "Leszek Grzanka", email = "grzanka@agh.edu.pl" }]
 requires-python = ">=3.9"
@@ -20,6 +20,11 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
 ]
 
 [tool.scikit-build]

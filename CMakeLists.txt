@@ -98,7 +98,6 @@ if(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-
 # Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
@@ -111,7 +110,7 @@ add_library(converters ${CONVERTER_SOURCES})
 # Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
 
-# Link _core and beta_from_energy against required libraries.
+# Link _core and converters against required libraries.
 target_link_libraries(_core PRIVATE
   pybind11::headers
   amtrack
@@ -135,7 +134,6 @@ if(WIN32)
   target_link_libraries(_core PRIVATE ${Python_LIBRARIES})
   target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
 endif()
-
 target_include_directories(converters PRIVATE ${Python_INCLUDE_DIRS})
 
 # Pass the project version as a preprocessor definition.
