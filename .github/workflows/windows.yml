@@ -95,8 +95,8 @@ jobs:
           }
           pip show -f pyamtrack
           python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
-          python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150));"
-          python -c "import pyamtrack; print(pyamtrack.electron_range(150));"
+          python -c "from pyamtrack.converters import beta_from_energy; print(beta_from_energy(150));"
+          python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
 
       - name: Install pytest and test dependencies
         shell: pwsh
