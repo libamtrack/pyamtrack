@@ -16,15 +16,7 @@ PYBIND11_MODULE(_core, m) {
         &beta_from_energy,
         py::arg("input"),
         py::return_value_policy::automatic,
-        R"pbdoc(
-        Calculate beta from energy per nucleon (MeV/u).
-
-        Parameters:
-            input (float | int | numpy.ndarray | list): The energy per nucleon in MeV/u. Can be a single value, a NumPy array, or a Python list.
-
-        Returns:
-            float | numpy.ndarray | list: The calculated beta value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
-        )pbdoc"
+        beta_from_energy_doc
     );
 
     m.def(
@@ -32,15 +24,7 @@ PYBIND11_MODULE(_core, m) {
         &energy_from_beta,
         py::arg("input"),
         py::return_value_policy::automatic,
-        R"pbdoc(
-        Calculate energy per nucleon (MeV/u) from beta.
-
-        Parameters:
-            input (float | int | numpy.ndarray | list): The beta value(s). Can be a single value, a NumPy array, or a Python list.
-
-        Returns:
-            float | numpy.ndarray | list: The calculated energy value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
-        )pbdoc"
+        energy_from_beta_doc
     );
 
     m.def(
