@@ -89,8 +89,13 @@ print(pyamtrack.converters.beta_from_energy(150))
 
 For a clean and isolated build environment, you can use `cibuildwheel`. This ensures that the compilation happens in a very clean environment, which is ideal for producing distributable wheels:
 
-```bash
+```sh
 pip install cibuildwheel
+```
+
+Then, run the following command to build the wheel for a specific Python version and platform:
+
+```bash
 cibuildwheel --only "cp312-manylinux_x86_64"
 ```
 
