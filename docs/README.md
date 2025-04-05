@@ -47,7 +47,7 @@ pip install dist/*.whl
 
 ### **6. Test the Python Module**
 ```sh
-python -c "import pyamtrack; print(pyamtrack.beta_from_energy(150))"
+python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))"
 ```
 
 Expected output:
@@ -75,7 +75,7 @@ python -m build --wheel
 Now you can use `pyamtrack` in your Python scripts:
 ```python
 import pyamtrack
-print(pyamtrack.beta_from_energy(150))
+print(pyamtrack.converters.beta_from_energy(150))
 ```
 
 ### Building with cibuildwheel (on Linux)
