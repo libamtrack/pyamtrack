@@ -72,5 +72,4 @@ jobs:
 
       - name: Run build_linux.sh script
         run: |
-          chmod +x scripts/build_linux.sh
           ./scripts/build_linux.sh
