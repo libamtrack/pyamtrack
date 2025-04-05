@@ -23,7 +23,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
-        
+
       - name: Install Python build tools
         run: pip install --upgrade build
 
@@ -58,3 +58,19 @@ jobs:
           path: dist/*.whl
           if-no-files-found: error
           retention-days: 5
+
+  run_build_script:
+    needs: build_and_test_linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install system packages
+        run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
+
+      - name: Run build_linux.sh script
+        run: |
+          chmod +x scripts/build_linux.sh
+          ./scripts/build_linux.sh

@@ -30,8 +30,17 @@ python -m build --wheel --no-isolation --config-setting=build-dir=./build || err
 echo "Installing the built wheel..."
 pip install dist/*.whl || error "Failed to install the package from the dist directory."
 
+# Test with pip show to verify installation
+echo "Verifying the installation..."
+pip show -f pyamtrack || error "Failed to show package information."
+
 # Test the installation
 echo "Testing the installation..."
 python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))" || error "Failed to import pyamtrack or run the test script."
 
+# Run the tests
+echo "Running the tests..."
+pytest || error "Tests failed."
+
 echo "Package built, installed, and tested successfully!"
+
