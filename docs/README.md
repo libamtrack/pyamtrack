@@ -12,43 +12,40 @@ Ensure you have the following installed:
 
 Follow these steps to build and install the `pyamtrack` Python module as a wheel package.
 
-### **1. Create a Virtual Environment**
-```sh
-python3 -m venv venv
-```
+### **Building and Installing the Project Locally**
 
-### **2. Activate the Virtual Environment**
-```sh
-source venv/bin/activate
-```
+To build and install the project locally, follow these steps:
 
-### **3. Install Build Dependencies**
-```sh
-pip install build
-```
+1. **Create a Virtual Environment**:
+   Create and activate a Python virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
 
-### **4. Build the Wheel Package**
+2. **Install Development Dependencies**:
+   Install the required dependencies for building the project:
+   ```bash
+   pip install -r requirements-build.txt
+   ```
 
-Clean all previously generated packages:
+3. **Build the Project**:
+   Run the following command to build the project:
+   ```bash
+   python -m build --wheel --no-isolation --config-setting=build-dir=./build
+   ```
 
-```sh
-rm -rf dist/
-```
+4. **Install the Built Wheel**:
+   After building, install the wheel:
+   ```bash
+   pip install dist/*.whl
+   ```
 
-The command below assumes that GSL is installed in your OS.
-```sh
-python -m build --wheel
-```
-
-### **5. Install the Built Wheel**
-```sh
-pip install dist/*.whl
-```
-
-### **6. Test the Python Module**
-```sh
-python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))"
-```
+5. **Test the Installation**:
+   Verify the installation by running:
+   ```bash
+   python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))"
+   ```
 
 Expected output:
 ```

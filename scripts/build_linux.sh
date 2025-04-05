@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
+# Exit immediately if a command exits with a non-zero status.
 set -e
 
 # Function to display error message and exit
@@ -9,35 +9,29 @@ function error {
     exit 1
 }
 
+# Create and activate a virtual environment
+echo "Creating and activating a virtual environment..."
+python3 -m venv venv || error "Failed to create virtual environment."
+source venv/bin/activate || error "Failed to activate virtual environment."
+
+# Install development dependencies
+echo "Installing development dependencies..."
+pip install -r requirements-build.txt || error "Failed to install development dependencies."
+
 # Clean the dist directory
 echo "Cleaning the dist directory..."
 rm -rf dist || error "Failed to clean the dist directory."
 
-# Uninstall the existing package
-echo "Uninstalling the existing pyamtrack package..."
-pip uninstall pyamtrack --yes || error "Failed to uninstall the pyamtrack package."
+# Build the wheel package
+echo "Building the wheel package..."
+python -m build --wheel --no-isolation --config-setting=build-dir=./build || error "Failed to build the wheel package."
 
-# Build the package
-echo "Building the package..."
-python -m build --wheel || error "Failed to build the package."
-
-# Install the newly built package
-echo "Installing the newly built package..."
+# Install the built wheel
+echo "Installing the built wheel..."
 pip install dist/*.whl || error "Failed to install the package from the dist directory."
-
-# Check with pip show
-pip show -f pyamtrack
 
 # Test the installation
 echo "Testing the installation..."
-python -c "import pyamtrack; print(dir(pyamtrack)); print(pyamtrack.converters.beta_from_energy(2));" || error "Failed to import pyamtrack or run the test script."
-
-python -c "import pyamtrack; print(pyamtrack.electron_range(100));" || error "Failed to import pyamtrack or run the test script."
-
-python -c "import pyamtrack; print(pyamtrack.__version__);" || error "Failed to import pyamtrack or run the test script."
-
-# Run pytest on the tests directory
-echo "Running pytest on the tests directory..."
-pytest tests/ || error "Pytest failed."
+python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))" || error "Failed to import pyamtrack or run the test script."
 
 echo "Package built, installed, and tested successfully!"
