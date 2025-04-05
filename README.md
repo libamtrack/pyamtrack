@@ -21,7 +21,7 @@ A new version of pyamtrack is currently being developed, addressing these limita
 
 The work is still in progress, and the latest **alpha release** can be installed via:
 ```bash
-pip install pyamtrack==0.14.1a2
+pip install pyamtrack --pre
 ```
 *(Use at your own risk, as many things may still be broken.)*
 
