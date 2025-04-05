@@ -14,4 +14,3 @@ updates:
     directory: "/" # Location of requirements-build.txt
     schedule:
       interval: "weekly"
-    file: "requirements-build.txt"

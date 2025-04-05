@@ -26,7 +26,7 @@ To build and install the project locally, follow these steps:
 2. **Install Development Dependencies**:
    Install the required dependencies for building the project:
    ```bash
-   pip install -r requirements-build.txt
+   pip install -r requirements-dev.txt
    ```
 
 3. **Build the Project**:

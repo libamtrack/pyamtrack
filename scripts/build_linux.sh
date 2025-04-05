@@ -16,7 +16,7 @@ source venv/bin/activate || error "Failed to activate virtual environment."
 
 # Install development dependencies
 echo "Installing development dependencies..."
-pip install -r requirements-build.txt || error "Failed to install development dependencies."
+pip install -r requirements-dev.txt || error "Failed to install development dependencies."
 
 # Clean the dist directory
 echo "Cleaning the dist directory..."
