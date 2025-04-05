@@ -1,8 +1,8 @@
-# Requirements for building the pyamtrack project
-scikit-build-core>0.10
-pybind11
-setuptools_scm>=8
-ninja
-numpy
-cmake>=3.15
-build
+build==1.2.2.post1
+cmake==4.0.0
+ninja==1.11.1.4
+numpy==2.2.4
+pybind11==2.13.6
+scikit_build_core==0.11.1
+setuptools-scm==8.2.0
+pytest==8.3.5
