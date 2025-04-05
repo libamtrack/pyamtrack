@@ -11,6 +11,6 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "pip"
-    directory: "/" # Location of requirements-build.txt
+    directory: "/"
     schedule:
       interval: "weekly"

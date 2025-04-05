@@ -35,6 +35,8 @@ To build and install the project locally, follow these steps:
    python -m build --wheel --no-isolation --config-setting=build-dir=./build
    ```
 
+   This command speeds up the build process for local development by avoiding recompilation of the `libamtrack` source code in every iteration.
+
 4. **Install the Built Wheel**:
    After building, install the wheel:
    ```bash
@@ -52,7 +54,15 @@ Expected output:
 Python bindings for libamtrack
 ```
 
-## **Uninstallation**
+### Using the `scripts/build_linux.sh` Script
+
+Alternatively, you can use the `scripts/build_linux.sh` script to perform the same steps as above. This script automates the process of creating a virtual environment, installing dependencies, building the project, and testing the installation:
+
+```bash
+./scripts/build_linux.sh
+```
+
+### **Uninstallation**
 ### **Remove the Installed Package**
 ```sh
 pip uninstall pyamtrack
@@ -75,24 +85,22 @@ import pyamtrack
 print(pyamtrack.converters.beta_from_energy(150))
 ```
 
-### Building with cibuildwheel (on Linux)
+### Building with `cibuildwheel`
 
-The command below downloads and compiles GSL, it may take much longer.
-```sh
+For a clean and isolated build environment, you can use `cibuildwheel`. This ensures that the compilation happens in a very clean environment, which is ideal for producing distributable wheels:
+
+```bash
 pip install cibuildwheel
-```
-
-```sh
 cibuildwheel --only "cp312-manylinux_x86_64"
 ```
 
-To test installed package type in `venv`:
+To test the installed package, type in the virtual environment:
 
-```sh
+```bash
 pip install wheelhouse/*whl
 ```
 
-Then
+Then:
 
 ```python
 >>> import pyamtrack
