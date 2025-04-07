@@ -37,5 +37,6 @@ if sys.platform == "win32":
 
 from . import converters
 from . import stopping
+from . import materials
 
 __all__ = ["converters", "stopping", "materials"]
