@@ -1,11 +1,13 @@
 import pytest
 import numpy as np
 from pyamtrack.converters import beta_from_energy, energy_from_beta
+from pyamtrack.stopping import electron_range
 
 # Define test parameters: function, min value, max value
 test_cases = [
     (beta_from_energy, 0, 1000),
     (energy_from_beta, 0, 1),
+    (electron_range, 0, 1000),
 ]
 
 @pytest.mark.parametrize("func, min_val, max_val", test_cases)
