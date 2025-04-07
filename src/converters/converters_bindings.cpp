@@ -25,7 +25,7 @@ const char* energy_from_beta_doc = R"pbdoc(
     )pbdoc";
 
 PYBIND11_MODULE(converters, m) {
-    m.doc() = "Python bindings for libamtrack";
+    m.doc() = "Functions for converting between different physical quantities.";
 
     m.def(
         "beta_from_energy",
