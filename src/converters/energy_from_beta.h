@@ -5,8 +5,6 @@
 
 namespace py = pybind11;
 
-
-
 py::object PYBIND11_EXPORT energy_from_beta(py::object input);
 
 #endif // ENERGY_FROM_BETA_H
