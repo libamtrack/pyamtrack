@@ -15,7 +15,7 @@ namespace py = pybind11;
 
 class Material {
     public:
-        long material_no;
+        long id;
         double density_g_cm3;
         double I_eV;
         double alpha_g_cm2_MeV;
@@ -23,10 +23,10 @@ class Material {
         double m_g_cm2;
         double average_A;
         double average_Z;
-        std::string material_name;
+        std::string name;
         long phase;
     
-        Material(long material_no);
+        Material(long id);
     };
     
 
