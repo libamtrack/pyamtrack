@@ -20,4 +20,10 @@ PYBIND11_MODULE(materials, m) {
         .def_readonly("material_name", &Material::material_name)
         .def_readonly("phase", &Material::phase);
 
+    m.def("get_material_name", [](long material_no) {
+        char name[MATERIAL_NAME_LENGTH];
+        AT_material_name_from_number(material_no, name);
+        return std::string(name);
+    });
+
 }
