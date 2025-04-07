@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from pyamtrack.converters import beta_from_energy
+from pyamtrack.converters import beta_from_energy, energy_from_beta
 
 
 def test_beta_from_energy_60_MeV_u():
