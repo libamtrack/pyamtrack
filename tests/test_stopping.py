@@ -1,6 +1,4 @@
-import pytest
 import pyamtrack.stopping
-import numpy as np
 
 
 def test_electron_range():
