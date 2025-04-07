@@ -108,53 +108,41 @@ endif()
 # Create the Python module from the source file.
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
-# Use GLOB to include all .cpp files in the src/converters directory.
-file(GLOB CONVERTER_SOURCES src/converters/*.cpp)
+# Define a list of targets to link against the required libraries.
+set(PYAMTRACK_TARGETS converters stopping)
 
-# Create the converters library.
-python_add_library(converters MODULE ${CONVERTER_SOURCES} WITH_SOABI)
-
-# Use GLOB to include all .cpp files in the src/stopping directory.
-file(GLOB STOPPING_SOURCES src/stopping/*.cpp)
-
-# Create the stopping library.
-python_add_library(stopping MODULE ${STOPPING_SOURCES} WITH_SOABI)
+foreach(TARGET ${PYAMTRACK_TARGETS})
+  # Create a library for each target.
+  file(GLOB SOURCES src/${TARGET}/*.cpp)
+  python_add_library(${TARGET} MODULE ${SOURCES} WITH_SOABI)
+endforeach()
 
 # Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
 
-# Link _core, converters, and stopping against required libraries.
-target_link_libraries(_core PRIVATE
-  pybind11::headers
-  amtrack
-  GSL::gsl
-  GSL::gslcblas
-)
-target_link_libraries(converters PRIVATE
-  pybind11::headers
-  amtrack
-  GSL::gsl
-  GSL::gslcblas
-)
-target_link_libraries(stopping PRIVATE
-  pybind11::headers
-  amtrack
-  GSL::gsl
-  GSL::gslcblas
-)
+# Loop through the targets and link them against the required libraries.
+foreach(TARGET ${PYAMTRACK_TARGETS} _core)
+  target_link_libraries(${TARGET} PRIVATE
+    pybind11::headers
+    amtrack
+    GSL::gsl
+    GSL::gslcblas
+  )
+endforeach()
 
 # Add this block to explicitly link Python on Windows.
 if(WIN32)
   # Ensure Python library is linked.
-  target_link_libraries(converters PRIVATE ${Python_LIBRARIES})
-  target_link_libraries(stopping PRIVATE ${Python_LIBRARIES})
-  target_link_libraries(_core PRIVATE ${Python_LIBRARIES})
-  target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
+  foreach(TARGET ${PYAMTRACK_TARGETS} _core)
+    target_link_libraries(${TARGET} PRIVATE ${Python_LIBRARIES})
+  endforeach()  
+  # target_include_directories(_core PRIVATE ${Python_INCLUDE_DIRS})
 endif()
 
-# Include Python headers for converters and stopping.
-target_include_directories(converters PRIVATE ${Python_INCLUDE_DIRS})
-target_include_directories(stopping PRIVATE ${Python_INCLUDE_DIRS})
+# Include Python headers for all targets.
+foreach(TARGET ${PYAMTRACK_TARGETS} _core)
+  target_include_directories(${TARGET} PRIVATE ${Python_INCLUDE_DIRS})
+endforeach()
 
 # Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
@@ -169,9 +157,9 @@ install(TARGETS _core DESTINATION pyamtrack)
 
 # Install the libamtrack shared library (amtrack.dll) into the same package directory.
 if(WIN32)
-  install(TARGETS amtrack converters stopping RUNTIME DESTINATION pyamtrack)
+  install(TARGETS amtrack ${PYAMTRACK_TARGETS} RUNTIME DESTINATION pyamtrack)
 else()
-  install(TARGETS amtrack converters stopping
+  install(TARGETS amtrack ${PYAMTRACK_TARGETS}
     LIBRARY DESTINATION pyamtrack
     RUNTIME DESTINATION pyamtrack
     ARCHIVE DESTINATION pyamtrack
@@ -189,7 +177,7 @@ endif()
 if(WIN32)
   # RPATH is not used on Windows.
 elseif(APPLE)
-  set_target_properties(_core converters stopping PROPERTIES INSTALL_RPATH "@loader_path")
+  set_target_properties(_core ${PYAMTRACK_TARGETS} PROPERTIES INSTALL_RPATH "@loader_path")
 else()
-  set_target_properties(_core converters stopping PROPERTIES INSTALL_RPATH "$ORIGIN")
+  set_target_properties(_core ${PYAMTRACK_TARGETS} PROPERTIES INSTALL_RPATH "$ORIGIN")
 endif()
