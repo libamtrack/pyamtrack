@@ -11,6 +11,17 @@ Material::Material(long id)
     phase = AT_phase_from_material_no(id);
 }
 
+Material::Material(const std::string& name) {
+    long id = AT_material_number_from_name(name.c_str());
+    if (id < 1) {
+        throw std::invalid_argument("Material not found: " + name);
+    }
+    AT_get_material_data(id, &density_g_cm3, &I_eV, &alpha_g_cm2_MeV, &p_MeV, &m_g_cm2, &average_A, &average_Z);
+    this->id = id;
+    phase = AT_phase_from_material_no(id);
+    this->name = name;
+}
+
 std::vector<long> get_ids() {
     const AT_table_of_material_data_struct& data = AT_Material_Data;
     return std::vector<long>(std::begin(data.material_no) + 1, std::begin(data.material_no) + data.n);

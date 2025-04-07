@@ -25,10 +25,16 @@ PYBIND11_MODULE(materials, m) {
             phase (int): The phase of the material (e.g., condensed or gaseous).
     )pbdoc")
         .def(py::init<long>(), R"pbdoc(
-            Initializes a Material object.
+            Initializes a Material object by ID.
 
             Args:
                 id (int): The unique identifier for the material.
+        )pbdoc")
+        .def(py::init<const std::string &>(), R"pbdoc(
+            Initializes a Material object by name.
+
+            Args:
+                name (str): The name of the material.
         )pbdoc")
         .def_readonly("id", &Material::id, "The unique identifier for the material.")
         .def_readonly("density_g_cm3", &Material::density_g_cm3, "The density of the material in g/cm³.")

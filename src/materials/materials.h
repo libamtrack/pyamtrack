@@ -30,6 +30,7 @@ class Material {
         long phase;
     
         Material(long id);
+        Material(const std::string &name);
     };
     
 

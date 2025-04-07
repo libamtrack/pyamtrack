@@ -1,4 +1,3 @@
-import pytest
 import pyamtrack
 
 def test_material_initialization():
@@ -26,4 +25,10 @@ def test_get_short_names():
     assert isinstance(names, list)
     assert len(names) > 0
     assert all(isinstance(name, str) for name in names)
-    assert names[0] == "Water_Liquid"  # Check the first name
+    assert names[0] == "water_liquid"  # Check the first name
+
+def test_via_object():
+    material = pyamtrack.materials.water_liquid
+    assert material.id == 1
+    assert material.name == "Water, Liquid"
+    assert material.density_g_cm3 == 1.0
