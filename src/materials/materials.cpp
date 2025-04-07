@@ -4,6 +4,10 @@
 
 Material::Material(long id)
     : id(id) {
+    auto material_index = AT_material_index_from_material_number(id);
+    if (material_index < 0) {
+        throw std::invalid_argument("Material not found: " + std::to_string(id));
+    }
     AT_get_material_data(id, &density_g_cm3, &I_eV, &alpha_g_cm2_MeV, &p_MeV, &m_g_cm2, &average_A, &average_Z);
     char material_name[MATERIAL_NAME_LENGTH];
     AT_material_name_from_number(id, material_name);
@@ -12,7 +16,7 @@ Material::Material(long id)
 }
 
 Material::Material(const std::string& name) {
-    long id = AT_material_number_from_name(name.c_str());
+    auto id = AT_material_number_from_name(name.c_str());
     if (id < 1) {
         throw std::invalid_argument("Material not found: " + name);
     }
