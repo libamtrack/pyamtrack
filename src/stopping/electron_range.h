@@ -3,6 +3,8 @@
 
 #include <pybind11/pybind11.h>
 
-pybind11::object PYBIND11_EXPORT electron_range(pybind11::object input);
+namespace py = pybind11;
+
+py::object PYBIND11_EXPORT electron_range(py::object input);
 
 #endif // ELECTRON_RANGE_H

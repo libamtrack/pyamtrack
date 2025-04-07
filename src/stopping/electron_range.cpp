@@ -5,8 +5,6 @@ extern "C" {
     #include "AT_ElectronRange.h"
 }
 
-namespace py = pybind11;
-
 // Helper function for single value calculation
 double electron_range_single(double E_MeV_u) {
     return AT_max_electron_range_m(E_MeV_u, 1, 7);
