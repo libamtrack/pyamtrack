@@ -109,7 +109,7 @@ Then:
 
 ```python
 >>> import pyamtrack
->>> pyamtrack.electron_range(120)
+>>> pyamtrack.stopping.electron_range(120)
 0.0006700734300203331
 >>> pyamtrack.__version__
 '0.14.1'
