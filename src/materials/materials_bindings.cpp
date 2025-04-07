@@ -61,7 +61,7 @@ PYBIND11_MODULE(materials, m) {
         Retrieves the full names of all materials.
 
         Returns:
-            list[int]: A list of full material names.
+            list[str]: A list of full material names.
     )pbdoc");
 
     m.def("get_names", &get_names, R"pbdoc(
