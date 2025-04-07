@@ -36,7 +36,7 @@ pip show -f pyamtrack || error "Failed to show package information."
 
 # Test the installation
 echo "Testing the installation..."
-python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150))" || error "Failed to import pyamtrack or run the test script."
+python -c "import pyamtrack.converters; print(pyamtrack.converters.beta_from_energy(150))" || error "Failed to import pyamtrack or run the test script."
 
 # Run the tests
 echo "Running the tests..."
