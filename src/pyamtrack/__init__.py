@@ -35,4 +35,8 @@ if sys.platform == "win32":
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
 
-__all__ = ["__doc__", "__version__"]
+from ._version import __version__
+from . import converters
+from . import stopping
+
+__all__ = ["converters", "stopping"]
