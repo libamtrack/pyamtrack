@@ -38,4 +38,4 @@ if sys.platform == "win32":
 from . import converters
 from . import stopping
 
-__all__ = ["converters", "stopping"]
+__all__ = ["converters", "stopping", "materials"]

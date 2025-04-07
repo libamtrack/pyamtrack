@@ -98,7 +98,7 @@ FetchContent_MakeAvailable(libamtrack)
 target_link_libraries(amtrack PRIVATE GSL::gsl GSL::gslcblas)
 
 ###############################################################################
-# Build the Python module (_core), converters library, and stopping library
+# Build the Python module (_core) and other targets
 ###############################################################################
 # Add dynamic lookup for macOS to resolve Python symbols at runtime.
 if(APPLE)
@@ -109,7 +109,7 @@ endif()
 python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 
 # Define a list of targets to link against the required libraries.
-set(PYAMTRACK_TARGETS converters stopping)
+set(PYAMTRACK_TARGETS converters stopping materials)
 
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
