@@ -156,15 +156,25 @@ message(STATUS "Project version: ${PROJECT_VERSION}")
 install(TARGETS _core DESTINATION pyamtrack)
 
 # Install the libamtrack shared library (amtrack.dll) into the same package directory.
-if(WIN32)
-  install(TARGETS amtrack ${PYAMTRACK_TARGETS} RUNTIME DESTINATION pyamtrack)
-else()
-  install(TARGETS amtrack ${PYAMTRACK_TARGETS}
-    LIBRARY DESTINATION pyamtrack
-    RUNTIME DESTINATION pyamtrack
-    ARCHIVE DESTINATION pyamtrack
-  )
-endif()
+
+install(TARGETS amtrack ${PYAMTRACK_TARGETS}
+  LIBRARY DESTINATION pyamtrack
+  RUNTIME DESTINATION pyamtrack
+  ARCHIVE DESTINATION pyamtrack
+)
+
+# if(WIN32)
+#   install(TARGETS amtrack ${PYAMTRACK_TARGETS}
+#   LIBRARY DESTINATION pyamtrack
+#   RUNTIME DESTINATION pyamtrack
+#   )
+# else()
+#   install(TARGETS amtrack ${PYAMTRACK_TARGETS}
+#     LIBRARY DESTINATION pyamtrack
+#     RUNTIME DESTINATION pyamtrack
+#     ARCHIVE DESTINATION pyamtrack
+#   )
+# endif()
 
 # Install the GSL DLLs on Windows so they are present in the package folder.
 if(WIN32)
