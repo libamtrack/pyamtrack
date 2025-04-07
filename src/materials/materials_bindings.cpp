@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "materials.h"
+#include "AT_DataMaterial.h"
 #include <iostream>
 
 namespace py = pybind11;
@@ -40,7 +41,10 @@ PYBIND11_MODULE(materials, m) {
         .def_readonly("name", &Material::name, "The name of the material.")
         .def_readonly("phase", &Material::phase, "The phase of the material (e.g., condensed or gaseous).");
 
-    m.def("get_ids", &get_ids, R"pbdoc(
+    m.def("get_ids", []() {
+        const AT_table_of_material_data_struct& data = AT_Material_Data;
+        return std::vector<long>(std::begin(data.material_no) + 1, std::begin(data.material_no) + data.n);
+    }, R"pbdoc(
         Retrieves the list of material IDs.
 
         Returns:
@@ -62,4 +66,10 @@ PYBIND11_MODULE(materials, m) {
         Returns:
             list[str]: A list of sanitized material names.
     )pbdoc");
+
+    // Dynamically expose materials as attributes of the module
+    auto names = get_names();
+    for (size_t i = 0; i < names.size(); ++i) {
+        m.attr(names[i].c_str()) = Material(static_cast<long>(i + 1));
+    }
 }

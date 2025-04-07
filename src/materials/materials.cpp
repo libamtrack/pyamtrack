@@ -21,15 +21,21 @@ std::vector<std::string> get_long_names() {
     return std::vector<std::string>(std::begin(data.material_name) + 1, std::begin(data.material_name) + data.n);
 }
 
+std::string to_name( const std::string& name) {
+    std::string result = name;
+    // Replace all spaces with underscores
+    std::replace(result.begin(), result.end(), ' ', '_');
+    // Remove all non-alphanumeric characters
+    result.erase(std::remove_if(result.begin(), result.end(), [](char c) { return !std::isalnum(c) && c != '_'; }), result.end());
+    // Convert to lowercase
+    std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::tolower(c); });
+    return result;
+}
+
 std::vector<std::string> get_names() {
     auto names = get_long_names();
-    // Replace all spaces with underscores
     for (auto& name : names) {
-        std::replace(name.begin(), name.end(), ' ', '_');
-    }
-    // Remove all non-alphanumeric characters
-    for (auto& name : names) {
-        name.erase(std::remove_if(name.begin(), name.end(), [](char c) { return !std::isalnum(c) && c != '_'; }), name.end());
+        name = to_name(name);
     }
     return names;
 }
