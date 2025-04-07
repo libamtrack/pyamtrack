@@ -12,6 +12,9 @@ extern "C" {
 
 namespace py = pybind11;
 
+std::vector<long> get_ids();
+std::vector<std::string> get_names();
+std::vector<std::string> get_long_names();
 
 class Material {
     public:
