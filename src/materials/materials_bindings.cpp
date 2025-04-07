@@ -21,15 +21,28 @@ PYBIND11_MODULE(materials, m) {
         .def_readonly("name", &Material::name)
         .def_readonly("phase", &Material::phase);
 
-    // Expose get_ids as a proper Python wrapper
     m.def("get_ids", []() {
         const AT_table_of_material_data_struct& data = AT_Material_Data;
-        return std::vector<long>(std::begin(data.material_no), std::begin(data.material_no) + data.n);
+        return std::vector<long>(std::begin(data.material_no) + 1, std::begin(data.material_no) + data.n);
+    });
+
+    m.def("get_long_names", []() {
+        const AT_table_of_material_data_struct& data = AT_Material_Data;
+        return std::vector<std::string>(std::begin(data.material_name) + 1, std::begin(data.material_name) + data.n);
     });
 
     m.def("get_names", []() {
         const AT_table_of_material_data_struct& data = AT_Material_Data;
-        return std::vector<std::string>(std::begin(data.material_name), std::begin(data.material_name) + data.n);
+        auto names = std::vector<std::string>(std::begin(data.material_name) + 1, std::begin(data.material_name) + data.n);
+        // replace all spaces with underscores
+        for (auto& name : names) {
+            std::replace(name.begin(), name.end(), ' ', '_');
+        }
+        // remove all non-alphanumeric characters
+        for (auto& name : names) {
+            name.erase(std::remove_if(name.begin(), name.end(), [](char c) { return !std::isalnum(c) && c != '_'; }), name.end());
+        }
+        return names;
     });
 
 }
