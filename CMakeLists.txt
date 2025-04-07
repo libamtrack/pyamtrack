@@ -112,13 +112,17 @@ python_add_library(_core MODULE src/main.cpp WITH_SOABI)
 file(GLOB CONVERTER_SOURCES src/converters/*.cpp)
 
 # Create the converters library.
-add_library(converters ${CONVERTER_SOURCES})
+#add_library(converters ${CONVERTER_SOURCES})
 
 # Use GLOB to include all .cpp files in the src/stopping directory.
 file(GLOB STOPPING_SOURCES src/stopping/*.cpp)
 
 # Create the stopping library.
-add_library(stopping ${STOPPING_SOURCES})
+#add_library(stopping ${STOPPING_SOURCES})
+
+python_add_library(stopping MODULE ${STOPPING_SOURCES} WITH_SOABI)
+python_add_library(converters MODULE ${CONVERTER_SOURCES} WITH_SOABI)
+
 
 # Ensure that _core is built after libamtrack.
 add_dependencies(_core amtrack)
@@ -127,8 +131,8 @@ add_dependencies(_core amtrack)
 target_link_libraries(_core PRIVATE
   pybind11::headers
   amtrack
-  converters
-  stopping
+  # converters
+  # stopping
   GSL::gsl
   GSL::gslcblas
 )
