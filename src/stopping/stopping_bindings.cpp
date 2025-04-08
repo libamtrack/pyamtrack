@@ -17,7 +17,7 @@ PYBIND11_MODULE(stopping, m) {
     
             Parameters:
                 input (float | int | numpy.ndarray | list): The energy per nucleon in MeV. Can be a single value, a NumPy array, or a Python list.
-                material (int | Material, optional): Either a material ID as integer or a Material object. Defaults to 1.
+                material (int | Material, optional): Either a material ID as integer or a Material object. Defaults to 1 (Liquid water).
     
             Returns:
                 float | numpy.ndarray | list: The calculated electron range(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.

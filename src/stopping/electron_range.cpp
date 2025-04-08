@@ -6,11 +6,6 @@ extern "C" {
     #include "AT_ElectronRange.h"
 }
 
-// Helper function for single value calculation
-double electron_range_single(double E_MeV_u) {
-    return AT_max_electron_range_m(E_MeV_u, 1, 7);
-}
-
 // Main function to handle different input types
 py::object electron_range(py::object input, py::object material = py::int_(1)) {
     int material_id = 0;
@@ -32,5 +27,11 @@ py::object electron_range(py::object input, py::object material = py::int_(1)) {
             throw py::type_error("Material object must have 'id' attribute");
         }
     }
+
+    // create a lambda function to capture material_id
+    auto electron_range_single = [material_id](double E_MeV_u) {
+        return AT_max_electron_range_m(E_MeV_u, material_id, 7);
+    };
+
     return wrap_function(electron_range_single, input);
 }
