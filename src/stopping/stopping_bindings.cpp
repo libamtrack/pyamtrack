@@ -3,8 +3,22 @@
 
 namespace py = pybind11;
 
+
+
+
 PYBIND11_MODULE(stopping, m) {
     m.doc() = "Functions for calculating stopping power of ions and protons and range of particles in materials.";
+
+   // Create submodule for models
+   py::module_ models = m.def_submodule("models", "Stopping power models");
+    
+   // Add model constants using the map
+   for (const auto& [name, id] : STOPPING_MODELS) {
+       models.attr(name.c_str()) = py::int_(id);
+   }
+
+   m.def("get_models", &get_models, "Returns list of available stopping power models");
+   m.def("model", &get_model_id, py::arg("name"), "Returns model ID for given model name");
 
     m.def(
         "electron_range",

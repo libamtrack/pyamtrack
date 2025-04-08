@@ -5,6 +5,23 @@ extern "C" {
     #include "AT_ElectronRange.h"
 }
 
+// Helper functions using the map
+std::vector<std::string> get_models() {
+    std::vector<std::string> names;
+    for (const auto& [name, id] : STOPPING_MODELS) {
+        names.push_back(name);
+    }
+    return names;
+}
+
+int get_model_id(const std::string& model_name) {
+    auto it = STOPPING_MODELS.find(model_name);
+    if (it == STOPPING_MODELS.end()) {
+        throw std::runtime_error("Unknown model name: " + model_name);
+    }
+    return it->second;
+}
+
 // Main function to handle different input types
 py::object electron_range(py::object input, py::object material) {
     int material_id = 0;
