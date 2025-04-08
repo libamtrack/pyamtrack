@@ -28,6 +28,7 @@ python -m build --wheel --no-isolation --config-setting=build-dir=./build || err
 
 # Install the built wheel
 echo "Installing the built wheel..."
+pip uninstall pyamtrack -y || error "Failed to uninstall existing pyamtrack package."
 pip install dist/*.whl || error "Failed to install the package from the dist directory."
 
 # Test with pip show to verify installation
