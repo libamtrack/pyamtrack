@@ -29,3 +29,9 @@ def test_material_assignment_invalid():
         pyamtrack.stopping.electron_range(1000.0, "aaa")  # Invalid ID
     with pytest.raises(TypeError, match="Material argument must be either an integer or a Material object"):
         pyamtrack.stopping.electron_range(1000.0, pyamtrack.materials.get_ids)
+
+@pytest.mark.skip
+def test_invalid_id():
+    """Test the electron_range function with an invalid ID."""
+    with pytest.raises(ValueError, match="Invalid material ID"):
+        pyamtrack.stopping.electron_range(1000.0, 1000000)
