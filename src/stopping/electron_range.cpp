@@ -23,7 +23,7 @@ int get_model_id(const std::string& model_name) {
 }
 
 // Main function to handle different input types
-py::object electron_range(py::object input, py::object material) {
+py::object electron_range(py::object input, py::object material, py::str model) {
     int material_id = 0;
     if (py::isinstance<py::int_>(material)) {
         material_id = material.cast<int>();
