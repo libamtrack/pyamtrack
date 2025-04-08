@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+title: "pyamtrack: python binding for the libamtrack library"
+message: >-
+  Thank you for using pyamtrack. If you use this software in your
+  research, please cite the corresponding article:
+  Greilich, Steffen, et al. "Amorphous track models: a numerical comparison study." 
+  Radiation measurements 45.10 (2010): 1406-1409.
+type: software
+authors:
+  - given-names: Leszek
+    family-names: Grzanka
+    affiliation: 'Institute of Nuclear Physics: Krakow, PL'
+    orcid: 'https://orcid.org/0000-0002-3599-854X'
+  - given-names: Steffen
+    family-names: Greilich
+    affiliation: 'Department of Medical Physics in Radiation Oncology, German Cancer Research Center (DKFZ), Im Neuenheimer Feld 280, D-69120 Heidelberg, Germany'
+    orcid: 'https://orcid.org/0000-0001-6237-7936'
+  - given-names: Niels
+    family-names: Bassler
+    affiliation: 'Aarhus University: Aarhus C, DK'
+    orcid: 'https://orcid.org/0000-0002-4160-1078'
+license: GPL
