@@ -1,6 +1,5 @@
 #include "../wrapper_template.h"
 #include "electron_range.h"
-#include <iostream>
 
 extern "C" {
     #include "AT_ElectronRange.h"
