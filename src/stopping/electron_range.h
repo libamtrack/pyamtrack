@@ -23,7 +23,7 @@ int get_model_id(const std::string& model_name);
 
 py::object PYBIND11_EXPORT electron_range(py::object input, 
     py::object material = py::int_(1),
-    py::str model = py::str("tabata")
+    py::object model = py::str("tabata")
 );
 
 #endif // ELECTRON_RANGE_H
