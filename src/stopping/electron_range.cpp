@@ -22,7 +22,7 @@ py::object electron_range(py::object input, py::object material) {
         try {
             material_id = material.attr("id").cast<int>();
         } catch (const py::error_already_set&) {
-            throw py::type_error("Material object must have 'id' attribute");
+            throw py::type_error("Material argument must be either an integer or a Material object with an 'id' attribute");
         }
     }
 
