@@ -5,6 +5,6 @@
 
 namespace py = pybind11;
 
-py::object PYBIND11_EXPORT electron_range(py::object input);
+py::object PYBIND11_EXPORT electron_range(py::object input, py::object material);
 
 #endif // ELECTRON_RANGE_H
