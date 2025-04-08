@@ -9,6 +9,13 @@ project(
 )
 
 ###############################################################################
+# Set C++17 as the required standard
+###############################################################################
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+###############################################################################
 # Locate Python and pybind11
 ###############################################################################
 # Find Python interpreter, development headers, and library.
