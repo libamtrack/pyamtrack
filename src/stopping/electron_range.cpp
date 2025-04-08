@@ -6,7 +6,7 @@ extern "C" {
 }
 
 // Main function to handle different input types
-py::object electron_range(py::object input, py::object material = py::int_(1)) {
+py::object electron_range(py::object input, py::object material) {
     int material_id = 0;
     if (py::isinstance<py::int_>(material)) {
         material_id = material.cast<int>();
