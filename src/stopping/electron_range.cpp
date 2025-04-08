@@ -11,13 +11,12 @@ py::object electron_range(py::object input, py::object material = py::int_(1)) {
     if (py::isinstance<py::int_>(material)) {
         material_id = material.cast<int>();
     } else {
-        // Check if material is an instance of Material class
-        py::module_ builtins = py::module_::import("builtins");
-        py::object type_func = builtins.attr("type");
-        py::str type_name = type_func(material).attr("__name__").cast<py::str>();
-        
-        if (std::string(type_name) != "Material") {
-            throw py::type_error("Material argument must be either an integer or a Material object");
+        py::module_ pyamtrack = py::module_::import("pyamtrack");
+        py::module_ materials = pyamtrack.attr("materials");
+        py::object Material = materials.attr("Material");
+
+        if (!py::isinstance(material, Material)) {
+            throw py::type_error("Material argument must be either an integer or a Material object DUPA");
         }
         
         try {
