@@ -16,7 +16,7 @@ py::object electron_range(py::object input, py::object material = py::int_(1)) {
         py::object Material = materials.attr("Material");
 
         if (!py::isinstance(material, Material)) {
-            throw py::type_error("Material argument must be either an integer or a Material object DUPA");
+            throw py::type_error("Material argument must be either an integer or a Material object");
         }
         
         try {
