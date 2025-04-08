@@ -16,13 +16,13 @@ py::object electron_range(py::object input, py::object material) {
         py::object Material = materials.attr("Material");
 
         if (!py::isinstance(material, Material)) {
-            throw py::type_error("Material argument must be either an integer or a Material object with an 'id' attribute");
+            throw py::type_error("Material argument must be either an integer or a Material object");
         }
         
         try {
             material_id = material.attr("id").cast<int>();
         } catch (const py::error_already_set&) {
-            throw py::type_error("Material argument must be either an integer or a Material object with an 'id' attribute");
+            throw py::type_error("Material argument must be either an integer or a Material object");
         }
     }
 
