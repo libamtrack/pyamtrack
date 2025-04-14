@@ -14,7 +14,7 @@ namespace py = pybind11;
  * The string key is the model name used in Python, and the integer value
  * is the corresponding model ID used in the underlying C/C++ implementation.
  */
-const std::map<std::string, int> STOPPING_MODELS = {
+const std::map<std::string, int> ELECTRON_RANGE_MODELS = {
     {"butts_katz", 2},   // Butts & Katz model
     {"waligorski", 3},   // Waligorski model
     {"geiss", 4},        // Geiss model

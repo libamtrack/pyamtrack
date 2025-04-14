@@ -10,7 +10,7 @@ PYBIND11_MODULE(stopping, m) {
     py::module_ models = m.def_submodule("models", "Stopping power models");
     
     // Add model constants using the map
-    for (const auto& [name, id] : STOPPING_MODELS) {
+    for (const auto& [name, id] : ELECTRON_RANGE_MODELS) {
         models.attr(name.c_str()) = py::int_(id);
     }
 
