@@ -8,6 +8,30 @@ project(
   LANGUAGES C CXX
 )
 
+# Warn if the user invokes CMake directly
+if (NOT SKBUILD)
+  message(WARNING "\
+  This CMake file is meant to be executed using 'scikit-build-core'.
+  Running it directly will almost certainly not produce the desired
+  result. If you are a user trying to install this package, use the
+  command below, which will install all necessary build dependencies,
+  compile the package in an isolated environment, and then install it.
+  =====================================================================
+   $ pip install .
+  =====================================================================
+  If you are a software developer, and this is your own package, then
+  it is usually much more efficient to install the build dependencies
+  in your environment once and use the following command that avoids
+  a costly creation of a new virtual environment at every compilation:
+  =====================================================================
+   $ pip install nanobind scikit-build-core[pyproject]
+   $ pip install --no-build-isolation -ve .
+  =====================================================================
+  You may optionally add -Ceditable.rebuild=true to auto-rebuild when
+  the package is imported. Otherwise, you need to rerun the above
+  after editing C++ files.")
+endif()
+
 if (CMAKE_VERSION VERSION_LESS 3.18)
   set(DEV_MODULE Development)
 else()
@@ -138,9 +162,6 @@ foreach(TARGET ${PYAMTRACK_TARGETS})
   nanobind_add_module(${TARGET} ${SOURCES})
 endforeach()
 
-# Ensure that _core is built after libamtrack.
-# add_dependencies(_core amtrack)
-
 # Loop through the targets and link them against the required libraries.
 foreach(TARGET ${PYAMTRACK_TARGETS} _core)
   target_link_libraries(${TARGET} PRIVATE
@@ -150,18 +171,10 @@ foreach(TARGET ${PYAMTRACK_TARGETS} _core)
   )
 endforeach()
 
-# # Add this block to explicitly link Python on Windows.
-# if(WIN32)
-#   # Ensure Python library is linked.
-#   foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-#     target_link_libraries(${TARGET} PRIVATE ${Python_LIBRARIES})
-#   endforeach()  
-# endif()
-
-# Include Python headers for all targets.
-foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-  target_include_directories(${TARGET} PRIVATE ${Python_INCLUDE_DIRS})
-endforeach()
+# # Include Python headers for all targets.
+# foreach(TARGET ${PYAMTRACK_TARGETS} _core)
+#   target_include_directories(${TARGET} PRIVATE ${Python_INCLUDE_DIRS})
+# endforeach()
 
 # Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
