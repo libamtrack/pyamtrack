@@ -31,8 +31,8 @@ def test_invalid_model(electron_energy_MeV):
     """Test handling of invalid model names."""
     with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
         stopping.electron_range(electron_energy_MeV, model="invalid_model")
-    # with pytest.raises(TypeError, match="must be either an integer or a string"):
-    #     stopping.electron_range(electron_energy_MeV, model=None)
+    with pytest.raises(TypeError):
+        stopping.electron_range(electron_energy_MeV, model=None)
 
 @pytest.mark.parametrize("model_name", [
     "butts_katz", "waligorski", "geiss", 
@@ -63,12 +63,12 @@ def test_model_relative_ranges(electron_energy_MeV, models):
     # Models can legitimately differ by larger factors due to different theoretical approaches
     assert max_range / min_range < 25, "Models differ too drastically"
 
-# def test_energy_scaling():
-#     """Test that range increases with energy across all models."""
-#     energies = np.array([10.0, 100.0])
-#     for model in stopping.get_models():
-#         ranges = stopping.electron_range(energies, model=model)
-#         assert ranges[1] > ranges[0], f"{model} model doesn't show expected energy scaling"
+def test_energy_scaling():
+    """Test that range increases with energy across all models."""
+    energies = np.array([10.0, 100.0])
+    for model in stopping.get_models():
+        ranges = stopping.electron_range(energies, model=model)
+        assert ranges[1] > ranges[0], f"{model} model doesn't show expected energy scaling"
 
 def test_material_independence(electron_energy_MeV, models):
     """Test that models work with different materials."""
