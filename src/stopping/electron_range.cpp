@@ -3,7 +3,6 @@
 #include <string>             // For std::string
 #include <vector>             // For std::vector
 #include <stdexcept>          // For std::runtime_error
-#include <map>                // If STOPPING_MODELS is a map
 
 
 extern "C" {
@@ -47,9 +46,8 @@ nb::object electron_range(nb::object input, nb::object material, nb::object mode
             throw; // Preserves original Python exception type and traceback
         } catch (const nb::cast_error &e) {
             std::string error_msg = "Material object's 'id' attribute is not an integer: " + std::string(e.what());
-            throw nb::type_error(error_msg.c_str()); // nb::type_error is correct here
+            throw nb::type_error(error_msg.c_str());
         } catch (const std::exception &e) { // Catches std::runtime_error and others
-            // FIX: Use std::runtime_error from <stdexcept>
             std::string error_msg = "An error occurred while processing the Material object: " + std::string(e.what());
             throw std::runtime_error(error_msg.c_str()); // Nanobind will translate this
         }
@@ -60,8 +58,7 @@ nb::object electron_range(nb::object input, nb::object material, nb::object mode
         std::string model_name = nb::cast<std::string>(model);
          try {
             model_id = get_model_id(model_name);
-         } catch (const std::runtime_error &e) { // Catches error from get_model_id
-             // Throwing nb::value_error is appropriate here for invalid input name
+         } catch (const std::runtime_error &e) {
              throw nb::value_error(e.what());
          }
     } else if (nb::isinstance<nb::int_>(model)) {
