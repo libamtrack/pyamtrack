@@ -1,52 +1,29 @@
 #include "../wrapper_template.h" // Should contain wrap_function
-#include "electron_range.h"   // May contain STOPPING_MODELS definition?
+#include "electron_range.h"
 #include <string>             // For std::string
 #include <vector>             // For std::vector
 #include <stdexcept>          // For std::runtime_error
 #include <map>                // If STOPPING_MODELS is a map
-
-// Assuming STOPPING_MODELS is defined somewhere accessible, like electron_range.h
-// Example definition if needed:
-// static const std::map<std::string, int> STOPPING_MODELS = {
-//    {"ModelName1", 1}, {"ModelName2", 2} /* ... more models ... */
-// };
-// If it's not a map, adjust the helper functions accordingly.
 
 
 extern "C" {
     #include "AT_ElectronRange.h" // Contains AT_max_electron_range_m definition
 }
 
-// Helper functions using the map (ensure STOPPING_MODELS is defined and accessible)
 std::vector<std::string> get_models() {
     std::vector<std::string> names;
-    // If STOPPING_MODELS isn't available, this logic needs changing
-    // For example, maybe read names from a structure in AT_ElectronRange.h
-#ifdef STOPPING_MODELS // Conditional compilation if it might not be defined
-    for (const auto& pair : STOPPING_MODELS) { // Use structured binding if C++17
+    for (const auto& pair : STOPPING_MODELS) { 
         names.push_back(pair.first);
     }
-#else
-    // Placeholder if map isn't defined/available
-    names = {"Waligorski", "ButtsKatz", "Geiss"}; // Example names
-#endif
     return names;
 }
 
 int get_model_id(const std::string& model_name) {
-#ifdef STOPPING_MODELS
     auto it = STOPPING_MODELS.find(model_name);
     if (it == STOPPING_MODELS.end()) {
         throw std::runtime_error("Unknown model name: " + model_name);
     }
     return it->second;
-#else
-    // Placeholder if map isn't defined/available
-    if (model_name == "Waligorski") return 2; // Example IDs
-    if (model_name == "ButtsKatz") return 1;
-    if (model_name == "Geiss") return 3;
-    throw std::runtime_error("Unknown model name (map unavailable): " + model_name);
-#endif
 }
 
 
