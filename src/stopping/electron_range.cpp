@@ -12,8 +12,8 @@ extern "C" {
 
 std::vector<std::string> get_models() {
     std::vector<std::string> names;
-    for (const auto& pair : STOPPING_MODELS) { 
-        names.push_back(pair.first);
+    for (const auto& [name, id] : STOPPING_MODELS) {
+        names.push_back(name);
     }
     return names;
 }

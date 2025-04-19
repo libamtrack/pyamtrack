@@ -126,7 +126,7 @@ if(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-# Create the Python module from the source file using python_add_library
+# Create the Python module from the source file
 nanobind_add_module(_core src/main.cpp)
 
 # Define a list of targets to link against the required libraries.
