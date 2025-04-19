@@ -139,7 +139,7 @@ foreach(TARGET ${PYAMTRACK_TARGETS})
 endforeach()
 
 # Ensure that _core is built after libamtrack.
-add_dependencies(_core amtrack)
+# add_dependencies(_core amtrack)
 
 # Loop through the targets and link them against the required libraries.
 foreach(TARGET ${PYAMTRACK_TARGETS} _core)
@@ -150,13 +150,13 @@ foreach(TARGET ${PYAMTRACK_TARGETS} _core)
   )
 endforeach()
 
-# Add this block to explicitly link Python on Windows.
-if(WIN32)
-  # Ensure Python library is linked.
-  foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-    target_link_libraries(${TARGET} PRIVATE ${Python_LIBRARIES})
-  endforeach()  
-endif()
+# # Add this block to explicitly link Python on Windows.
+# if(WIN32)
+#   # Ensure Python library is linked.
+#   foreach(TARGET ${PYAMTRACK_TARGETS} _core)
+#     target_link_libraries(${TARGET} PRIVATE ${Python_LIBRARIES})
+#   endforeach()  
+# endif()
 
 # Include Python headers for all targets.
 foreach(TARGET ${PYAMTRACK_TARGETS} _core)
