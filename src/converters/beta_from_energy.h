@@ -1,10 +1,10 @@
 #ifndef BETA_FROM_ENERGY_H
 #define BETA_FROM_ENERGY_H
 
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-py::object PYBIND11_EXPORT beta_from_energy(py::object input);
+nb::object beta_from_energy(nb::object input);
 
 #endif // BETA_FROM_ENERGY_H

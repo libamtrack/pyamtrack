@@ -23,34 +23,34 @@ int get_model_id(const std::string& model_name) {
 }
 
 // Main function to handle different input types
-py::object electron_range(py::object input, py::object material, py::object model) {
+nb::object electron_range(nb::object input, nb::object material, nb::object model) {
     int material_id = 0;
-    if (py::isinstance<py::int_>(material)) {
-        material_id = material.cast<int>();
+    if (nb::isinstance<nb::int_>(material)) {
+        material_id = nb::cast<int>(material);
     } else {
-        py::module_ pyamtrack = py::module_::import("pyamtrack");
-        py::module_ materials = pyamtrack.attr("materials");
-        py::object Material = materials.attr("Material");
+        nb::module_ pyamtrack = nb::module_::import("pyamtrack");
+        nb::module_ materials = pyamtrack.attr("materials");
+        nb::object Material = materials.attr("Material");
 
-        if (!py::isinstance(material, Material)) {
-            throw py::type_error("Material argument must be either an integer or a Material object");
+        if (!nb::isinstance(material, Material)) {
+            throw nb::type_error("Material argument must be either an integer or a Material object");
         }
         
         try {
-            material_id = material.attr("id").cast<int>();
-        } catch (const py::error_already_set&) {
-            throw py::type_error("Material argument must be either an integer or a Material object");
+            material_id = nb::cast<int>(material.attr("id"));
+        } catch (const std::exception&) {
+            throw nb::type_error("Material argument must be either an integer or a Material object");
         }
     }
 
     int model_id = 0;
-    if( py::isinstance<py::str>(model) ) {
-        std::string model_name = model.cast<std::string>();
+    if (nb::isinstance<nb::str>(model)) {
+        std::string model_name = nb::cast<std::string>(model);
         model_id = get_model_id(model_name);
-    } else if (py::isinstance<py::int_>(model)) {
-        model_id = model.cast<int>();
+    } else if (nb::isinstance<nb::int_>(model)) {
+        model_id = nb::cast<int>(model);
     } else {
-        throw py::type_error("Model argument must be either an integer or a string");
+        throw nb::type_error("Model argument must be either an integer or a string");
     }
 
     // create a lambda function to capture material_id

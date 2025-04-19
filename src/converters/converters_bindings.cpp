@@ -1,8 +1,8 @@
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
 #include "beta_from_energy.h"
 #include "energy_from_beta.h"
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 const char* beta_from_energy_doc = R"pbdoc(
     Calculate beta from energy per nucleon (MeV/u).
@@ -24,22 +24,20 @@ const char* energy_from_beta_doc = R"pbdoc(
         float | numpy.ndarray | list: The calculated energy value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
     )pbdoc";
 
-PYBIND11_MODULE(converters, m) {
+NB_MODULE(converters, m) {
     m.doc() = "Functions for converting between different physical quantities.";
 
     m.def(
         "beta_from_energy",
         &beta_from_energy,
-        py::arg("input"),
-        py::return_value_policy::automatic,
+        nb::arg("input"),
         beta_from_energy_doc
     );
 
     m.def(
         "energy_from_beta",
         &energy_from_beta,
-        py::arg("input"),
-        py::return_value_policy::automatic,
+        nb::arg("input"),
         energy_from_beta_doc
     );
 

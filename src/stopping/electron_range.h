@@ -1,11 +1,13 @@
 #ifndef ELECTRON_RANGE_H
 #define ELECTRON_RANGE_H
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/map.h>
 #include <map>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 /**
  * @brief Available electron range calculation models and their corresponding IDs.
@@ -51,16 +53,16 @@ int get_model_id(const std::string& model_name);
  * @param material Either a material ID (int) or a Material object. Defaults to 1 (Liquid water).
  * @param model The stopping power model to use. Can be specified as a string name or model ID.
  *             Defaults to "tabata" (ID=7).
- * @return py::object The calculated electron range(s) in meters. Returns a float for single input,
+ * @return nb::object The calculated electron range(s) in meters. Returns a float for single input,
  *                   NumPy array for array input, or Python list for list input.
- * @throws py::type_error If material argument is neither an integer nor a Material object,
+ * @throws nb::type_error If material argument is neither an integer nor a Material object,
  *                      or if model argument is neither a string nor an integer.
  * @throws std::runtime_error If the model name/ID is invalid.
  */
-py::object PYBIND11_EXPORT electron_range(
-    py::object input,
-    py::object material = py::int_(1),
-    py::object model = py::str("tabata")
+nb::object electron_range(
+    nb::object input,
+    nb::object material = nb::int_(1),
+    nb::object model = nb::str("tabata")
 );
 
 #endif // ELECTRON_RANGE_H

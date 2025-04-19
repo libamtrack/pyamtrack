@@ -1,8 +1,9 @@
 #ifndef MATERIALS_H
 #define MATERIALS_H
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 #include <string>
 #include <vector>
 
@@ -10,7 +11,7 @@ extern "C" {
     #include "AT_DataMaterial.h"
 }
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 /**
  * @brief Retrieves the list of material IDs.

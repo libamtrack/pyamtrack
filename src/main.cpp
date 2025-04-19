@@ -1,11 +1,11 @@
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-PYBIND11_MODULE(_core, m) {
+NB_MODULE(_core, m) {
     m.doc() = "Python bindings for libamtrack";
 
 #ifdef VERSION_INFO

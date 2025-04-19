@@ -5,6 +5,6 @@ extern "C" {
     #include "AT_PhysicsRoutines.h"
 }
 
-py::object beta_from_energy(py::object input) {
+nb::object beta_from_energy(nb::object input) {
     return wrap_function(AT_beta_from_E_single, input);
 }

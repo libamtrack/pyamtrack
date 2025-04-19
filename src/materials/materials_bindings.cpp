@@ -1,15 +1,16 @@
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/string.h>
 #include "materials.h"
 #include "AT_DataMaterial.h"
 #include <iostream>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-PYBIND11_MODULE(materials, m) {
+NB_MODULE(materials, m) {
     m.doc() = "Functions and data structures for accessing and manipulating material properties.";
 
-    py::class_<Material>(m, "Material", R"pbdoc(
+    nb::class_<Material>(m, "Material", R"pbdoc(
         Represents a material with various physical properties.
 
         Attributes:
@@ -24,13 +25,13 @@ PYBIND11_MODULE(materials, m) {
             name (str): The name of the material.
             phase (int): The phase of the material (e.g., condensed or gaseous).
     )pbdoc")
-        .def(py::init<long>(), R"pbdoc(
+        .def(nb::init<long>(), R"pbdoc(
             Initializes a Material object by ID.
 
             Args:
                 id (int): The unique identifier for the material.
         )pbdoc")
-        .def(py::init<const std::string &>(), R"pbdoc(
+        .def(nb::init<const std::string &>(), R"pbdoc(
             Initializes a Material object by name.
 
             Args:
