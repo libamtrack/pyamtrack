@@ -37,16 +37,16 @@ NB_MODULE(materials, m) {
             Args:
                 name (str): The name of the material.
         )pbdoc")
-        .def_readonly("id", &Material::id, "The unique identifier for the material.")
-        .def_readonly("density_g_cm3", &Material::density_g_cm3, "The density of the material in g/cm³.")
-        .def_readonly("I_eV", &Material::I_eV, "The mean ionization potential in eV.")
-        .def_readonly("alpha_g_cm2_MeV", &Material::alpha_g_cm2_MeV, "Fit parameter for power-law representation of stopping power.")
-        .def_readonly("p_MeV", &Material::p_MeV, "Fit parameter for power-law representation of stopping power.")
-        .def_readonly("m_g_cm2", &Material::m_g_cm2, "Fit parameter for linear representation of fluence changes.")
-        .def_readonly("average_A", &Material::average_A, "The average mass number of the material.")
-        .def_readonly("average_Z", &Material::average_Z, "The average atomic number of the material.")
-        .def_readonly("name", &Material::name, "The name of the material.")
-        .def_readonly("phase", &Material::phase, "The phase of the material (e.g., condensed or gaseous).");
+        .def_ro("id", &Material::id, "The unique identifier for the material.")
+        .def_ro("density_g_cm3", &Material::density_g_cm3, "The density of the material in g/cm³.")
+        .def_ro("I_eV", &Material::I_eV, "The mean ionization potential in eV.")
+        .def_ro("alpha_g_cm2_MeV", &Material::alpha_g_cm2_MeV, "Fit parameter for power-law representation of stopping power.")
+        .def_ro("p_MeV", &Material::p_MeV, "Fit parameter for power-law representation of stopping power.")
+        .def_ro("m_g_cm2", &Material::m_g_cm2, "Fit parameter for linear representation of fluence changes.")
+        .def_ro("average_A", &Material::average_A, "The average mass number of the material.")
+        .def_ro("average_Z", &Material::average_Z, "The average atomic number of the material.")
+        .def_ro("name", &Material::name, "The name of the material.")
+        .def_ro("phase", &Material::phase, "The phase of the material (e.g., condensed or gaseous).");
 
     m.def("get_ids", []() {
         const AT_table_of_material_data_struct& data = AT_Material_Data;
