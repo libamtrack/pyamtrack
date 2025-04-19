@@ -18,9 +18,6 @@ using Func = std::function<double(double)>;
 
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
-
-    std::cout << "wrap 1 " << std::endl;
-
     // 1. Check for scalar types (float or int)
     if (PyFloat_Check(input.ptr()) || PyLong_Check(input.ptr())) {
         double input_val = nb::cast<double>(input);
@@ -45,9 +42,6 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
     // 3. Check for NumPy array
     else if (nb::isinstance<nb::ndarray<>>(input)) {
         // Get generic handle only for checking properties like ndim
-
-        std::cout << " wrap 2 " << std::endl;
-
         auto np_array_generic = nb::cast<nb::ndarray<>>(input);
 
         if (np_array_generic.ndim() != 1) {

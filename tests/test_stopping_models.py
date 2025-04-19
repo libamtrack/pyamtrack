@@ -27,12 +27,12 @@ def test_model_id_mapping():
     assert stopping.model("tabata") == 7
     assert stopping.model("scholz_new") == 8
 
-# def test_invalid_model(electron_energy_MeV):
-#     """Test handling of invalid model names."""
-#     with pytest.raises(RuntimeError, match="Unknown model name"):
-#         stopping.electron_range(electron_energy_MeV, model="invalid_model")
-#     with pytest.raises(TypeError, match="must be either an integer or a string"):
-#         stopping.electron_range(electron_energy_MeV, model=None)
+def test_invalid_model(electron_energy_MeV):
+    """Test handling of invalid model names."""
+    with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
+        stopping.electron_range(electron_energy_MeV, model="invalid_model")
+    # with pytest.raises(TypeError, match="must be either an integer or a string"):
+    #     stopping.electron_range(electron_energy_MeV, model=None)
 
 @pytest.mark.parametrize("model_name", [
     "butts_katz", "waligorski", "geiss", 
