@@ -32,9 +32,9 @@ def test_material_assignment(electron_energy_MeV):
 
 def test_material_assignment_invalid(electron_energy_MeV):
     """Test the material assignment with an invalid ID."""
-    with pytest.raises(TypeError, match="Material argument must be either an integer or a Material object"):
+    with pytest.raises(RuntimeError, match="Material argument must be an integer or a pyamtrack.materials.Material object"):
         pyamtrack.stopping.electron_range(electron_energy_MeV, "aaa")  # Invalid ID
-    with pytest.raises(TypeError, match="Material argument must be either an integer or a Material object"):
+    with pytest.raises(RuntimeError, match="Material argument must be an integer or a pyamtrack.materials.Material object"):
         pyamtrack.stopping.electron_range(electron_energy_MeV, pyamtrack.materials.get_ids)
 
 

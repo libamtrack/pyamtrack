@@ -29,9 +29,9 @@ def test_model_id_mapping():
 
 def test_invalid_model(electron_energy_MeV):
     """Test handling of invalid model names."""
-    with pytest.raises(RuntimeError, match="Unknown model name"):
+    with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
         stopping.electron_range(electron_energy_MeV, model="invalid_model")
-    with pytest.raises(TypeError, match="must be either an integer or a string"):
+    with pytest.raises(TypeError):
         stopping.electron_range(electron_energy_MeV, model=None)
 
 @pytest.mark.parametrize("model_name", [

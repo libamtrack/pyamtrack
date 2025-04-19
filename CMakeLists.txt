@@ -8,6 +8,36 @@ project(
   LANGUAGES C CXX
 )
 
+# Warn if the user invokes CMake directly
+if (NOT SKBUILD)
+  message(WARNING "\
+  This CMake file is meant to be executed using 'scikit-build-core'.
+  Running it directly will almost certainly not produce the desired
+  result. If you are a user trying to install this package, use the
+  command below, which will install all necessary build dependencies,
+  compile the package in an isolated environment, and then install it.
+  =====================================================================
+   $ pip install .
+  =====================================================================
+  If you are a software developer, and this is your own package, then
+  it is usually much more efficient to install the build dependencies
+  in your environment once and use the following command that avoids
+  a costly creation of a new virtual environment at every compilation:
+  =====================================================================
+   $ pip install nanobind scikit-build-core[pyproject]
+   $ pip install --no-build-isolation -ve .
+  =====================================================================
+  You may optionally add -Ceditable.rebuild=true to auto-rebuild when
+  the package is imported. Otherwise, you need to rerun the above
+  after editing C++ files.")
+endif()
+
+if (CMAKE_VERSION VERSION_LESS 3.18)
+  set(DEV_MODULE Development)
+else()
+  set(DEV_MODULE Development.Module)
+endif()
+
 ###############################################################################
 # Set C++17 as the required standard
 ###############################################################################
@@ -16,13 +46,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 ###############################################################################
-# Locate Python and pybind11
+# Locate Python and nanobind
 ###############################################################################
 # Find Python interpreter, development headers, and library.
-find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+find_package(Python 3.8 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
 
-# Find pybind11 for Python bindings.
-find_package(pybind11 CONFIG REQUIRED)
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
 
 ###############################################################################
 # Configure RPATH for non-Windows platforms
@@ -112,8 +150,8 @@ if(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-# Create the Python module from the source file.
-python_add_library(_core MODULE src/main.cpp WITH_SOABI)
+# Create the Python module from the source file
+nanobind_add_module(_core src/main.cpp)
 
 # Define a list of targets to link against the required libraries.
 set(PYAMTRACK_TARGETS converters stopping materials)
@@ -121,33 +159,16 @@ set(PYAMTRACK_TARGETS converters stopping materials)
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
   file(GLOB SOURCES src/${TARGET}/*.cpp)
-  python_add_library(${TARGET} MODULE ${SOURCES} WITH_SOABI)
+  nanobind_add_module(${TARGET} ${SOURCES})
 endforeach()
-
-# Ensure that _core is built after libamtrack.
-add_dependencies(_core amtrack)
 
 # Loop through the targets and link them against the required libraries.
 foreach(TARGET ${PYAMTRACK_TARGETS} _core)
   target_link_libraries(${TARGET} PRIVATE
-    pybind11::headers
     amtrack
     GSL::gsl
     GSL::gslcblas
   )
-endforeach()
-
-# Add this block to explicitly link Python on Windows.
-if(WIN32)
-  # Ensure Python library is linked.
-  foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-    target_link_libraries(${TARGET} PRIVATE ${Python_LIBRARIES})
-  endforeach()  
-endif()
-
-# Include Python headers for all targets.
-foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-  target_include_directories(${TARGET} PRIVATE ${Python_INCLUDE_DIRS})
 endforeach()
 
 # Pass the project version as a preprocessor definition.

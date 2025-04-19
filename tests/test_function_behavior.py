@@ -39,11 +39,11 @@ def test_function_behavior(func, min_val, max_val):
     assert np.isnan(result) or np.isinf(result), f"{func.__name__} failed for negative input."
 
     # Test: Corner cases for non-numeric values
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         func("string")
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         func(None)
-    with pytest.raises(RuntimeError):
+    with pytest.raises(TypeError):
         func([1, "string", 3])  # Mixture of numbers and non-numerical types
 
     # Test: Function should be monotonically increasing
