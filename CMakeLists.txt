@@ -171,11 +171,6 @@ foreach(TARGET ${PYAMTRACK_TARGETS} _core)
   )
 endforeach()
 
-# # Include Python headers for all targets.
-# foreach(TARGET ${PYAMTRACK_TARGETS} _core)
-#   target_include_directories(${TARGET} PRIVATE ${Python_INCLUDE_DIRS})
-# endforeach()
-
 # Pass the project version as a preprocessor definition.
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
