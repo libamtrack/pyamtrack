@@ -151,7 +151,7 @@ if(APPLE)
 endif()
 
 # Create the Python module from the source file
-nanobind_add_module(_core src/main.cpp)
+nanobind_add_module(_core STABLE_ABI src/main.cpp)
 
 # Define a list of targets to link against the required libraries.
 set(PYAMTRACK_TARGETS converters stopping materials)
@@ -159,7 +159,7 @@ set(PYAMTRACK_TARGETS converters stopping materials)
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
   file(GLOB SOURCES src/${TARGET}/*.cpp)
-  nanobind_add_module(${TARGET} ${SOURCES})
+  nanobind_add_module(${TARGET} STABLE_ABI ${SOURCES})
 endforeach()
 
 # Loop through the targets and link them against the required libraries.

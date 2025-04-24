@@ -35,6 +35,8 @@ Issues = "https://github.com/libamtrack/pyamtrack/issues"
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
+minimum-version = "build-system.requires"
+wheel.py-api = "cp312"
 
 wheel.exclude = ["share/libamtrack/VERSION", "include/AT_Version.h", "lib/cmake/**"]
 minimum-version = "build-system.requires"
