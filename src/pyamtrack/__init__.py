@@ -35,8 +35,8 @@ if sys.platform == "win32":
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
 
-from . import converters
-from . import stopping
-from . import materials
+# from . import converters
+# from . import stopping
+# from . import materials
 
-__all__ = ["converters", "stopping", "materials"]
+# __all__ = ["converters", "stopping", "materials"]
