@@ -39,4 +39,6 @@ if sys.platform == "win32":
 # from . import stopping
 # from . import materials
 
-# __all__ = ["converters", "stopping", "materials"]
+#__all__ = ["converters", "stopping", "materials"]
+
+from pyamtrack import converters, stopping, materials
