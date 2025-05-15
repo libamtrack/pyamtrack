@@ -1,5 +1,5 @@
 build==1.2.2.post1
-cmake==4.0.0
+cmake==4.0.2
 ninja==1.11.1.4
 numpy==2.2.4
 nanobind==2.7.0
