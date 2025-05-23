@@ -24,9 +24,7 @@ int get_model_id(const std::string& model_name) {
     }
     return it->second;
 }
-
-
-nb::object electron_range(nb::object input, nb::object material, nb::object model) {
+int process_material(const nb::object& material){
     int material_id = 0;
     if (nb::isinstance<nb::int_>(material)) {
         material_id = nb::cast<int>(material);
@@ -36,7 +34,7 @@ nb::object electron_range(nb::object input, nb::object material, nb::object mode
             nb::object MaterialType = pyamtrack_mod.attr("Material");
 
             if (!nb::isinstance(material, MaterialType)) {
-                 throw nb::type_error("Material argument must be an integer or a pyamtrack.materials.Material object");
+                throw nb::type_error("Material argument must be an integer or a pyamtrack.materials.Material object");
             }
 
             material_id = nb::cast<int>(material.attr("id"));
@@ -52,24 +50,79 @@ nb::object electron_range(nb::object input, nb::object material, nb::object mode
             throw std::runtime_error(error_msg.c_str()); // Nanobind will translate this
         }
     }
+    return material_id;
+}
 
+int process_model(const nb::object& model){
     int model_id = 0;
     if (nb::isinstance<nb::str>(model)) {
-        std::string model_name = nb::cast<std::string>(model);
-         try {
+        auto model_name = nb::cast<std::string>(model);
+        try {
             model_id = get_model_id(model_name);
-         } catch (const std::runtime_error &e) {
-             throw nb::value_error(e.what());
-         }
+        } catch (const std::runtime_error &e) {
+            throw nb::value_error(e.what());
+        }
     } else if (nb::isinstance<nb::int_>(model)) {
         model_id = nb::cast<int>(model);
     } else {
         throw nb::type_error("Model argument must be either an integer or a string");
     }
+    return model_id;
+}
+bool check_int_dtype(const nb::object& array){
+    if(nb::isinstance<nb::ndarray<const int>>(array)
+    || nb::isinstance<nb::ndarray<const u_int>>(array)
+    || nb::isinstance<nb::ndarray<const long>>(array)
+    || nb::isinstance<nb::ndarray<const u_long>>(array)
+    ){
+        return true;
+    }
+    return false;
+}
 
-    auto electron_range_single = [material_id, model_id](double e_mev_u) -> double {
-        return AT_max_electron_range_m(e_mev_u, material_id, model_id);
+nb::object electron_range(const nb::object& input, const nb::object& material, const nb::object& model) {
+    std::vector<nb::object> arguments_vector;
+    arguments_vector.push_back(input);
+    auto electron_range_vector = [](std::vector<double> vec) -> double {
+        return AT_max_electron_range_m(vec[0], (int)vec[1], (int)vec[2]);
     };
+    if(nb::isinstance<nb::list>(material)){
+        auto list = nb::cast<nb::list>(material);
+        nb::list material_id;
 
-    return wrap_function(electron_range_single, input);
+        for(int i = 0; i< nb::len(list); i++){
+            material_id.append(process_material(nb::cast(list[i])));
+        }
+        arguments_vector.push_back(nb::cast(material_id));
+    }
+    else if(check_int_dtype(material)){
+        arguments_vector.push_back(material);
+    }
+    else if(nb::isinstance<nb::ndarray<>>(material)){
+        throw nb::type_error("material arrays of type other than int unsupported");
+    }
+    else{
+        int material_id = process_material(material);
+        arguments_vector.push_back(nb::cast(material_id));
+    }
+
+    if(nb::isinstance<nb::list>(model)){
+        auto list = nb::cast<nb::list>(model);
+        nb::list model_id;
+        for(int i = 0; i< nb::len(list); i++){
+            model_id.append(process_model(nb::cast(list[i])));
+        }
+        arguments_vector.push_back(nb::cast(model_id));
+    }
+    else if(check_int_dtype(model)){
+        arguments_vector.push_back(model);
+    }
+    else if(nb::isinstance<nb::ndarray<>>(model)){
+        throw nb::type_error("model arrays of type other than int unsupported");
+    }
+    else{
+        int model_id = process_model(model);
+        arguments_vector.push_back(nb::cast(model_id));
+    }
+    return wrap_multiargument_function(electron_range_vector, arguments_vector);
 }

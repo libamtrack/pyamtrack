@@ -17,8 +17,8 @@ def test_energy_from_beta_single():
 
 def test_max_E_transfer_MeV():
     a = max_E_transfer_MeV(1, 2)
-    b = max_E_transfer_MeV([1, 2], [2, 3])
+    b = max_E_transfer_MeV(1, [2, 3])
     c = max_E_transfer_MeV(np.array([1, 2]), np.array([2, 3]))
     assert isinstance(a, float) or isinstance(a, int)
-    assert isinstance(b, list)
+    assert isinstance(b, np.ndarray)
     assert isinstance(c, np.ndarray)

@@ -60,9 +60,9 @@ int get_model_id(const std::string& model_name);
  * @throws std::runtime_error If the model name/ID is invalid.
  */
 nb::object electron_range(
-    nb::object input,
-    nb::object material = nb::int_(1),
-    nb::object model = nb::str("tabata")
+    const nb::object& input,
+    const nb::object& material = nb::int_(1),
+    const nb::object& model = nb::str("tabata")
 );
 
 #endif // ELECTRON_RANGE_H
