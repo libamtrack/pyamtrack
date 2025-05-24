@@ -157,9 +157,17 @@ nanobind_add_module(_core src/main.cpp)
 set(PYAMTRACK_TARGETS converters stopping materials)
 
 foreach(TARGET ${PYAMTRACK_TARGETS})
-  # Create a library for each target.
-  file(GLOB SOURCES src/${TARGET}/*.cpp)
-  nanobind_add_module(${TARGET} ${SOURCES})
+  # Get target-specific source files
+  file(GLOB TARGET_SOURCES src/${TARGET}/*.cpp)
+
+  # Add shared implementation (e.g. materials.cpp)
+  set(SHARED_SOURCES src/materials/materials.cpp)
+
+  # Combine all sources
+  set(ALL_SOURCES ${TARGET_SOURCES} ${SHARED_SOURCES})
+
+  # Build nanobind module
+  nanobind_add_module(${TARGET} ${ALL_SOURCES})
 endforeach()
 
 # Loop through the targets and link them against the required libraries.
