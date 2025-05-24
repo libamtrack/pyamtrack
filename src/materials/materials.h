@@ -46,6 +46,14 @@ std::vector<std::string> get_names();
  *
  * @return std::vector<std::string> A list of full material names.
  */
+int process_material(const nb::object& material);
+/**
+ * @brief transforms material into its corresponding id. If int is passed as input, then returns input;
+ *
+ * @return int a material id
+ */
+
+
 std::vector<std::string> get_long_names();
 
 /**

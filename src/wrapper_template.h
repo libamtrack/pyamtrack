@@ -73,13 +73,35 @@ inline nb::object wrap_function(Func func, const nb::object &input) {
     throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
 }
 
+inline nb::object prepare_array_argument(const nb::object &scalar, u_int shape){
+    std::vector<double> results(shape);
+    for(int i = 0; i< shape; i++){
+        results[i] = nb::cast<double>(scalar);
+    }
+    auto result_array = nb::ndarray<double, nb::numpy>(results.data(), {(u_long)shape}).cast();
+    return result_array;
+}
+
 inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, const std::vector<nb::object> &input) {
 
     // Check for scalar types (float or int)
     bool scalars_only = true;
+    size_t len = 0;
     for (const auto& argument: input) {
-        if (!PyFloat_Check(argument.ptr()) && !PyLong_Check(argument.ptr())){
+        if (nb::isinstance<nb::list>(argument)) {
+            auto list = nb::cast<nb::list>(argument);
+            len = nb::len(list);
             scalars_only = false;
+            break;
+        }
+        else if (nb::isinstance<nb::ndarray<>>(argument)) {
+            auto array = nb::cast<nb::ndarray<>>(argument);
+            len = array.size();
+            scalars_only = false;
+            break;
+        }else if (!PyFloat_Check(argument.ptr()) && !PyLong_Check(argument.ptr())){
+            // Handle unsupported types
+            throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
         }
     }
     if (scalars_only) {
@@ -93,36 +115,22 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
     }
         // Check for Python list and / or arrays
     else {
-        std::vector<int> argument_types; // -1 for scalar, array_arguments idx otherwise
-        argument_types.reserve(input.size());
-        std::vector<nb::ndarray<const double, nb::shape<-1>>> array_arguments;
-        std::vector<nb::list> list_arguments;
-        size_t len = 0;
+        std::vector<nb::object> arguments;
         for (const auto & i : input) {
             if (PyFloat_Check(i.ptr()) || PyLong_Check(i.ptr()))
-                argument_types.push_back(-1);
+                arguments.push_back(prepare_array_argument(i, (int)len));
             else if (nb::isinstance<nb::list>(i)) {
-                argument_types.push_back((int) list_arguments.size());
-                auto list = nb::cast<nb::list>(i);
-                list_arguments.push_back(list);
-                size_t new_len = nb::len(list);
-                if (len && new_len != len)
+                arguments.push_back(i);
+                if (nb::len(nb::cast<nb::list>(i)) != len)
                     throw nb::value_error("Incompatible lists/arrays size");
-                else
-                    len = new_len;
             }
             else if (nb::isinstance<nb::ndarray<>>(i)) {
-                argument_types.push_back((int) array_arguments.size());
                 auto array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(i);
-                if (array.ndim() != 1) {
+                if (array.ndim() != 1)
                     throw nb::value_error("Input NumPy array must be 1-D.");
-                }
-                array_arguments.push_back(array);
-                size_t new_len = array.size();
-                if (len && new_len != len)
+                arguments.push_back(i);
+                if (array.size() != len)
                     throw nb::value_error("Incompatible lists/arrays size");
-                else
-                    len = new_len;
             }else {
                 // Handle unsupported types
                 throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
@@ -131,18 +139,16 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
         std::vector<double> results(len);
         try {
             for (int i = 0; i < len; i++) {
-                std::vector<double> argument_list;
-                for (int j = 0; j < argument_types.size(); j++) {
-                    if (argument_types[j] == -1)
-                        argument_list.push_back(nb::cast<double>(input[j]));
-                    else if(nb::isinstance<nb::list>(input[j])){
-                        argument_list.push_back(nb::cast<double>(list_arguments[argument_types[j]][i]));
-                    }
+                std::vector<double> arguments_vector;
+                for (auto & argument : arguments) {
+                    if(nb::isinstance<nb::list>(argument))
+                        arguments_vector.push_back(nb::cast<double>(argument[i]));
                     else{
-                        argument_list.push_back(array_arguments[argument_types[j]](i));
+                        auto array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(argument);
+                        arguments_vector.push_back(array(i));
                     }
                 }
-                results[i] = func(argument_list);
+                results[i] = func(arguments_vector);
             }
         } catch (const nb::cast_error &e) {
             throw nb::type_error("1-D NumPy array dtype cannot be cast to double or input is not suitable.");
@@ -155,6 +161,17 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
     }
 
 
+}
+
+inline bool check_int_dtype(const nb::object& array){
+    if(nb::isinstance<nb::ndarray<const int>>(array)
+       || nb::isinstance<nb::ndarray<const u_int>>(array)
+       || nb::isinstance<nb::ndarray<const long>>(array)
+       || nb::isinstance<nb::ndarray<const u_long>>(array)
+            ){
+        return true;
+    }
+    return false;
 }
 
 #endif // WRAPPER_TEMPLATE_H

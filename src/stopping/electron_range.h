@@ -6,6 +6,7 @@
 #include <nanobind/stl/vector.h>
 #include <nanobind/stl/map.h>
 #include <map>
+#include "../materials/materials.h"
 
 namespace nb = nanobind;
 
