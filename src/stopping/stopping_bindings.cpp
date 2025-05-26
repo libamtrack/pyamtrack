@@ -6,24 +6,23 @@
 namespace nb = nanobind;
 
 NB_MODULE(stopping, m) {
-    m.doc() =
-        "Functions for calculating stopping power of ions and protons and range of particles in "
-        "materials.";
+  m.doc() =
+      "Functions for calculating stopping power of ions and protons and range of particles in "
+      "materials.";
 
-    // Create submodule for models
-    nb::module_ models = m.def_submodule("models", "Stopping power models");
+  // Create submodule for models
+  nb::module_ models = m.def_submodule("models", "Stopping power models");
 
-    // Add model constants using the map
-    for (const auto& [name, id] : STOPPING_MODELS) {
-        models.attr(name.c_str()) = nb::int_(id);
-    }
+  // Add model constants using the map
+  for (const auto& [name, id] : STOPPING_MODELS) {
+    models.attr(name.c_str()) = nb::int_(id);
+  }
 
-    m.def("get_models", &get_models, "Returns list of available stopping power models");
-    m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
+  m.def("get_models", &get_models, "Returns list of available stopping power models");
+  m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
 
-    m.def("electron_range", &electron_range, nb::arg("input"), nb::arg("material") = 1,
-          nb::arg("model") = "tabata",
-          R"pbdoc(
+  m.def("electron_range", &electron_range, nb::arg("input"), nb::arg("material") = 1, nb::arg("model") = "tabata",
+        R"pbdoc(
         Calculate electron range in meters using various models.
 
         This function calculates the maximum electron range in a material using different theoretical

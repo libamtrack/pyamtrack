@@ -26,9 +26,9 @@ const char* energy_from_beta_doc = R"pbdoc(
     )pbdoc";
 
 NB_MODULE(converters, m) {
-    m.doc() = "Functions for converting between different physical quantities.";
+  m.doc() = "Functions for converting between different physical quantities.";
 
-    m.def("beta_from_energy", &beta_from_energy, nb::arg("input"), beta_from_energy_doc);
+  m.def("beta_from_energy", &beta_from_energy, nb::arg("input"), beta_from_energy_doc);
 
-    m.def("energy_from_beta", &energy_from_beta, nb::arg("input"), energy_from_beta_doc);
+  m.def("energy_from_beta", &energy_from_beta, nb::arg("input"), energy_from_beta_doc);
 }

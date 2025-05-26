@@ -7,5 +7,5 @@ extern "C" {
 }
 
 nb::object energy_from_beta(nb::object input) {
-    return wrap_function(AT_E_from_beta_single, input);
+  return wrap_function(AT_E_from_beta_single, input);
 }

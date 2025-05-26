@@ -82,9 +82,7 @@ def test_energy_scaling():
     energies = np.array([10.0, 100.0])
     for model in stopping.get_models():
         ranges = stopping.electron_range(energies, model=model)
-        assert (
-            ranges[1] > ranges[0]
-        ), f"{model} model doesn't show expected energy scaling"
+        assert ranges[1] > ranges[0], f"{model} model doesn't show expected energy scaling"
 
 
 def test_material_independence(electron_energy_MeV, models):
@@ -92,8 +90,5 @@ def test_material_independence(electron_energy_MeV, models):
     materials = [1, pyamtrack.materials.water_liquid, pyamtrack.materials.air]
 
     for model in models:
-        ranges = [
-            stopping.electron_range(electron_energy_MeV, material=m, model=model)
-            for m in materials
-        ]
+        ranges = [stopping.electron_range(electron_energy_MeV, material=m, model=model) for m in materials]
         assert all(r > 0 for r in ranges), f"{model} failed with some material"
