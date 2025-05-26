@@ -68,25 +68,26 @@ This project uses [pre-commit](https://pre-commit.com) to ensure code quality an
 
 To set it up:
 
-1. Install `pre-commit` if you don't have it:
-
+1. **Create a Virtual Environment**:
+   Create and activate a Python virtual environment:
    ```bash
-   pip install pre-commit
+   python3 -m venv venv
+   source venv/bin/activate
    ```
 
-2. Install clang-format:
-
+2. **Install Development Dependencies**:
+   Install the required dependencies for building the project:
    ```bash
-   apt install clang-format
+   pip install -r requirements-dev.txt
    ```
 
-3. Install the Git hooks:
+3. **Install the Git hooks**:
 
    ```bash
    pre-commit install
    ```
 
-4. Run all hooks on all files once (recommended after cloning the repo):
+4. **Run all hooks on all files once** (recommended after cloning the repo):
 
    ```bash
    pre-commit run --all-files
