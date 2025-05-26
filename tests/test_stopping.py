@@ -13,7 +13,7 @@ def test_electron_range(electron_energy_MeV):
     range_m = pyamtrack.stopping.electron_range(electron_energy_MeV)
     assert range_m > 0.01, "Expected positive range for positive energy."
 
- 
+
 def test_electron_range_air_vs_water(electron_energy_MeV):
     """Test the electron_range function for air and water."""
     range_air = pyamtrack.stopping.electron_range(electron_energy_MeV, pyamtrack.materials.air)
@@ -32,9 +32,15 @@ def test_material_assignment(electron_energy_MeV):
 
 def test_material_assignment_invalid(electron_energy_MeV):
     """Test the material assignment with an invalid ID."""
-    with pytest.raises(RuntimeError, match="Material argument must be an integer or a pyamtrack.materials.Material object"):
+    with pytest.raises(
+        RuntimeError,
+        match="Material argument must be an integer or a pyamtrack.materials.Material object",
+    ):
         pyamtrack.stopping.electron_range(electron_energy_MeV, "aaa")  # Invalid ID
-    with pytest.raises(RuntimeError, match="Material argument must be an integer or a pyamtrack.materials.Material object"):
+    with pytest.raises(
+        RuntimeError,
+        match="Material argument must be an integer or a pyamtrack.materials.Material object",
+    ):
         pyamtrack.stopping.electron_range(electron_energy_MeV, pyamtrack.materials.get_ids)
 
 

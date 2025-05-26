@@ -1,34 +1,32 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
+
 #include "electron_range.h"
 
 namespace nb = nanobind;
 
 NB_MODULE(stopping, m) {
-    m.doc() = "Functions for calculating stopping power of ions and protons and range of particles in materials.";
+  m.doc() =
+      "Functions for calculating stopping power of ions and protons and range of particles in "
+      "materials.";
 
-    // Create submodule for models
-    nb::module_ models = m.def_submodule("models", "Stopping power models");
-    
-    // Add model constants using the map
-    for (const auto& [name, id] : STOPPING_MODELS) {
-        models.attr(name.c_str()) = nb::int_(id);
-    }
+  // Create submodule for models
+  nb::module_ models = m.def_submodule("models", "Stopping power models");
 
-    m.def("get_models", &get_models, "Returns list of available stopping power models");
-    m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
+  // Add model constants using the map
+  for (const auto& [name, id] : STOPPING_MODELS) {
+    models.attr(name.c_str()) = nb::int_(id);
+  }
 
-    m.def(
-        "electron_range",
-        &electron_range,
-        nb::arg("input"),
-        nb::arg("material") = 1,
-        nb::arg("model") = "tabata",
+  m.def("get_models", &get_models, "Returns list of available stopping power models");
+  m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
+
+  m.def("electron_range", &electron_range, nb::arg("input"), nb::arg("material") = 1, nb::arg("model") = "tabata",
         R"pbdoc(
         Calculate electron range in meters using various models.
 
-        This function calculates the maximum electron range in a material using different theoretical 
-        or empirical models. The range represents the maximum distance that electrons can travel 
+        This function calculates the maximum electron range in a material using different theoretical
+        or empirical models. The range represents the maximum distance that electrons can travel
         in the material before losing all their energy.
 
         Parameters
@@ -61,6 +59,5 @@ NB_MODULE(stopping, m) {
             or if model argument is neither a string nor an integer.
         ValueError
             If the input energy is negative or the model/material ID is invalid.
-        )pbdoc"
-    );
+        )pbdoc");
 }

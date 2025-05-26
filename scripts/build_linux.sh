@@ -44,4 +44,3 @@ echo "Running the tests..."
 pytest || error "Tests failed."
 
 echo "Package built, installed, and tested successfully!"
-

@@ -10,6 +10,7 @@ test_cases = [
     (electron_range, 0, 1000),
 ]
 
+
 @pytest.mark.parametrize("func, min_val, max_val", test_cases)
 def test_function_behavior(func, min_val, max_val):
     """

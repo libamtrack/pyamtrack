@@ -6,11 +6,11 @@
 namespace nb = nanobind;
 
 NB_MODULE(_core, m) {
-    m.doc() = "Python bindings for libamtrack";
+  m.doc() = "Python bindings for libamtrack";
 
 #ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
+  m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
-    m.attr("__version__") = "dev";
+  m.attr("__version__") = "dev";
 #endif
 }

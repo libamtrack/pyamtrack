@@ -75,7 +75,7 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install --upgrade build
-  
+
       - name: Build Windows Wheel
         env:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed

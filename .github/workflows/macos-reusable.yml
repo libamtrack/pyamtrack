@@ -30,7 +30,7 @@ jobs:
 
       - name: Install Python dependencies
         run: pip install --upgrade build
-  
+
       - name: Build MacOS Wheel
         run: python -m build
 
