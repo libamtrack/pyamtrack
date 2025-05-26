@@ -1,15 +1,16 @@
 #ifndef WRAPPER_TEMPLATE_H
 #define WRAPPER_TEMPLATE_H
 
-#include <vector>
-#include <functional>
-#include <stdexcept>
-#include <type_traits>
-#include <string>
-#include <iostream>
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/vector.h>
 #include <nanobind/ndarray.h>
+#include <nanobind/stl/vector.h>
+
+#include <functional>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 namespace nb = nanobind;
 
@@ -50,21 +51,23 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
 
         // Handle 1-D array
         if (np_array_generic.ndim() == 1) {
-             try {
+            try {
                 auto input_array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(input);
                 size_t size = input_array.size();
                 std::vector<double> results(size);
-                for(size_t i = 0; i < size; ++i) {
+                for (size_t i = 0; i < size; ++i) {
                     results[i] = func(input_array(i));
                 }
-                auto result_array = nb::ndarray<double, nb::numpy>(results.data() ,{size}).cast();
+                auto result_array = nb::ndarray<double, nb::numpy>(results.data(), {size}).cast();
                 return result_array;
 
-             } catch (const nb::cast_error& e) {
-                 throw nb::type_error("1-D NumPy array dtype cannot be cast to double or input is not suitable.");
-             } catch (const std::exception& e) {
-                 throw std::runtime_error("Error processing 1-D NumPy array: " + std::string(e.what()));
-             }
+            } catch (const nb::cast_error& e) {
+                throw nb::type_error(
+                    "1-D NumPy array dtype cannot be cast to double or input is not suitable.");
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Error processing 1-D NumPy array: " +
+                                         std::string(e.what()));
+            }
         }
     }
 
@@ -72,4 +75,4 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
     throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
 }
 
-#endif // WRAPPER_TEMPLATE_H
+#endif  // WRAPPER_TEMPLATE_H

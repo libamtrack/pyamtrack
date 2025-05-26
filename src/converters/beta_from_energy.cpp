@@ -1,8 +1,9 @@
-#include "../wrapper_template.h"
 #include "beta_from_energy.h"
 
+#include "../wrapper_template.h"
+
 extern "C" {
-    #include "AT_PhysicsRoutines.h"
+#include "AT_PhysicsRoutines.h"
 }
 
 nb::object beta_from_energy(nb::object input) {

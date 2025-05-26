@@ -9,6 +9,7 @@ def test_beta_from_energy_60_MeV_u():
     beta = beta_from_energy(energy)
     assert beta < 0.5, "Beta should be smaller than 0.5 for 60 MeV/u"
 
+
 def test_energy_from_beta_single():
     """Test the energy_from_beta function with a single value."""
     beta = 0.5

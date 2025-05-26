@@ -1,9 +1,11 @@
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/vector.h>
 #include <nanobind/stl/string.h>
-#include "materials.h"
-#include "AT_DataMaterial.h"
+#include <nanobind/stl/vector.h>
+
 #include <iostream>
+
+#include "AT_DataMaterial.h"
+#include "materials.h"
 
 namespace nb = nanobind;
 
@@ -31,7 +33,7 @@ NB_MODULE(materials, m) {
             Args:
                 id (int): The unique identifier for the material.
         )pbdoc")
-        .def(nb::init<const std::string &>(), R"pbdoc(
+        .def(nb::init<const std::string&>(), R"pbdoc(
             Initializes a Material object by name.
 
             Args:
@@ -40,18 +42,26 @@ NB_MODULE(materials, m) {
         .def_ro("id", &Material::id, "The unique identifier for the material.")
         .def_ro("density_g_cm3", &Material::density_g_cm3, "The density of the material in g/cm³.")
         .def_ro("I_eV", &Material::I_eV, "The mean ionization potential in eV.")
-        .def_ro("alpha_g_cm2_MeV", &Material::alpha_g_cm2_MeV, "Fit parameter for power-law representation of stopping power.")
-        .def_ro("p_MeV", &Material::p_MeV, "Fit parameter for power-law representation of stopping power.")
-        .def_ro("m_g_cm2", &Material::m_g_cm2, "Fit parameter for linear representation of fluence changes.")
+        .def_ro("alpha_g_cm2_MeV", &Material::alpha_g_cm2_MeV,
+                "Fit parameter for power-law representation of stopping power.")
+        .def_ro("p_MeV", &Material::p_MeV,
+                "Fit parameter for power-law representation of stopping power.")
+        .def_ro("m_g_cm2", &Material::m_g_cm2,
+                "Fit parameter for linear representation of fluence changes.")
         .def_ro("average_A", &Material::average_A, "The average mass number of the material.")
         .def_ro("average_Z", &Material::average_Z, "The average atomic number of the material.")
         .def_ro("name", &Material::name, "The name of the material.")
-        .def_ro("phase", &Material::phase, "The phase of the material (e.g., condensed or gaseous).");
+        .def_ro("phase", &Material::phase,
+                "The phase of the material (e.g., condensed or gaseous).");
 
-    m.def("get_ids", []() {
-        const AT_table_of_material_data_struct& data = AT_Material_Data;
-        return std::vector<long>(std::begin(data.material_no) + 1, std::begin(data.material_no) + data.n);
-    }, R"pbdoc(
+    m.def(
+        "get_ids",
+        []() {
+            const AT_table_of_material_data_struct& data = AT_Material_Data;
+            return std::vector<long>(std::begin(data.material_no) + 1,
+                                     std::begin(data.material_no) + data.n);
+        },
+        R"pbdoc(
         Retrieves the list of material IDs.
 
         Returns:

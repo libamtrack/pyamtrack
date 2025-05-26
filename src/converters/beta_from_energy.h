@@ -7,4 +7,4 @@ namespace nb = nanobind;
 
 nb::object beta_from_energy(nb::object input);
 
-#endif // BETA_FROM_ENERGY_H
+#endif  // BETA_FROM_ENERGY_H
