@@ -99,7 +99,7 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
             len = array.size();
             scalars_only = false;
             break;
-        }else if (!PyFloat_Check(argument.ptr()) && !PyLong_Check(argument.ptr())){
+        }else if (!nb::isinstance<nb::float_>(argument) && !nb::isinstance<nb::int_>(argument)){
             // Handle unsupported types
             throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
         }
