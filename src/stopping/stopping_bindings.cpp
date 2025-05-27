@@ -37,7 +37,7 @@ NB_MODULE(stopping, m) {
             The electron energy in MeV. Can be a single value, a NumPy array, or a Python list.
         material : int, Material, list[int | Material] or numpy array with int as dtype, optional
             Either a material ID as integer or a Material object. Defaults to 1 (Liquid water).
-        model : str, int, list[int | str] or numpy array with inst as dtype, optional
+        model : str, int, list[int | str] or numpy array with int as dtype, optional
             The stopping power model to use. Can be specified either as a string name or model ID.
             Available models:
             - "butts_katz" (id=2): Butts & Katz model
