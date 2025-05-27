@@ -33,7 +33,7 @@ int process_model(const nb::object& model){
          try {
             model_id = get_model_id(model_name);
          } catch (const std::runtime_error &e) {
-            throw nb::value_error(e.what());
+             throw nb::value_error(e.what());
          }
     } else if (nb::isinstance<nb::int_>(model)) {
         model_id = nb::cast<int>(model);

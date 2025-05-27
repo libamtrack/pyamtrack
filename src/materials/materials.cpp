@@ -47,35 +47,6 @@ std::string to_name( const std::string& name) {
     return result;
 }
 
-int process_material(const nb::object& material){
-    int material_id = 0;
-    if (nb::isinstance<nb::int_>(material)) {
-        material_id = nb::cast<int>(material);
-    } else {
-        try {
-            nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.materials");
-            nb::object MaterialType = pyamtrack_mod.attr("Material");
-
-            if (!nb::isinstance(material, MaterialType)) {
-                throw nb::type_error("Material argument must be an integer or a pyamtrack.materials.Material object");
-            }
-
-            material_id = nb::cast<int>(material.attr("id"));
-
-        } catch (const nb::python_error &e) {
-            // FIX: Re-throw the original Python error
-            throw; // Preserves original Python exception type and traceback
-        } catch (const nb::cast_error &e) {
-            std::string error_msg = "Material object's 'id' attribute is not an integer: " + std::string(e.what());
-            throw nb::type_error(error_msg.c_str());
-        } catch (const std::exception &e) { // Catches std::runtime_error and others
-            std::string error_msg = "An error occurred while processing the Material object: " + std::string(e.what());
-            throw std::runtime_error(error_msg.c_str()); // Nanobind will translate this
-        }
-    }
-    return material_id;
-}
-
 std::vector<std::string> get_names() {
     auto names = get_long_names();
     for (auto& name : names) {

@@ -165,9 +165,9 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
 
 inline bool check_int_dtype(const nb::object& array){
     if(nb::isinstance<nb::ndarray<const int>>(array)
-       || nb::isinstance<nb::ndarray<const u_int>>(array)
+       || nb::isinstance<nb::ndarray<const unsigned int>>(array)
        || nb::isinstance<nb::ndarray<const long>>(array)
-       || nb::isinstance<nb::ndarray<const u_long>>(array)
+       || nb::isinstance<nb::ndarray<const unsigned long>>(array)
             ){
         return true;
     }
