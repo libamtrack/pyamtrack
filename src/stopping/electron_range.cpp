@@ -68,6 +68,9 @@ nb::object electron_range(const nb::object& input, const nb::object& material, c
     std::vector<nb::object> arguments_vector;
     arguments_vector.push_back(input);
     auto electron_range_vector = [](std::vector<double> vec) -> double {
+        if (vec.size() < 3) {
+            throw std::invalid_argument("Input vector must have at least three elements.");
+        }
         return AT_max_electron_range_m(vec[0], (int)vec[1], (int)vec[2]);
     };
     arguments_vector.push_back(get_id(material, process_material)); // unifying materials to int
