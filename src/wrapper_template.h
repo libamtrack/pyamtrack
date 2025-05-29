@@ -15,7 +15,7 @@ namespace nb = nanobind;
 
 // Define the type for the function to be wrapped.
 using Func = std::function<double(double)>;
-using MultiargumentFunc = std::function<double(std::vector<double>)>;
+using MultiargumentFunc = std::function<double(const std::vector<double>)>;
 
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
@@ -165,15 +165,13 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
 
 }
 
-inline bool check_int_dtype(const nb::object& array){
-    if(nb::isinstance<nb::ndarray<const int>>(array)
-       || nb::isinstance<nb::ndarray<const unsigned int>>(array)
-       || nb::isinstance<nb::ndarray<const long>>(array)
-       || nb::isinstance<nb::ndarray<const unsigned long>>(array)
-            ){
+inline bool check_int_dtype(const nb::object& array) {
+    if (nb::isinstance<nb::ndarray<int8_t>>(array)  || nb::isinstance<nb::ndarray<uint8_t>>(array)  ||
+        nb::isinstance<nb::ndarray<int16_t>>(array) || nb::isinstance<nb::ndarray<uint16_t>>(array) ||
+        nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
+        nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array)) {
         return true;
     }
     return false;
 }
-
 #endif // WRAPPER_TEMPLATE_H
