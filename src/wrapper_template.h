@@ -15,7 +15,7 @@ namespace nb = nanobind;
 
 // Define the type for the function to be wrapped.
 using Func = std::function<double(double)>;
-using MultiargumentFunc = std::function<double(const std::vector<double>)>;
+using MultiargumentFunc = std::function<double(const std::vector<double>&)>;
 
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
@@ -118,19 +118,19 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
     else {
         // there is at least one list or array argument. input_length is length of the first one, others should have the same shape.
         std::vector<nb::object> arguments;
-        for (const auto & i : input) {
-            if (PyFloat_Check(i.ptr()) || PyLong_Check(i.ptr()))
-                arguments.push_back(prepare_array_argument(i, (int)input_length));
-            else if (nb::isinstance<nb::list>(i)) {
-                arguments.push_back(i);
-                if (nb::len(nb::cast<nb::list>(i)) != input_length)
+        for (const auto & input_element : input) {
+            if (nb::isinstance<nb::float_>(input_element) || nb::isinstance<nb::int_>(input_element))
+                arguments.push_back(prepare_array_argument(input_element, (int)input_length));
+            else if (nb::isinstance<nb::list>(input_element)) {
+                arguments.push_back(input_element);
+                if (nb::len(nb::cast<nb::list>(input_element)) != input_length)
                     throw nb::value_error("Incompatible lists/arrays size");
             }
-            else if (nb::isinstance<nb::ndarray<>>(i)) {
-                auto array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(i);
+            else if (nb::isinstance<nb::ndarray<>>(input_element)) {
+                auto array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(input_element);
                 if (array.ndim() != 1)
                     throw nb::value_error("Input NumPy array must be 1-D.");
-                arguments.push_back(i);
+                arguments.push_back(input_element);
                 if (array.size() != input_length)
                     throw nb::value_error("Incompatible lists/arrays size");
             }else {
@@ -140,7 +140,7 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc &func, con
         }
         std::vector<double> results(input_length);
         try {
-            for (int i = 0; i < input_length; i++) {
+            for (size_t i = 0; i < input_length; i++) {
                 std::vector<double> arguments_vector;
                 for (auto & argument : arguments) {
                     if(nb::isinstance<nb::list>(argument))

@@ -8,7 +8,7 @@
 extern "C" {
     #include "AT_ElectronRange.h" // Contains AT_max_electron_range_m definition
 }
-using ids_getter = std::function<int(nb::object)>;
+using ids_getter = std::function<int(const nb::object&)>;
 
 std::vector<std::string> get_models() {
     std::vector<std::string> names;
