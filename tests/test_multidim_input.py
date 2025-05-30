@@ -61,7 +61,7 @@ def test_multi_dim_array(func, min_val, max_val, dim):
     array = np.random.uniform(low=min_val, high=max_val, size=(10,) * dim)
 
     assert len(array.shape) == dim
-    assert array.size == np.pow(10, dim)
+    assert array.size == 10**dim
 
     partial_results = []
     for lower_dim_arr in array:

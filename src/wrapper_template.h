@@ -44,40 +44,39 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
     // 3. Check for NumPy array
     else if (nb::isinstance<nb::ndarray<>>(input)) {
         
-        // Handle ndarray with arbitray dimension
+        // Handle ndarray with arbitrary dimension
         try {
             // Cast the input to the ndarray of type double 
             // (const because the input data is read only)
             auto input_array = nb::cast<nb::ndarray<const double>>(input);
 
             // Size is the total number of elements in the array
-            size_t size = input_array.size();
+            size_t num_elements = input_array.size();
             
             // The shape vector is later used to initialize the result ndarray
             // It will have similar shape as input array
-            std::vector<size_t> shape(input_array.ndim());
+            std::vector<size_t> result_shape(input_array.ndim());
             for (size_t i = 0; i < input_array.ndim(); ++i)
-                shape[i] = input_array.shape(i);
+                result_shape[i] = input_array.shape(i);
             
             // Get the pointer to the block of data to be mapped
-            const double* data = input_array.data();
+            const double* data_buffer = input_array.data();
 
             // Initialize the vector that will store the result
             // And map all the elements from the input with the given func
-            std::vector<double> results(size);
-            for(size_t i = 0; i < size; ++i) {
-                results[i] = func(data[i]);
+            std::vector<double> results(num_elements);
+            for(size_t i = 0; i < num_elements; ++i) {
+                results[i] = func(data_buffer[i]);
             }
             
             // Create the result ndarray, with the mapped data and pass the according shape
-            auto result_array = nb::ndarray<double, nb::numpy>(results.data(), shape.size(), shape.data()).cast();
+            auto result_array = nb::ndarray<double, nb::numpy>(results.data(), result_shape.size(), result_shape.data()).cast();
             return result_array;
 
-             } catch (const nb::cast_error& e) {
-                 throw nb::type_error("1-D NumPy array dtype cannot be cast to double or input is not suitable.");
-             } catch (const std::exception& e) {
-                 throw std::runtime_error("Error processing 1-D NumPy array: " + std::string(e.what()));
-             }
+        } catch (const nb::cast_error& e) {
+            throw nb::type_error("NumPy array dtype cannot be cast to double or input is not suitable.");
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Error processing NumPy array: " + std::string(e.what()));
         }
     }
 
