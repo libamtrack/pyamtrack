@@ -17,4 +17,4 @@ repos:
     hooks:
       - id: clang-format
         args: [-style=file]
-        files: \.(cpp|hpp|c|h|cc|hh)$
+        files: '\.(cpp|hpp|c|h|cc|hh)$'
