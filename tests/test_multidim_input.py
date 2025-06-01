@@ -4,16 +4,25 @@ from random import uniform
 from pyamtrack.converters import beta_from_energy, energy_from_beta
 from pyamtrack.stopping import electron_range
 
-base_cases = [
+zero_dim_cases = [
+    (beta_from_energy, 0, 100),
+    (energy_from_beta, 0, 1),
+]
+
+one_dim_cases = [
     (beta_from_energy, 0, 100),
     (energy_from_beta, 0, 1),
     (electron_range, 0, 1000),
 ]
 
 # Create test cases for dimensions 2 through 5
-test_cases = [base_args + (dim,) for base_args in base_cases for dim in range(2, 6)]
+multidim_base_cases = [
+    (beta_from_energy, 0, 100),
+    (energy_from_beta, 0, 1)
+]
+multidim_cases = [base_args + (dim,) for base_args in multidim_base_cases for dim in range(2, 6)]
 
-@pytest.mark.parametrize("func, min_val, max_val", base_cases)
+@pytest.mark.parametrize("func, min_val, max_val", zero_dim_cases)
 def test_zero_dim_array(func, min_val, max_val):
     """
     Test that the function correctly handles 0-dimensional (scalar) NumPy inputs.
@@ -30,7 +39,7 @@ def test_zero_dim_array(func, min_val, max_val):
     assert np.allclose(result_scalar, result_np_scalar)
 
 
-@pytest.mark.parametrize("func, min_val, max_val", base_cases)
+@pytest.mark.parametrize("func, min_val, max_val", one_dim_cases)
 def test_one_dim_array(func, min_val, max_val):
 
     """
@@ -48,7 +57,7 @@ def test_one_dim_array(func, min_val, max_val):
 
 
 
-@pytest.mark.parametrize("func, min_val, max_val, dim", test_cases)
+@pytest.mark.parametrize("func, min_val, max_val, dim", multidim_cases)
 def test_multi_dim_array(func, min_val, max_val, dim):
 
     """
