@@ -7,6 +7,7 @@
 #include <nanobind/stl/vector.h>
 
 #include <map>
+
 #include "../materials/materials.h"
 
 namespace nb = nanobind;
@@ -61,10 +62,7 @@ int get_model_id(const std::string& model_name);
  *                      or if model argument is neither a string nor an integer.
  * @throws std::runtime_error If the model name/ID is invalid.
  */
-nb::object electron_range(
-    const nb::object& input,
-    const nb::object& material = nb::int_(1),
-    const nb::object& model = nb::str("tabata")
-);
+nb::object electron_range(const nb::object& input, const nb::object& material = nb::int_(1),
+                          const nb::object& model = nb::str("tabata"));
 
 #endif  // ELECTRON_RANGE_H
