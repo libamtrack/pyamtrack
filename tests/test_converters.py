@@ -1,5 +1,6 @@
-import pytest
 import numpy as np
+import pytest
+
 from pyamtrack.converters import beta_from_energy, energy_from_beta
 
 

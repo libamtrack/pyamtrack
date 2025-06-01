@@ -1,7 +1,8 @@
-import pytest
 import numpy as np
-import pyamtrack.stopping as stopping
+import pytest
+
 import pyamtrack.materials
+import pyamtrack.stopping as stopping
 
 
 @pytest.fixture
