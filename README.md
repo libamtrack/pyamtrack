@@ -41,6 +41,8 @@ Detailed user documentation is available at **[https://libamtrack.github.io/](ht
 - Guidelines on how to use pyamtrack.
 - Descriptions of all available functions, including examples.
 
+Informations about Linux installation and project workflow can also be found [here](docs/README.md)
+
 ### Example Notebooks
 
 For more detailed examples and tutorials, please refer to the notebooks in the `example` directory.

@@ -64,7 +64,7 @@ Alternatively, you can use the `scripts/build_linux.sh` script to perform the sa
 
 ### Code Formatting and Pre-commit Hooks
 
-This project uses [pre-commit](https://pre-commit.com) More information about that can be found [here](pre-commit.md).
+This project uses [pre-commit](https://pre-commit.com). More information about that can be found [here](pre-commit.md).
 
 ### **Uninstallation**
 ### **Remove the Installed Package**
@@ -120,4 +120,4 @@ Then:
 >>>
 ```
 
-CI of this project consist of quick, automatic jobs. There are also long non-automated jobs, which are described [here.](tests.md) 
+CI of this project consists of quick, automatic jobs. There are also long manual jobs, which are described [here](tests.md).
