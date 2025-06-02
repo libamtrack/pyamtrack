@@ -1,10 +1,12 @@
 from __future__ import annotations
+
+import ctypes
 import os
 import sys
-import ctypes
 
 try:
     import pyamtrack._version as v
+
     __version__ = v.version
 except ImportError:
     __version__ = "0.0.0"  # Fallback version
@@ -35,8 +37,6 @@ if sys.platform == "win32":
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
 
-from . import converters
-from . import stopping
-from . import materials
+from . import converters, materials, stopping
 
 __all__ = ["converters", "stopping", "materials"]

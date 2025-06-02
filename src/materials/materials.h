@@ -4,11 +4,12 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
+
 #include <string>
 #include <vector>
 
 extern "C" {
-    #include "AT_DataMaterial.h"
+#include "AT_DataMaterial.h"
 }
 
 namespace nb = nanobind;
@@ -42,33 +43,33 @@ std::vector<std::string> get_names();
  *
  * @return int a material id
  */
-inline int process_material(const nb::object& material){
-    int material_id = 0;
-    if (nb::isinstance<nb::int_>(material)) {
-        material_id = nb::cast<int>(material);
-    } else {
-        try {
-            nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.materials");
-            nb::object MaterialType = pyamtrack_mod.attr("Material");
+inline int process_material(const nb::object& material) {
+  int material_id = 0;
+  if (nb::isinstance<nb::int_>(material)) {
+    material_id = nb::cast<int>(material);
+  } else {
+    try {
+      nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.materials");
+      nb::object MaterialType = pyamtrack_mod.attr("Material");
 
-            if (!nb::isinstance(material, MaterialType)) {
-                throw nb::type_error("Material argument must be an integer or a pyamtrack.materials.Material object");
-            }
+      if (!nb::isinstance(material, MaterialType)) {
+        throw nb::type_error("Material argument must be an integer or a pyamtrack.materials.Material object");
+      }
 
-            material_id = nb::cast<int>(material.attr("id"));
+      material_id = nb::cast<int>(material.attr("id"));
 
-        } catch (const nb::python_error &e) {
-            // FIX: Re-throw the original Python error
-            throw; // Preserves original Python exception type and traceback
-        } catch (const nb::cast_error &e) {
-            std::string error_msg = "Material object's 'id' attribute is not an integer: " + std::string(e.what());
-            throw nb::type_error(error_msg.c_str());
-        } catch (const std::exception &e) { // Catches std::runtime_error and others
-            std::string error_msg = "An error occurred while processing the Material object: " + std::string(e.what());
-            throw std::runtime_error(error_msg.c_str()); // Nanobind will translate this
-        }
+    } catch (const nb::python_error& e) {
+      // FIX: Re-throw the original Python error
+      throw;  // Preserves original Python exception type and traceback
+    } catch (const nb::cast_error& e) {
+      std::string error_msg = "Material object's 'id' attribute is not an integer: " + std::string(e.what());
+      throw nb::type_error(error_msg.c_str());
+    } catch (const std::exception& e) {  // Catches std::runtime_error and others
+      std::string error_msg = "An error occurred while processing the Material object: " + std::string(e.what());
+      throw std::runtime_error(error_msg.c_str());  // Nanobind will translate this
     }
-    return material_id;
+  }
+  return material_id;
 }
 /**
  * @brief Retrieves the full names of all materials.
@@ -105,46 +106,46 @@ std::vector<std::string> get_long_names();
  * - phase (int): The phase of the material (e.g., condensed or gaseous).
  */
 class Material {
-    public:
-        long id; /**< The unique identifier for the material. */
-        double density_g_cm3; /**< The density of the material in g/cm³. */
-        double I_eV; /**< The mean ionization potential in eV. */
-        double alpha_g_cm2_MeV; /**< Fit parameter for power-law representation of stopping power. */
-        double p_MeV; /**< Fit parameter for power-law representation of stopping power. */
-        double m_g_cm2; /**< Fit parameter for linear representation of fluence changes. */
-        double average_A; /**< The average mass number of the material. */
-        double average_Z; /**< The average atomic number of the material. */
-        std::string name; /**< The name of the material. */
-        long phase; /**< The phase of the material (e.g., condensed or gaseous). */
+ public:
+  long id;                /**< The unique identifier for the material. */
+  double density_g_cm3;   /**< The density of the material in g/cm³. */
+  double I_eV;            /**< The mean ionization potential in eV. */
+  double alpha_g_cm2_MeV; /**< Fit parameter for power-law representation of stopping power. */
+  double p_MeV;           /**< Fit parameter for power-law representation of stopping power. */
+  double m_g_cm2;         /**< Fit parameter for linear representation of fluence changes. */
+  double average_A;       /**< The average mass number of the material. */
+  double average_Z;       /**< The average atomic number of the material. */
+  std::string name;       /**< The name of the material. */
+  long phase;             /**< The phase of the material (e.g., condensed or gaseous). */
 
-        /**
-         * @brief Initializes a Material object.
-         *
-         * Example:
-         * >>> material = Material(1)
-         * >>> material.id
-         * 1
-         * >>> material.name
-         * 'Water, Liquid'
-         *
-         * @param id_or_name The unique identifier or name of the material.
-         */
-        Material(long id);
+  /**
+   * @brief Initializes a Material object.
+   *
+   * Example:
+   * >>> material = Material(1)
+   * >>> material.id
+   * 1
+   * >>> material.name
+   * 'Water, Liquid'
+   *
+   * @param id_or_name The unique identifier or name of the material.
+   */
+  Material(long id);
 
-        /**
-         * @brief Initializes a Material object using its name.
-         *
-         * Example:
-         * >>> material = Material("Water, Liquid")
-         * >>> material.id
-         * 1
-         * >>> material.name
-         * 'Water, Liquid'
-         *
-         * @param name The name of the material.
-         * @throws std::invalid_argument if the material name is not found.
-         */
-        Material(const std::string &name);
+  /**
+   * @brief Initializes a Material object using its name.
+   *
+   * Example:
+   * >>> material = Material("Water, Liquid")
+   * >>> material.id
+   * 1
+   * >>> material.name
+   * 'Water, Liquid'
+   *
+   * @param name The name of the material.
+   * @throws std::invalid_argument if the material name is not found.
+   */
+  Material(const std::string& name);
 };
 
-#endif // MATERIALS_H
+#endif  // MATERIALS_H
