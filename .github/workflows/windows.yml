@@ -84,8 +84,6 @@ jobs:
       - name: Test Wheel Installation
         shell: pwsh
         run: |
-          python -m venv venv
-          .\venv\Scripts\Activate.ps1
           # Find the first wheel file that matches the pattern in the dist folder.
           $wheel = Get-ChildItem -Path "dist\pyamtrack-*.whl" | Select-Object -First 1
           if (-not $wheel) {
@@ -100,15 +98,11 @@ jobs:
 
       - name: Install pytest and test dependencies
         shell: pwsh
-        run: |
-          .\venv\Scripts\Activate.ps1
-          pip install pytest
+        run: pip install pytest
 
       - name: Run pytest
         shell: pwsh
-        run: |
-          .\venv\Scripts\Activate.ps1
-          pytest tests/
+        run: pytest tests/
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4

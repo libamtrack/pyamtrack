@@ -36,8 +36,6 @@ jobs:
 
       - name: Test Wheel Installation
         run: |
-          python3 -m venv venv
-          source venv/bin/activate
           pip install dist/*.whl
           pip show -f pyamtrack
           python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
@@ -45,14 +43,10 @@ jobs:
           python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
 
       - name: Install pytest and test dependencies
-        run: |
-          source venv/bin/activate
-          pip install pytest
+        run: pip install pytest
 
       - name: Run pytest
-        run: |
-          source venv/bin/activate
-          pytest tests/
+        run: pytest tests/
 
       - name: Upload macOS Artifact
         uses: actions/upload-artifact@v4
