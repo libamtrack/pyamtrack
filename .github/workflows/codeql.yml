@@ -1,15 +1,9 @@
 name: "CodeQL Advanced"
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.yaml'
-      - '**/*.json'
-      - '**/*.toml'
   schedule:
     - cron: '26 15 * * 2'
 
@@ -45,7 +39,7 @@ jobs:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
 
-    - if: ${{ matrix.build-mode == 'none' }}
+    - if: ${{ matrix.build-mode == 'manual' }}
       name: Setup Python environment
       uses: actions/setup-python@v5
       with:
@@ -55,8 +49,10 @@ jobs:
       name: Build C and C++ code
       run: |
         sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
-        pip install --upgrade build
-        python -m build --wheel
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
+        cmake --build . --parallel
+        cmake --install .
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
