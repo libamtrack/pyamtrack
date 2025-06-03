@@ -3,6 +3,13 @@ name: "CodeQL Advanced"
 on:
   push:
     branches: [ "master" ]
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.yaml'
+      - '**/*.json'
+      - '**/*.toml'
   schedule:
     - cron: '26 15 * * 2'
 
@@ -23,18 +30,33 @@ jobs:
         - language: actions
           build-mode: none
         - language: c-cpp
-          build-mode: autobuild
+          build-mode: manual
         - language: python
           build-mode: none
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for git describe and versioning
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+
+    - if: ${{ matrix.build-mode == 'none' }}
+      name: Setup Python environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+        
+    - if: ${{ matrix.build-mode == 'manual' }}
+      name: Build C and C++ code
+      run: |
+        sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
+        pip install --upgrade build
+        python -m build --wheel
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
