@@ -19,47 +19,47 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
-      # - name: Install system packages
-      #   run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
+      - name: Install system packages
+        run: sudo apt-get install -y --no-install-recommends libgsl-dev
 
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      # - name: Install Python build tools
-      #   run: pip install --upgrade build
+      - name: Install Python build tools
+        run: pip install --upgrade build
 
-      # - name: Build Python Wheel
-      #   run: python -m build --wheel
+      - name: Build Python Wheel
+        run: python -m build --wheel
 
-      # - name: Install and Test Python Wheel
-      #   run: |
-      #     python3 -m venv testenv
-      #     source testenv/bin/activate
-      #     pip install dist/*.whl
-      #     pip show -f pyamtrack
-      #     python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
-      #     python -c "from pyamtrack.converters import beta_from_energy; print(beta_from_energy(150));"
-      #     python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
-      #     python -c "import pyamtrack; print(pyamtrack.__version__);"
+      - name: Install and Test Python Wheel
+        run: |
+          python3 -m venv testenv
+          source testenv/bin/activate
+          pip install dist/*.whl
+          pip show -f pyamtrack
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
+          python -c "from pyamtrack.converters import beta_from_energy; print(beta_from_energy(150));"
+          python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
+          python -c "import pyamtrack; print(pyamtrack.__version__);"
 
-      # - name: Install pytest and test dependencies
-      #   run: |
-      #     source testenv/bin/activate
-      #     pip install pytest
+      - name: Install pytest and test dependencies
+        run: |
+          source testenv/bin/activate
+          pip install pytest
 
-      # - name: Run pytest
-      #   run: |
-      #     source testenv/bin/activate
-      #     pytest tests/
+      - name: Run pytest
+        run: |
+          source testenv/bin/activate
+          pytest tests/
 
-      # - name: Upload Linux Artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: libamtrack-linux
-      #     path: dist/*.whl
-      #     if-no-files-found: error
-      #     retention-days: 5
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: libamtrack-linux
+          path: dist/*.whl
+          if-no-files-found: error
+          retention-days: 5
 
   run_build_script:
     runs-on: ubuntu-latest
@@ -68,9 +68,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Install system packages
-      #   run: sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
+      - name: Install system packages
+        run: sudo apt-get install -y --no-install-recommends libgsl-dev
 
-      # - name: Run build_linux.sh script
-      #   run: |
-      #     ./scripts/build_linux.sh
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Run build_linux.sh script
+        run: |
+          ./scripts/build_linux.sh

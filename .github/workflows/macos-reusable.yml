@@ -21,43 +21,43 @@ jobs:
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
-      # - name: Install system packages
-      #   run: brew install gsl
+      - name: Install system packages
+        run: brew install gsl
 
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: "3.x"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-      # - name: Install Python dependencies
-      #   run: pip install --upgrade build
+      - name: Install Python dependencies
+        run: pip install --upgrade build
 
-      # - name: Build MacOS Wheel
-      #   run: python -m build
+      - name: Build MacOS Wheel
+        run: python -m build
 
-      # - name: Test Wheel Installation
-      #   run: |
-      #     python3 -m venv venv
-      #     source venv/bin/activate
-      #     pip install dist/*.whl
-      #     pip show -f pyamtrack
-      #     python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
-      #     python -c "from pyamtrack.converters import beta_from_energy; print(beta_from_energy(150));"
-      #     python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
+      - name: Test Wheel Installation
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install dist/*.whl
+          pip show -f pyamtrack
+          python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
+          python -c "from pyamtrack.converters import beta_from_energy; print(beta_from_energy(150));"
+          python -c "from pyamtrack.converters import energy_from_beta; print(energy_from_beta(0.5));"
 
-      # - name: Install pytest and test dependencies
-      #   run: |
-      #     source venv/bin/activate
-      #     pip install pytest
+      - name: Install pytest and test dependencies
+        run: |
+          source venv/bin/activate
+          pip install pytest
 
-      # - name: Run pytest
-      #   run: |
-      #     source venv/bin/activate
-      #     pytest tests/
+      - name: Run pytest
+        run: |
+          source venv/bin/activate
+          pytest tests/
 
-      # - name: Upload macOS Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: libamtrack-macos
-      #     path: dist/*.whl
-      #     if-no-files-found: error
-      #     retention-days: 5
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: libamtrack-macos
+          path: dist/*.whl
+          if-no-files-found: error
+          retention-days: 5
