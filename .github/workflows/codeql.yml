@@ -55,11 +55,12 @@ jobs:
     - if: ${{ matrix.build-mode == 'manual' }}
       name: Build C and C++ code
       run: |
-        sudo apt-get install -y --no-install-recommends libgsl-dev python3-pip python3-venv
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="${{ runner.temp }}/usr"
-        cmake --build . --parallel
-        cmake --install .
+        sudo apt-get install -y --no-install-recommends libgsl-dev
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade build
+        python -m build --wheel
+
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
