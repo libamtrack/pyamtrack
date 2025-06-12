@@ -10,13 +10,14 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <variant>
 #include <vector>
 
 namespace nb = nanobind;
 
 // Define the type for the function to be wrapped.
 using Func = std::function<double(double)>;
-using MultiargumentFunc = std::function<double(const std::vector<double>&)>;
+using MultiargumentFunc = std::function<double(const std::vector<std::variant<double, int>>&)>;
 
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
@@ -114,10 +115,14 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
   }
   if (scalars_only) {
     // there is no array or list argument
-    std::vector<double> input_casted;
+    std::vector<std::variant<double, int>> input_casted;
     input_casted.reserve(input.size());
     for (const auto& argument : input) {
-      input_casted.push_back(nb::cast<double>(argument));
+      if (PyFloat_Check(argument.ptr()))
+        input_casted.emplace_back(nb::cast<double>(argument));
+      else {
+        input_casted.emplace_back(nb::cast<int>(argument));
+      }
     }
     double result = func(input_casted);
     return nb::cast(static_cast<double>(result));
@@ -151,13 +156,17 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
     std::vector<double> results(input_length);
     try {
       for (size_t i = 0; i < input_length; i++) {
-        std::vector<double> arguments_vector;
+        std::vector<std::variant<double, int>> arguments_vector;
         for (auto& argument : arguments) {
-          if (nb::isinstance<nb::list>(argument))
-            arguments_vector.push_back(nb::cast<double>(argument[i]));
-          else {
+          if (nb::isinstance<nb::list>(argument)) {
+            if (PyFloat_Check(argument[i].ptr()))
+              arguments_vector.emplace_back(nb::cast<double>(argument[i]));
+            else {
+              arguments_vector.emplace_back(nb::cast<int>(argument[i]));
+            }
+          } else {
             auto array = nb::cast<nb::ndarray<const double, nb::shape<-1>>>(argument);
-            arguments_vector.push_back(array(i));
+            arguments_vector.emplace_back(array(i));
           }
         }
         results[i] = func(arguments_vector);
@@ -182,4 +191,12 @@ inline bool check_int_dtype(const nb::object& array) {
   }
   return false;
 }
+
+/* This C++ function template performs a type-safe conversion of the value held inside a std::variant<double, int>
+ * to another type T using std::visit. */
+template <typename T>
+T variant_cast(const std::variant<double, int>& v) {
+  return std::visit([](auto&& arg) -> T { return static_cast<T>(arg); }, v);
+}
+
 #endif  // WRAPPER_TEMPLATE_H
