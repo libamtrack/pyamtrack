@@ -65,13 +65,17 @@ nb::object get_id(const nb::object& object, const ids_getter& getter) {
 nb::object electron_range(const nb::object& input, const nb::object& material, const nb::object& model) {
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(input);
-  auto electron_range_vector = [](std::vector<double> vec) -> double {
+  arguments_vector.push_back(get_id(material, process_material));  // unifying materials to int
+  arguments_vector.push_back(get_id(model, process_model));        // unifying models to int
+  auto electron_range_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
     if (vec.size() < 3) {
       throw std::invalid_argument("Input vector must have at least three elements.");
     }
-    return AT_max_electron_range_m(vec[0], (int)vec[1], (int)vec[2]);
+    double energy = variant_cast<double>(vec[0]);
+    int mat_id = variant_cast<int>(vec[1]);
+    int model_id = variant_cast<int>(vec[2]);
+
+    return AT_max_electron_range_m(energy, mat_id, model_id);
   };
-  arguments_vector.push_back(get_id(material, process_material));  // unifying materials to int
-  arguments_vector.push_back(get_id(model, process_model));        // unifying models to int
   return wrap_multiargument_function(electron_range_vector, arguments_vector);
 }
