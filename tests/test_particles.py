@@ -40,7 +40,7 @@ def test_get_names():
     assert isinstance(names, list)
     assert len(names) > 0
     assert all(isinstance(name, str) for name in names)
-    # assert names[0] == "A"  # Check the first name
+    assert names[0] == "Hydrogen"  # Check the first name
 
 
 def test_get_acronyms():
