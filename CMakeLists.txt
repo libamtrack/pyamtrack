@@ -154,7 +154,7 @@ endif()
 nanobind_add_module(_core src/main.cpp)
 
 # Define a list of targets to link against the required libraries.
-set(PYAMTRACK_TARGETS converters stopping materials)
+set(PYAMTRACK_TARGETS converters stopping materials particles)
 
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
