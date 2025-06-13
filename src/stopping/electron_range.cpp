@@ -62,9 +62,9 @@ nb::object get_id(const nb::object& object, const ids_getter& getter) {
   }
 }
 
-nb::object electron_range(const nb::object& input, const nb::object& material, const nb::object& model) {
+nb::object electron_range(const nb::object& energy_MeV, const nb::object& material, const nb::object& model) {
   std::vector<nb::object> arguments_vector;
-  arguments_vector.push_back(input);
+  arguments_vector.push_back(energy_MeV);
   arguments_vector.push_back(get_id(material, process_material));  // unifying materials to int
   arguments_vector.push_back(get_id(model, process_model));        // unifying models to int
   auto electron_range_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
