@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+          architecture: "x64"  # Ensure we use the x64 architecture
+          allow-prerelease: true  # Allow pre-release versions if needed
 
       - name: Install Python build tools
         run: pip install --upgrade build
