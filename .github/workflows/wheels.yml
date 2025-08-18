@@ -55,7 +55,7 @@ jobs:
       with:
         fetch-depth: 0  # Fetch all history for git describe and versioning
 
-    - uses: pypa/cibuildwheel@v3.0
+    - uses: pypa/cibuildwheel@v3.1
       env:
         CIBW_ENVIRONMENT_WINDOWS: VCPKG_INSTALLED_DIR="D:/a/pyamtrack/pyamtrack/vcpkg_installed/"
 
