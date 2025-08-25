@@ -3,7 +3,7 @@ cmake==4.1.0
 ninja==1.11.1.4
 numpy==2.2.4
 nanobind==2.7.0
-scikit_build_core==0.11.5
+scikit_build_core==0.11.6
 setuptools-scm==8.3.1
 pytest==8.4.1
 pre-commit==4.3.0
