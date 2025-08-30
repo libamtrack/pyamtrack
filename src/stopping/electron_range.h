@@ -63,6 +63,6 @@ int get_model_id(const std::string& model_name);
  * @throws std::runtime_error If the model name/ID is invalid.
  */
 nb::object electron_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
-                          const nb::object& model = nb::str("tabata"));
+                          const nb::object& model = nb::str("tabata"), bool carthesian_product = false);
 
 #endif  // ELECTRON_RANGE_H
