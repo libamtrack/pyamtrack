@@ -191,9 +191,9 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
 }
 inline nb::object wrap_carthesian_product_function(const MultiargumentFunc& func,
                                                    const std::vector<nb::object>& input) {
+  std::cout << "wrapping carthesian product";
   // Check for scalar types (float or int)
   std::vector<size_t> shape;
-  size_t total_size = 1;
   std::vector<std::vector<nb::object>> expanded_inputs;
   expanded_inputs.reserve(input.size());
 
@@ -233,50 +233,23 @@ inline nb::object wrap_carthesian_product_function(const MultiargumentFunc& func
       // Handle unsupported types
       throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
     }
-    total_size *= shape.back();
   }
-  // Allocate result container
-  std::vector<double> results;
-  results.reserve(total_size);
 
-  // Mixed-radix counter over Cartesian product
-  std::vector<double> data;
-  data.reserve(total_size);
-
-  // Mixed-radix indexing
-  std::vector<size_t> idx(expanded_inputs.size(), 0);
-
-  for (size_t count = 0; count < total_size; ++count) {
-    std::vector<nb::object> current_tuple;
-    current_tuple.reserve(expanded_inputs.size());
-
-    for (size_t j = 0; j < expanded_inputs.size(); ++j) current_tuple.push_back(expanded_inputs[j][idx[j]]);
-
-    // Call non-Cartesian wrapper with this tuple
-    auto res_obj = wrap_multiargument_function(func, current_tuple);
-    data.emplace_back(nb::cast<double>(res_obj));
-
-    // Increment counter
-    for (int j = (int)idx.size() - 1; j >= 0; --j) {
-      if (++idx[j] < shape[j]) break;
-      idx[j] = 0;
+  std::function<nb::object(size_t, std::vector<nb::object>&)> build;
+  build = [&](size_t depth, std::vector<nb::object>& current) -> nb::object {
+    if (depth == expanded_inputs.size()) {
+      return wrap_multiargument_function(func, current);
     }
-  }
-  nb::ndarray<nb::numpy, nb::shape<100>, double> flat_result;  // array with allocated memory
-  // Convert dims → vector<int64_t>
-  std::vector<int64_t> dims(shape.begin(), shape.end());
-  // Create ndarray with ownership of data
-  nb::ndarray<const double> result(data.data(), shape.size(), shape.data(), nb::handle(), nullptr, nb::dtype<double>(),
-                                   nb::device::cpu::value, 0, 'C');
-  for (auto i : data) std::cout << i << "\n";
-  printf("Array data pointer : %p\n", result.data());
-  printf("Array dimension : %zu\n", result.ndim());
-  for (size_t i = 0; i < result.ndim(); ++i) {
-    printf("Array dimension [%zu] : %zu\n", i, result.shape(i));
-    printf("Array stride    [%zu] : %zd\n", i, result.stride(i));
-  }
-
-  return flat_result.cast();
+    nb::list out;
+    for (auto& val : expanded_inputs[depth]) {
+      current.push_back(val);
+      out.append(build(depth + 1, current));
+      current.pop_back();
+    }
+    return out;
+  };
+  std::vector<nb::object> current;
+  return build(0, current);
 }
 
 /* This C++ function template performs a type-safe conversion of the value held inside a std::variant<double, int>
