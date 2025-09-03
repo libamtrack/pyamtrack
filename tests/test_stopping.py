@@ -86,10 +86,15 @@ def test_arrays_with_mixed_dtypes(dtype1: type, dtype2: type):
 
 def test_carthesian_product():
     """test passing carthesian_product=True"""
-    range_numpy_arrays = pyamtrack.stopping.electron_range(
-        1000, np.array([1, 2, 2], dtype=int), np.array([3, 4, 3], dtype=int), carthesian_product=True
+    range_list = pyamtrack.stopping.electron_range(
+        [1000, 1050],
+        np.array([1, 2, 2], dtype=int),
+        np.array([3, 4, 3], dtype=int),
+        carthesian_product=True,
     )
-    assert isinstance(range_numpy_arrays, np.ndarray) and range_numpy_arrays.shape == (3,)
+    range_array = np.array(range_list)
+    assert isinstance(range_list, list)
+    assert range_array.shape == (2, 3, 3)
 
 
 def test_material_assignment_invalid(electron_energy_MeV):
