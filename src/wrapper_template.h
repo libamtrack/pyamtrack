@@ -189,9 +189,7 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
     return result_array;
   }
 }
-inline nb::object wrap_carthesian_product_function(const MultiargumentFunc& func,
-                                                   const std::vector<nb::object>& input) {
-  std::cout << "wrapping carthesian product";
+inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
   // Check for scalar types (float or int)
   std::vector<size_t> shape;
   std::vector<std::vector<nb::object>> expanded_inputs;

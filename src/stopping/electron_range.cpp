@@ -81,5 +81,5 @@ nb::object electron_range(const nb::object& energy_MeV, const nb::object& materi
   if (!cartesian_product)
     return wrap_multiargument_function(electron_range_vector, arguments_vector);
   else
-    return wrap_carthesian_product_function(electron_range_vector, arguments_vector);
+    return wrap_cartesian_product_function(electron_range_vector, arguments_vector);
 }
