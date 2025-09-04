@@ -63,7 +63,7 @@ nb::object get_id(const nb::object& object, const ids_getter& getter) {
 }
 
 nb::object electron_range(const nb::object& input, const nb::object& material, const nb::object& model,
-                          const bool carthesian_product) {
+                          const bool cartesian_product) {
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(input);
   arguments_vector.push_back(get_id(material, process_material));  // unifying materials to int
@@ -78,8 +78,8 @@ nb::object electron_range(const nb::object& input, const nb::object& material, c
 
     return AT_max_electron_range_m(energy, mat_id, model_id);
   };
-  if (!carthesian_product)
+  if (!cartesian_product)
     return wrap_multiargument_function(electron_range_vector, arguments_vector);
   else
-    return wrap_carthesian_product_function(electron_range_vector, arguments_vector);
+    return wrap_cartesian_product_function(electron_range_vector, arguments_vector);
 }

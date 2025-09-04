@@ -22,7 +22,7 @@ NB_MODULE(stopping, m) {
   m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
 
   m.def("electron_range", &electron_range, nb::arg("input"), nb::arg("material") = 1, nb::arg("model") = "tabata",
-        nb::arg("carthesian_product") = false,
+        nb::arg("cartesian_product") = false,
         R"pbdoc(
         Calculate electron range in meters using various models.
 
@@ -46,8 +46,8 @@ NB_MODULE(stopping, m) {
             - "edmund" (id=6): Edmund model
             - "tabata" (id=7): Tabata model (default)
             - "scholz_new" (id=8): Updated Scholz model
-        carthesian_product: bool
-            Indicates whether to compute carthesian product over passed arguments.
+        cartesian_product: bool
+            Indicates whether to compute cartesian product over passed arguments.
 
         Returns
         -------
