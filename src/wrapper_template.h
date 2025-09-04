@@ -18,7 +18,15 @@ namespace nb = nanobind;
 // Define the type for the function to be wrapped.
 using Func = std::function<double(double)>;
 using MultiargumentFunc = std::function<double(const std::vector<std::variant<double, int>>&)>;
-
+inline bool check_int_dtype(const nb::object& array) {
+  if (nb::isinstance<nb::ndarray<int8_t>>(array) || nb::isinstance<nb::ndarray<uint8_t>>(array) ||
+      nb::isinstance<nb::ndarray<int16_t>>(array) || nb::isinstance<nb::ndarray<uint16_t>>(array) ||
+      nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
+      nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array)) {
+    return true;
+  }
+  return false;
+}
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
   // 1. Check for scalar types (float or int)
@@ -181,15 +189,65 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
     return result_array;
   }
 }
+inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
+  // Check for scalar types (float or int)
+  std::vector<size_t> shape;
+  std::vector<std::vector<nb::object>> expanded_inputs;
+  expanded_inputs.reserve(input.size());
 
-inline bool check_int_dtype(const nb::object& array) {
-  if (nb::isinstance<nb::ndarray<int8_t>>(array) || nb::isinstance<nb::ndarray<uint8_t>>(array) ||
-      nb::isinstance<nb::ndarray<int16_t>>(array) || nb::isinstance<nb::ndarray<uint16_t>>(array) ||
-      nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
-      nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array)) {
-    return true;
+  for (const auto& argument : input) {
+    if (nb::isinstance<nb::list>(argument)) {
+      auto list = nb::cast<nb::list>(argument);
+      shape.push_back(nb::len(list));
+      std::vector<nb::object> tmp;
+      tmp.reserve(nb::len(list));
+      for (auto item : list) tmp.push_back(nb::cast(item));
+      expanded_inputs.push_back(std::move(tmp));
+    } else if (nb::isinstance<nb::ndarray<>>(argument)) {
+      if (check_int_dtype(argument)) {
+        auto array = nb::cast<nb::ndarray<long long, nb::shape<-1>>>(argument);
+
+        shape.push_back(array.size());
+        std::vector<nb::object> tmp;
+        tmp.reserve(array.size());
+        for (size_t i = 0; i < array.size(); ++i) {
+          tmp.push_back(nb::cast(array(i)));
+        }
+        expanded_inputs.push_back(std::move(tmp));
+      } else {
+        auto array = nb::cast<nb::ndarray<double, nb::shape<-1>>>(argument);
+        shape.push_back(array.size());
+        std::vector<nb::object> tmp;
+        tmp.reserve(array.size());
+        for (size_t i = 0; i < array.size(); ++i) {
+          tmp.push_back(nb::cast(array(i)));
+        }
+        expanded_inputs.push_back(std::move(tmp));
+      }
+    } else if (nb::isinstance<nb::float_>(argument) || nb::isinstance<nb::int_>(argument)) {
+      shape.push_back(1);
+      expanded_inputs.push_back({argument});
+    } else {
+      // Handle unsupported types
+      throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
+    }
   }
-  return false;
+
+  std::function<nb::object(size_t, std::vector<nb::object>&)> build;
+  build = [&](size_t depth, std::vector<nb::object>& current) -> nb::object {
+    if (depth == expanded_inputs.size()) {
+      return wrap_multiargument_function(func, current);
+    }
+    nb::list out;
+    for (auto& val : expanded_inputs[depth]) {
+      current.push_back(val);
+      out.append(build(depth + 1, current));
+      current.pop_back();
+    }
+    return out;
+  };
+  std::vector<nb::object> current;
+  return build(0, current);
 }
 
 /* This C++ function template performs a type-safe conversion of the value held inside a std::variant<double, int>
