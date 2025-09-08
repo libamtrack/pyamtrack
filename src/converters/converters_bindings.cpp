@@ -9,7 +9,7 @@ const char* beta_from_energy_doc = R"pbdoc(
     Calculate beta from energy per nucleon (MeV/u).
 
     Parameters:
-        energy_MeV_u (float | int | numpy.ndarray | list): The particle kinetic energy  in MeV/u. Can be a single value, a NumPy array, or a Python list.
+        energy_MeV_u (float | int | numpy.ndarray | list): The particle kinetic energy in MeV/u. Can be a single value, a NumPy array, or a Python list.
 
     Returns:
         float | numpy.ndarray | list: The calculated beta value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
