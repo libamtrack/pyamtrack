@@ -52,7 +52,7 @@ int get_model_id(const std::string& model_name);
  * in a material before losing all their energy, using various theoretical
  * or empirical models.
  *
- * @param energy_MeV The electron energy in MeV. Can be a single value, NumPy array, or Python list.
+ * @param energy_MeV The electron kinetic energy in MeV. Can be a single value, NumPy array, or Python list.
  * @param material Either a material ID (int) or a Material object. Defaults to 1 (Liquid water).
  * @param model The stopping power model to use. Can be specified as a string name or model ID.
  *             Defaults to "tabata" (ID=7).
