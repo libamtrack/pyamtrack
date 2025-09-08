@@ -52,7 +52,8 @@ include = ["pyamtrack", "pyamtrack.*"]
 
 [tool.cibuildwheel]
 archs = ["auto64"]
-skip= ["cp36-*", "cp37-*", "cp38-*", "pp*"]
+build = ["cp39-*", "cp310-*", "cp311-*", "cp312-*", "cp313-*"]
+skip = "cp3??t-*"
 test-requires = "pytest"
 test-command = "pytest {project}/tests"
 
