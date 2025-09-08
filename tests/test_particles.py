@@ -3,9 +3,9 @@ import pytest
 import pyamtrack
 
 
-def test_particle_initialization_by_n():
+def test_particle_initialization_by_id():
     particle = pyamtrack.particles.Particle(6)  # Carbon
-    assert particle.n == 6
+    assert particle.id == 6
     assert particle.element_name == "Carbon"
     assert particle.element_acronym == "C"
     assert particle.Z == 6
@@ -16,7 +16,7 @@ def test_particle_initialization_by_n():
 
 def test_particle_initialization_by_acronym():
     particle = pyamtrack.particles.Particle("He")  # Helium
-    assert particle.n == 2
+    assert particle.id == 2
     assert particle.element_name == "Helium"
     assert particle.element_acronym == "He"
     assert particle.Z == 2
@@ -25,14 +25,42 @@ def test_particle_initialization_by_acronym():
     assert particle.I_eV_per_Z > 0
 
 
-def test_particle_initialization_by_invalid_n():
+def test_particle_from_number():
+    particle = pyamtrack.particles.Particle.from_number(6012)  # Carbon-12
+    assert particle.Z == 6
+    assert particle.A == 12
+    assert particle.element_name == "Carbon"
+    assert particle.element_acronym == "C"
+    assert particle.number() == 6012
+
+
+def test_particle_initialization_by_id_and_acronym():
+    p1 = pyamtrack.particles.Particle.from_number(6012)
+    p2 = pyamtrack.particles.Particle.from_number(6012)
+    assert p1.Z == p2.Z == 6
+    assert p1.A == p2.A == 12
+    assert p1.element_name == p2.element_name == "Carbon"
+    assert p1.number() == p2.number()
+
+
+def test_particle_initialization_by_invalid_id():
     with pytest.raises(ValueError):
-        pyamtrack.particles.Particle(9999)  # Invalid n
+        pyamtrack.particles.Particle(9999)  # Invalid id
 
 
 def test_particle_initialization_by_invalid_acronym():
     with pytest.raises(ValueError):
         pyamtrack.particles.Particle("Invalid acronym")  # Invalid acronym
+
+
+def test_particle_from_number_invalid():
+    with pytest.raises(ValueError):
+        pyamtrack.particles.Particle.from_number(999999)  # Nonexistent particle
+
+
+def test_particle_number_method():
+    particle = pyamtrack.particles.Particle.from_number(6012)  # Carbon-12
+    assert particle.number() == 6012
 
 
 def test_get_names():
@@ -53,13 +81,13 @@ def test_get_acronyms():
 
 def test_via_name_object():
     particle = pyamtrack.particles.Carbon
-    assert particle.n == 6
+    assert particle.id == 6
     assert particle.element_name == "Carbon"
     assert particle.element_acronym == "C"
 
 
 def test_via_acronym_object():
     particle = pyamtrack.particles.He
-    assert particle.n == 2
+    assert particle.id == 2
     assert particle.element_name == "Helium"
     assert particle.element_acronym == "He"

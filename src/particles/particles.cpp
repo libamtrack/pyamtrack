@@ -4,11 +4,11 @@
 #include <cctype>
 #include <stdexcept>
 
-Particle::Particle(long n) : n(n) {
-  if (n < 1 || n > AT_Particle_Data.n) {
-    throw std::invalid_argument("Invalid particle number: " + std::to_string(n));
+Particle::Particle(long id) : id(id) {
+  if (id < 1 || id > AT_Particle_Data.n) {
+    throw std::invalid_argument("Invalid particle id: " + std::to_string(id));
   }
-  size_t index = static_cast<size_t>(n - 1);
+  size_t index = static_cast<size_t>(id - 1);
   Z = AT_Particle_Data.Z[index];
   atomic_weight = AT_Particle_Data.atomic_weight[index];
   element_name = std::string(AT_Particle_Data.element_name[index]);
@@ -27,13 +27,37 @@ Particle::Particle(const std::string& acronym) {
   }
 
   size_t index = std::distance(data.element_acronym, it);
-  n = index + 1;
+  id = index + 1;
   Z = data.Z[index];
   atomic_weight = data.atomic_weight[index];
   element_name = std::string(data.element_name[index]);
   element_acronym = acronym;
   density_g_cm3 = data.density_g_cm3[index];
   I_eV_per_Z = data.I_eV_per_Z[index];
+}
+
+Particle Particle::from_number(long particle_no) {
+  long Z_candidate = particle_no / 1000;
+  long A_candidate = AT_A_from_particle_no_single(particle_no);
+
+  if (A_candidate < 0) {
+    throw std::invalid_argument("Invalid particle number: " + std::to_string(particle_no));
+  }
+
+  const auto& data = AT_Particle_Data;
+  for (int i = 0; i < data.n; ++i) {
+    if (data.Z[i] == Z_candidate) {
+      Particle p(i + 1);
+      p.A = A_candidate;
+      return p;
+    }
+  }
+
+  throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
+}
+
+long Particle::number() const {
+  return AT_particle_no_from_Z_and_A_single(Z, A);
 }
 
 std::vector<std::string> get_names() {
