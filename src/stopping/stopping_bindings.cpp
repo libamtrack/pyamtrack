@@ -21,7 +21,7 @@ NB_MODULE(stopping, m) {
   m.def("get_models", &get_models, "Returns list of available stopping power models");
   m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
 
-  m.def("electron_range", &electron_range, nb::arg("input"), nb::arg("material") = 1, nb::arg("model") = "tabata",
+  m.def("electron_range", &electron_range, nb::arg("energy_MeV"), nb::arg("material") = 1, nb::arg("model") = "tabata",
         R"pbdoc(
         Calculate electron range in meters using various models.
 
@@ -31,7 +31,7 @@ NB_MODULE(stopping, m) {
 
         Parameters
         ----------
-        input : float or array_like
+        energy_MeV : float or array_like
             The electron energy in MeV. Can be a single value, a NumPy array, or a Python list.
         material : int, Material, list[int | Material] or numpy array with int as dtype, optional
             Either a material ID as integer or a Material object. Defaults to 1 (Liquid water).

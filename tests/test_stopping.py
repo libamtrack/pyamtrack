@@ -34,7 +34,7 @@ def test_material_assignment(electron_energy_MeV):
 
 def test_mixed_parameter_types(electron_energy_MeV):
     """Test passing each parameter as list or numpy.ndarray, check for output type and shape"""
-    range_material_in_array = pyamtrack.stopping.electron_range(input=[electron_energy_MeV])
+    range_material_in_array = pyamtrack.stopping.electron_range(energy_MeV=[electron_energy_MeV])
     range_many_materials = pyamtrack.stopping.electron_range(electron_energy_MeV, [1, 2], 3)
     range_many_methods = pyamtrack.stopping.electron_range(
         electron_energy_MeV, pyamtrack.materials.water_liquid, [1, 2]
