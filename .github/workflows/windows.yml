@@ -69,7 +69,7 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: .\vcpkg\vcpkg.exe install
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '>=3.9 <3.13.3 || >=3.13.5' # fix for https://github.com/spacetelescope/drizzle/pull/186
 
