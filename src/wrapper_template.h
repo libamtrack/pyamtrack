@@ -189,6 +189,22 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
     return result_array;
   }
 }
+/**
+ * This function applies a multi-argument function to the cartesian product of input argument lists or arrays.
+ * For each argument in the input vector, if it is a list or ndarray, it is expanded into its elements.
+ * The function then computes the cartesian product of all such argument sets, and applies the provided
+ * MultiargumentFunc to each combination, collecting the results in a nested list structure.
+ *
+ * @param func   The multi-argument function to apply. It should accept a vector of std::variant<double, int>.
+ * @param input  A vector of nanobind objects, each representing an argument. Each argument can be a scalar,
+ *               list, or ndarray. Lists and ndarrays are expanded; scalars are treated as single values.
+ * @return       A nested nanobind list (nb::object) containing the results of applying func to each
+ *               combination of arguments from the cartesian product.
+ *
+ * Differs from wrap_multiargument_function in that this function computes the cartesian product of argument
+ * lists/arrays, applying the function to every possible combination, whereas wrap_multiargument_function
+ * applies the function to a single set of arguments (possibly vectorized).
+ */
 inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
   // Check for scalar types (float or int)
   std::vector<size_t> shape;
