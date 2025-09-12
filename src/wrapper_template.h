@@ -19,13 +19,10 @@ namespace nb = nanobind;
 using Func = std::function<double(double)>;
 using MultiargumentFunc = std::function<double(const std::vector<std::variant<double, int>>&)>;
 inline bool check_int_dtype(const nb::object& array) {
-  if (nb::isinstance<nb::ndarray<int8_t>>(array) || nb::isinstance<nb::ndarray<uint8_t>>(array) ||
-      nb::isinstance<nb::ndarray<int16_t>>(array) || nb::isinstance<nb::ndarray<uint16_t>>(array) ||
-      nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
-      nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array)) {
-    return true;
-  }
-  return false;
+  return nb::isinstance<nb::ndarray<int8_t>>(array) || nb::isinstance<nb::ndarray<uint8_t>>(array) ||
+         nb::isinstance<nb::ndarray<int16_t>>(array) || nb::isinstance<nb::ndarray<uint16_t>>(array) ||
+         nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
+         nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array);
 }
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
@@ -252,7 +249,18 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   std::function<nb::object(size_t, std::vector<nb::object>&)> build;
   build = [&](size_t depth, std::vector<nb::object>& current) -> nb::object {
     if (depth == expanded_inputs.size()) {
-      return wrap_multiargument_function(func, current);
+      std::vector<std::variant<double, int>> args;
+      args.reserve(current.size());
+      for (const auto& obj : current) {
+        if (nb::isinstance<nb::float_>(obj)) {
+          args.emplace_back(nb::cast<double>(obj));
+        } else if (nb::isinstance<nb::int_>(obj)) {
+          args.emplace_back(nb::cast<int>(obj));
+        } else {
+          throw nb::type_error("All arguments must be int or float at the deepest level.");
+        }
+      }
+      return nb::cast(func(args));
     }
     nb::list out;
     for (auto& val : expanded_inputs[depth]) {
