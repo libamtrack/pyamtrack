@@ -31,7 +31,6 @@ def test_particle_from_number():
     assert particle.A == 12
     assert particle.element_name == "Carbon"
     assert particle.element_acronym == "C"
-    assert particle.number() == 6012
 
 
 def test_particle_initialization_by_id_and_acronym():
@@ -40,7 +39,6 @@ def test_particle_initialization_by_id_and_acronym():
     assert p1.Z == p2.Z == 6
     assert p1.A == p2.A == 12
     assert p1.element_name == p2.element_name == "Carbon"
-    assert p1.number() == p2.number()
 
 
 def test_particle_initialization_by_invalid_id():
@@ -56,11 +54,6 @@ def test_particle_initialization_by_invalid_acronym():
 def test_particle_from_number_invalid():
     with pytest.raises(ValueError):
         pyamtrack.particles.Particle.from_number(999999)  # Nonexistent particle
-
-
-def test_particle_number_method():
-    particle = pyamtrack.particles.Particle.from_number(6012)  # Carbon-12
-    assert particle.number() == 6012
 
 
 def test_get_names():

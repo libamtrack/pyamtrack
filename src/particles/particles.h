@@ -50,7 +50,7 @@ std::vector<std::string> get_acronyms();
  * Attributes:
  * - id (long): The id of particle.
  * - Z (long): Atomic number of the particle.
- * - A (long): Mass number of the particle.
+ * - A (optional long): Mass number of the particle.
  * - atomic_weight (double): Atomic weight of the particle.
  * - element_name (std::string): Name of the particle.
  * - element_acronym (std::string): Acronym of the particle.
@@ -59,14 +59,16 @@ std::vector<std::string> get_acronyms();
  */
 class Particle {
  public:
-  long id;                     /**< The id of particle. */
-  long Z;                      /**< Atomic number of the particle. */
-  long A;                      /**< Mass number of the particle. */
+  long id; /**< The id of particle. */
+  long Z;  /**< Atomic number of the particle. */
+  std::optional<long> A;
+  ;                            /**< Mass number of the particle. */
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
   double density_g_cm3;        /**< Density of the particle in g/cm³. */
   double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
+  nb::object py_get_A() const;
   /**
    * @brief Initializes a Particle object.
    *
@@ -121,24 +123,6 @@ class Particle {
    * @throws std::invalid_argument if the particle number is invalid.
    */
   static Particle from_number(long particle_no);
-
-  /**
-   * @brief Returns the particle number (1000*Z + A).
-   *
-   * The particle number encodes the atomic number and mass number
-   * following the PyAmtrack convention:
-   *
-   *   particle_no = 1000 * Z + A
-   *
-   * Example:
-   * >>> particle = Particle("C")
-   * >>> particle.A = 12
-   * >>> particle.number()
-   * 6012
-   *
-   * @return The particle number (1000*Z + A).
-   */
-  long number() const;
 };
 
 #endif  // PARTICLE_H

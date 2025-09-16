@@ -59,26 +59,10 @@ NB_MODULE(particles, m) {
         Raises:
             ValueError: If the particle number is invalid.
     )pbdoc")
-      .def("number", &Particle::number, R"pbdoc(
-        Returns the particle number (1000*Z + A).
-
-        The particle number encodes the atomic number and mass number
-        following the PyAmtrack convention:
-
-            particle_no = 1000 * Z + A
-
-        Example:
-            >>> particle = Particle("C")
-            >>> particle.A = 12
-            >>> particle.number()
-            6012
-
-        Returns:
-            int: The particle number (1000*Z + A).
-    )pbdoc")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
       .def_ro("Z", &Particle::Z, "The atomic number of the particle.")
-      .def_ro("A", &Particle::A, "The mass number of the particle.")
+      .def_prop_ro("A", &Particle::py_get_A,
+                   "The mass number of the particle. Available if constructed via from_number(), else None.")
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")

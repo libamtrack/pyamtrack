@@ -75,3 +75,11 @@ std::vector<std::string> get_acronyms() {
   }
   return acronyms;
 }
+
+nb::object Particle::py_get_A() const {
+  if (A) {
+    return nb::int_(*A);
+  } else {
+    return nb::none();
+  }
+}
