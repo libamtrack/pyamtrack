@@ -15,6 +15,7 @@ Particle::Particle(long id) : id(id) {
   element_acronym = std::string(AT_Particle_Data.element_acronym[index]);
   density_g_cm3 = AT_Particle_Data.density_g_cm3[index];
   I_eV_per_Z = AT_Particle_Data.I_eV_per_Z[index];
+  A = std::nullopt;
 }
 
 Particle::Particle(const std::string& acronym) {
@@ -34,6 +35,7 @@ Particle::Particle(const std::string& acronym) {
   element_acronym = acronym;
   density_g_cm3 = data.density_g_cm3[index];
   I_eV_per_Z = data.I_eV_per_Z[index];
+  A = std::nullopt;
 }
 
 Particle Particle::from_number(long particle_no) {
@@ -54,10 +56,6 @@ Particle Particle::from_number(long particle_no) {
   }
 
   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
-}
-
-long Particle::number() const {
-  return AT_particle_no_from_Z_and_A_single(Z, A);
 }
 
 std::vector<std::string> get_names() {

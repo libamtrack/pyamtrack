@@ -141,4 +141,4 @@ class Particle {
   long number() const;
 };
 
-#endif  // MATERIALS_H
+#endif  // PARTICLE_H
