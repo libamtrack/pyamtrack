@@ -56,6 +56,9 @@ int get_model_id(const std::string& model_name);
  * @param material Either a material ID (int) or a Material object. Defaults to 1 (Liquid water).
  * @param model The stopping power model to use. Can be specified as a string name or model ID.
  *             Defaults to "tabata" (ID=7).
+ * @param cartesian_product Parameter that tells wheter to compute the cartesian product (all possible combinations) of
+ * the preeceding parameters
+ * @param new_version Tells wheter to use the newer version of the algorithm or the old
  * @return nb::object The calculated electron range(s) in meters. Returns a float for single input,
  *                   NumPy array for array input, or Python list for list input.
  * @throws nb::type_error If material argument is neither an integer nor a Material object,
@@ -63,6 +66,7 @@ int get_model_id(const std::string& model_name);
  * @throws std::runtime_error If the model name/ID is invalid.
  */
 nb::object electron_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
-                          const nb::object& model = nb::str("tabata"), bool cartesian_product = false);
+                          const nb::object& model = nb::str("tabata"), bool cartesian_product = false,
+                          bool new_version = false);
 
 #endif  // ELECTRON_RANGE_H
