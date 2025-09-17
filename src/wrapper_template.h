@@ -68,14 +68,16 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
 
       // Initialize the vector that will store the result
       // And map all the elements from the input with the given func
-      std::vector<double> results(num_elements);
+      double* results = new double[num_elements];
       for (size_t i = 0; i < num_elements; ++i) {
         results[i] = func(data_buffer[i]);
       }
 
       // Create the result ndarray, with the mapped data and pass the according shape
+
+      nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
       auto result_array =
-          nb::ndarray<double, nb::numpy>(results.data(), result_shape.size(), result_shape.data()).cast();
+          nb::ndarray<double, nb::numpy>(results, result_shape.size(), result_shape.data(), owner).cast();
       return result_array;
 
     } catch (const nb::cast_error& e) {
@@ -90,11 +92,13 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
 }
 
 inline nb::object prepare_array_argument(const nb::object& scalar, std::size_t shape) {
-  std::vector<double> results(shape);
+  double* results = new double[shape];
   for (std::size_t i = 0; i < shape; i++) {
     results[i] = nb::cast<double>(scalar);
   }
-  auto result_array = nb::ndarray<double, nb::numpy>(results.data(), {static_cast<std::size_t>(shape)}).cast();
+
+  nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
+  auto result_array = nb::ndarray<double, nb::numpy>(results, {static_cast<std::size_t>(shape)}, owner).cast();
   return result_array;
 }
 
@@ -158,7 +162,8 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
         throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
       }
     }
-    std::vector<double> results(input_length);
+
+    double* results = new double[input_length];
     try {
       for (size_t i = 0; i < input_length; i++) {
         std::vector<std::variant<double, int>> arguments_vector;
@@ -182,7 +187,9 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
       throw std::runtime_error("Error processing 1-D NumPy array: " + std::string(e.what()));
     }
 
-    auto result_array = nb::ndarray<double, nb::numpy>(results.data(), {input_length}).cast();
+    nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
+
+    auto result_array = nb::ndarray<double, nb::numpy>(results, {input_length}, owner).cast();
     return result_array;
   }
 }
