@@ -59,6 +59,32 @@ Particle Particle::from_number(long particle_no) {
   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
 }
 
+Particle Particle::from_string(const std::string& name) {
+  size_t pos = 0;
+  while (pos < name.size() && isdigit(name[pos])) {
+    ++pos;
+  }
+
+  std::optional<long> mass_number;
+  if (pos > 0) {
+    mass_number = std::stol(name.substr(0, pos));
+  }
+
+  std::string acronym = name.substr(pos);
+
+  if (acronym.empty()) {
+    throw std::invalid_argument("Invalid particle name: " + name);
+  }
+
+  Particle p(acronym);
+
+  if (mass_number) {
+    p.A = *mass_number;
+  }
+
+  return p;
+}
+
 std::vector<std::string> get_names() {
   std::vector<std::string> names;
   names.reserve(AT_Particle_Data.n);

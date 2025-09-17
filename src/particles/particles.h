@@ -123,6 +123,28 @@ class Particle {
    * @throws std::invalid_argument if the particle number is invalid.
    */
   static Particle from_number(long particle_no);
+
+  /**
+   * @brief Initializes a Particle object from a string representation.
+   *
+   * The string can be:
+   *   - Just the acronym of the element: "He", "C", "U"
+   *   - An isotope notation with mass number: "3He", "4He", "12C", "238U"
+   *
+   * Example:
+   * >>> particle = Particle::from_string("14C")
+   * >>> particle.Z
+   * 6
+   * >>> particle.A
+   * 14
+   * >>> particle.element_name
+   * 'Carbon'
+   *
+   * @param name The string representation of the particle.
+   * @return A Particle object corresponding to the given name.
+   * @throws std::invalid_argument if the name cannot be parsed.
+   */
+  static Particle from_string(const std::string& name);
 };
 
 #endif  // PARTICLE_H

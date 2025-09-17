@@ -56,6 +56,29 @@ def test_particle_from_number_invalid():
         pyamtrack.particles.Particle.from_number(999999)  # Nonexistent particle
 
 
+def test_particle_from_string_acronym():
+    particle = pyamtrack.particles.Particle.from_string("He")
+    assert particle.id == 2
+    assert particle.Z == 2
+    assert particle.element_name == "Helium"
+    assert particle.element_acronym == "He"
+    assert particle.A is None  # No mass number parsed
+
+
+def test_particle_from_string_isotope():
+    particle = pyamtrack.particles.Particle.from_string("14C")
+    assert particle.id == 6
+    assert particle.Z == 6
+    assert particle.A == 14
+    assert particle.element_name == "Carbon"
+    assert particle.element_acronym == "C"
+
+
+def test_particle_from_string_invalid():
+    with pytest.raises(ValueError):
+        pyamtrack.particles.Particle.from_string("Xyz123")
+
+
 def test_get_names():
     names = pyamtrack.particles.get_names()
     assert isinstance(names, list)
