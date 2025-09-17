@@ -43,7 +43,7 @@ std::vector<std::string> get_acronyms();
  *
  * Example:
  * >>> particle = Particle(6)
- * >>> particle.n
+ * >>> particle.id
  * 6
  * >>> particle.element_name
  * 'Carbon'
@@ -60,10 +60,9 @@ std::vector<std::string> get_acronyms();
  */
 class Particle {
  public:
-  long id; /**< The id of particle. */
-  long Z;  /**< Atomic number of the particle. */
-  std::optional<long> A;
-  ;                            /**< Mass number of the particle. */
+  long id;                     /**< The id of particle. */
+  long Z;                      /**< Atomic number of the particle. */
+  std::optional<long> A;       /**< Mass number of the particle. */
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
@@ -89,7 +88,7 @@ class Particle {
    *
    * Example:
    * >>> particle = Particle("C")
-   * >>> particle.n
+   * >>> particle.id
    * 6
    * >>> particle.element_name
    * 'Carbon'
