@@ -195,7 +195,7 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
 }
 
 // Parses the input consisting of lists, arrays and scalars and unifies their representation
-std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::object>& input) {
+inline std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::object>& input) {
   std::vector<std::vector<nb::object>> array_inputs;
   array_inputs.reserve(input.size());
 
