@@ -193,6 +193,53 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
     return result_array;
   }
 }
+
+// Parses the input consisting of lists, arrays and scalars and unifies their representation
+std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::object>& input) {
+  std::vector<std::vector<nb::object>> array_inputs;
+  array_inputs.reserve(input.size());
+
+  for (const auto& argument : input) {
+    // 1. Check for list
+    if (nb::isinstance<nb::list>(argument)) {
+      auto list = nb::cast<nb::list>(argument);
+      std::vector<nb::object> tmp;
+      tmp.reserve(nb::len(list));
+      for (auto item : list) tmp.push_back(nb::cast(item));
+      array_inputs.push_back(std::move(tmp));
+
+    }
+    // 2. Check for ndarray
+    else if (nb::isinstance<nb::ndarray<>>(argument)) {
+      if (check_int_dtype(argument)) {
+        auto array = nb::cast<nb::ndarray<long long, nb::shape<-1>>>(argument);
+        std::vector<nb::object> tmp;
+        tmp.reserve(array.size());
+        for (size_t i = 0; i < array.size(); ++i) {
+          tmp.push_back(nb::cast(array(i)));
+        }
+        array_inputs.push_back(std::move(tmp));
+      } else {
+        auto array = nb::cast<nb::ndarray<double, nb::shape<-1>>>(argument);
+        std::vector<nb::object> tmp;
+        tmp.reserve(array.size());
+        for (size_t i = 0; i < array.size(); ++i) {
+          tmp.push_back(nb::cast(array(i)));
+        }
+        array_inputs.push_back(std::move(tmp));
+      }
+
+      // 3. Check for scalar
+    } else if (nb::isinstance<nb::float_>(argument) || nb::isinstance<nb::int_>(argument)) {
+      array_inputs.push_back({argument});
+    } else {
+      // Handle unsupported types
+      throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
+    }
+  }
+  return array_inputs;
+}
+
 /**
  * This function applies a multi-argument function to the cartesian product of input argument lists or arrays.
  * For each argument in the input vector, if it is a list or ndarray, it is expanded into its elements.
@@ -210,136 +257,30 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
  * applies the function to a single set of arguments (possibly vectorized).
  */
 inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
-  // Check for scalar types (float or int)
-  std::vector<size_t> shape;
-  std::vector<std::vector<nb::object>> expanded_inputs;
-  expanded_inputs.reserve(input.size());
+  // Parse the input object
+  std::vector<std::vector<nb::object>> array_inputs = parse_input(input);
 
-  for (const auto& argument : input) {
-    if (nb::isinstance<nb::list>(argument)) {
-      auto list = nb::cast<nb::list>(argument);
-      shape.push_back(nb::len(list));
-      std::vector<nb::object> tmp;
-      tmp.reserve(nb::len(list));
-      for (auto item : list) tmp.push_back(nb::cast(item));
-      expanded_inputs.push_back(std::move(tmp));
-    } else if (nb::isinstance<nb::ndarray<>>(argument)) {
-      if (check_int_dtype(argument)) {
-        auto array = nb::cast<nb::ndarray<long long, nb::shape<-1>>>(argument);
+  // Record the size of every input, return empty np.array in case any of the inputs is empty
+  std::vector<size_t> shapes;
 
-        shape.push_back(array.size());
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        expanded_inputs.push_back(std::move(tmp));
-      } else {
-        auto array = nb::cast<nb::ndarray<double, nb::shape<-1>>>(argument);
-        shape.push_back(array.size());
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        expanded_inputs.push_back(std::move(tmp));
-      }
-    } else if (nb::isinstance<nb::float_>(argument) || nb::isinstance<nb::int_>(argument)) {
-      shape.push_back(1);
-      expanded_inputs.push_back({argument});
-    } else {
-      // Handle unsupported types
-      throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
+  for (const auto& input_vector : array_inputs) {
+    ssize_t size = input_vector.size();
+    if (size <= 0) {
+      return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();
     }
-    if (shape.back() <= 0) {
-      return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();  // return empty array
-    }
+    shapes.push_back(size);
   }
 
-  std::function<nb::object(size_t, std::vector<nb::object>&)> build;
-  build = [&](size_t depth, std::vector<nb::object>& current) -> nb::object {
-    if (depth == expanded_inputs.size()) {
-      std::vector<std::variant<double, int>> args;
-      args.reserve(current.size());
-      for (const auto& obj : current) {
-        if (nb::isinstance<nb::float_>(obj)) {
-          args.emplace_back(nb::cast<double>(obj));
-        } else if (nb::isinstance<nb::int_>(obj)) {
-          args.emplace_back(nb::cast<int>(obj));
-        } else {
-          throw nb::type_error("All arguments must be int or float at the deepest level.");
-        }
-      }
-      return nb::cast(func(args));
-    }
-    nb::list out;
-    for (auto& val : expanded_inputs[depth]) {
-      current.push_back(val);
-      out.append(build(depth + 1, current));
-      current.pop_back();
-    }
-    return out;
-  };
-  std::vector<nb::object> current;
-  return build(0, current);
-}
-
-inline nb::object wrap_cartesian_product_function_new(const MultiargumentFunc& func,
-                                                      const std::vector<nb::object>& input) {
-  // Check for scalar types (float or int)
-  std::vector<size_t> shape;
-  std::vector<std::vector<nb::object>> expanded_inputs;
-  expanded_inputs.reserve(input.size());
-
-  for (const auto& argument : input) {
-    if (nb::isinstance<nb::list>(argument)) {
-      auto list = nb::cast<nb::list>(argument);
-      shape.push_back(nb::len(list));
-      std::vector<nb::object> tmp;
-      tmp.reserve(nb::len(list));
-      for (auto item : list) tmp.push_back(nb::cast(item));
-      expanded_inputs.push_back(std::move(tmp));
-    } else if (nb::isinstance<nb::ndarray<>>(argument)) {
-      if (check_int_dtype(argument)) {
-        auto array = nb::cast<nb::ndarray<long long, nb::shape<-1>>>(argument);
-
-        shape.push_back(array.size());
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        expanded_inputs.push_back(std::move(tmp));
-      } else {
-        auto array = nb::cast<nb::ndarray<double, nb::shape<-1>>>(argument);
-        shape.push_back(array.size());
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        expanded_inputs.push_back(std::move(tmp));
-      }
-    } else if (nb::isinstance<nb::float_>(argument) || nb::isinstance<nb::int_>(argument)) {
-      shape.push_back(1);
-      expanded_inputs.push_back({argument});
-    } else {
-      // Handle unsupported types
-      throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
-    }
-    if (shape.back() <= 0) {
-      return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();  // return empty array
-    }
-  }
-
-  size_t num_inputs = expanded_inputs.size();
+  // Initialize the vector of pointers and compute the number of elements in the output
+  int num_inputs = shapes.size();
   std::vector<size_t> index_pointers(num_inputs, 0);
-  size_t output_size = 1;
+  int output_size = 1;
 
   for (size_t i = 0; i < num_inputs; ++i) {
-    output_size *= shape[i];
+    output_size *= shapes[i];
   }
 
+  // Iterate through all the combinations and fill the array with functions output
   double* results = new double[output_size];
   std::vector<std::variant<double, int>> args(num_inputs);
 
@@ -354,7 +295,7 @@ inline nb::object wrap_cartesian_product_function_new(const MultiargumentFunc& f
   };
 
   for (int j = 0; j < num_inputs; ++j) {
-    auto val = expanded_inputs[j][index_pointers[j]];
+    auto val = array_inputs[j][index_pointers[j]];
     assign_val(val, j);
   }
 
@@ -363,23 +304,25 @@ inline nb::object wrap_cartesian_product_function_new(const MultiargumentFunc& f
   for (int i = 1; i < output_size; ++i) {
     int j = num_inputs - 1;
 
-    while (index_pointers[j] >= shape[j] - 1) {
+    while (index_pointers[j] >= shapes[j] - 1) {
       index_pointers[j] = 0;
-      auto val = expanded_inputs[j][index_pointers[j]];
+      auto val = array_inputs[j][index_pointers[j]];
       assign_val(val, j);
       --j;
     }
 
     index_pointers[j] += 1;
-    auto val = expanded_inputs[j][index_pointers[j]];
+    auto val = array_inputs[j][index_pointers[j]];
     assign_val(val, j);
 
     results[i] = func(args);
   }
 
+  // Transform the raw pointer and return nb::ndarray
+
   nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
 
-  auto result_array = nb::ndarray<double, nb::numpy>(results, shape.size(), shape.data(), nb::handle(owner)).cast();
+  auto result_array = nb::ndarray<double, nb::numpy>(results, shapes.size(), shapes.data(), nb::handle(owner)).cast();
   return result_array;
 }
 
