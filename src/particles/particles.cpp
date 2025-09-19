@@ -59,8 +59,30 @@ Particle Particle::from_number(long particle_no) {
   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
 }
 
+/**
+ * @brief Constructs a Particle from a string representation.
+ *
+ * The input string can represent:
+ *   - An element acronym only (e.g. "He", "C", "U"), or
+ *   - An isotope notation with a leading mass number followed by the acronym
+ *     (e.g. "3He", "12C", "238U").
+ *
+ * Parsing logic:
+ *   1. Scan the string from the beginning to extract any leading digits
+ *      (interpreted as the mass number A).
+ *   2. The remainder of the string is treated as the element acronym.
+ *   3. Create a Particle using the acronym.
+ *   4. If a mass number was found, set it as the Particle's A.
+ *
+ * @param name The string representation of the particle.
+ * @return Particle The constructed Particle object.
+ * @throws std::invalid_argument If the string is malformed
+ *         (e.g. empty acronym, unknown acronym).
+ */
 Particle Particle::from_string(const std::string& name) {
   size_t pos = 0;
+
+  // Step 1: parse leading digits (mass number, e.g. "12" in "12C")
   while (pos < name.size() && isdigit(name[pos])) {
     ++pos;
   }
@@ -70,14 +92,17 @@ Particle Particle::from_string(const std::string& name) {
     mass_number = std::stol(name.substr(0, pos));
   }
 
+  // Step 2: extract the element acronym
   std::string acronym = name.substr(pos);
 
   if (acronym.empty()) {
     throw std::invalid_argument("Invalid particle name: " + name);
   }
 
+  // Step 3: construct particle from acronym
   Particle p(acronym);
 
+  // Step 4: attach mass number if one was parsed
   if (mass_number) {
     p.A = *mass_number;
   }
