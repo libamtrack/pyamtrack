@@ -64,7 +64,7 @@ def compare_coords(output: np.ndarray, inputs: tuple, coords: list[tuple[int, ..
             args.append(inp[coord])
 
     assert np.allclose(
-        output[*flattened_coords].item(),
+        output[flattened_coords].item(),
         electron_range(float(args[0]), int(args[1]), int(args[2])),
     )
 
