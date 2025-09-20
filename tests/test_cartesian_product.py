@@ -61,7 +61,7 @@ def compare_coords(output: np.ndarray, inputs: tuple, coords: list[tuple[int, ..
         if isinstance(inp, list):
             args.append(inp[coord[0]])
         else:
-            args.append(inp[*coord])
+            args.append(inp[coord])
 
     assert np.allclose(
         output[*flattened_coords].item(),
