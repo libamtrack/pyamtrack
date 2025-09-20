@@ -54,7 +54,7 @@ def draw_random_coords(size1: Shape, size2: Shape, size3: Shape) -> list[tuple[i
 
 
 def compare_coords(output: np.ndarray, inputs: tuple, coords: list[tuple[int, ...]]):
-    flattened_coords = [s for shape in coords for s in shape]
+    flattened_coords = tuple([s for shape in coords for s in shape])
 
     args = []
     for inp, coord in zip(inputs, coords):
