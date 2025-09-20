@@ -24,6 +24,19 @@ inline bool check_int_dtype(const nb::object& array) {
          nb::isinstance<nb::ndarray<int32_t>>(array) || nb::isinstance<nb::ndarray<uint32_t>>(array) ||
          nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array);
 }
+
+// Function to check whether given ndarray is c_contigous (row-major contigous)
+template <typename T>
+inline bool is_c_contiguous(const nb::ndarray<T>& arr) {
+  if (arr.size() == 0) return true;
+  size_t expected_stride = 1;
+  for (ssize_t i = arr.ndim() - 1; i >= 0; --i) {
+    if (arr.stride(i) != expected_stride) return false;
+    expected_stride *= arr.shape(i);
+  }
+  return true;
+}
+
 // The wrapper function
 inline nb::object wrap_function(Func func, const nb::object& input) {
   // 1. Check for scalar types (float or int)
@@ -55,6 +68,12 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
       // (const because the input data is read only)
       auto input_array = nb::cast<nb::ndarray<const double>>(input);
 
+      if (!is_c_contiguous(input_array)) {
+        throw nb::type_error(
+            "NDArray must be C-contiguous. "
+            "Use numpy.ascontiguousarray(your_array) before passing it.");
+      }
+
       // Size is the total number of elements in the array
       size_t num_elements = input_array.size();
 
@@ -74,7 +93,6 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
       }
 
       // Create the result ndarray, with the mapped data and pass the according shape
-
       nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
       auto result_array =
           nb::ndarray<double, nb::numpy>(results, result_shape.size(), result_shape.data(), owner).cast();
@@ -194,9 +212,43 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
   }
 }
 
-// Parses the input consisting of lists, arrays and scalars and unifies their representation
-inline std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::object>& input) {
+template <typename T>
+inline void process_array(nb::handle argument, std::vector<std::vector<nb::object>>& array_inputs,
+                          std::vector<size_t>& output_shape) {
+  auto arr = nb::cast<nb::ndarray<T>>(argument);
+  if (!is_c_contiguous(arr)) {
+    throw nb::type_error(
+        "NDArray must be C-contiguous. "
+        "Use numpy.ascontiguousarray(your_array) before passing it.");
+  }
+
+  if (arr.ndim() == 0) {
+    // scalar ndarray
+    T* ptr = arr.data();
+    array_inputs.push_back({nb::cast(ptr[0])});
+  } else {
+    // flatten NDarray and record its original shape
+    std::vector<nb::object> tmp;
+    tmp.reserve(arr.size());
+
+    for (size_t i = 0; i < arr.ndim(); ++i) {
+      output_shape.push_back(arr.shape(i));
+    }
+
+    T* ptr = arr.data();
+    for (size_t i = 0; i < arr.size(); ++i) {
+      tmp.push_back(nb::cast(ptr[i]));
+    }
+    array_inputs.push_back(std::move(tmp));
+  }
+}
+
+// Parse the input consisting of lists, arrays and scalars and unify their representation
+inline std::pair<std::vector<std::vector<nb::object>>, std::vector<size_t>> parse_input(
+    const std::vector<nb::object>& input) {
   std::vector<std::vector<nb::object>> array_inputs;
+  std::vector<size_t> output_shape;
+
   array_inputs.reserve(input.size());
 
   for (const auto& argument : input) {
@@ -208,25 +260,14 @@ inline std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::ob
       for (auto item : list) tmp.push_back(nb::cast(item));
       array_inputs.push_back(std::move(tmp));
 
+      output_shape.push_back(nb::len(list));
     }
     // 2. Check for ndarray
     else if (nb::isinstance<nb::ndarray<>>(argument)) {
       if (check_int_dtype(argument)) {
-        auto array = nb::cast<nb::ndarray<long long, nb::shape<-1>>>(argument);
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        array_inputs.push_back(std::move(tmp));
+        process_array<long long>(argument, array_inputs, output_shape);
       } else {
-        auto array = nb::cast<nb::ndarray<double, nb::shape<-1>>>(argument);
-        std::vector<nb::object> tmp;
-        tmp.reserve(array.size());
-        for (size_t i = 0; i < array.size(); ++i) {
-          tmp.push_back(nb::cast(array(i)));
-        }
-        array_inputs.push_back(std::move(tmp));
+        process_array<double>(argument, array_inputs, output_shape);
       }
 
       // 3. Check for scalar
@@ -237,7 +278,7 @@ inline std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::ob
       throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
     }
   }
-  return array_inputs;
+  return {array_inputs, output_shape};
 }
 
 /**
@@ -258,26 +299,26 @@ inline std::vector<std::vector<nb::object>> parse_input(const std::vector<nb::ob
  */
 inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
   // Parse the input object
-  std::vector<std::vector<nb::object>> array_inputs = parse_input(input);
+  auto [array_inputs, output_shape] = parse_input(input);
 
   // Record the size of every input, return empty np.array in case any of the inputs is empty
-  std::vector<size_t> shapes;
+  std::vector<size_t> shape;
 
   for (const auto& input_vector : array_inputs) {
     ssize_t size = input_vector.size();
     if (size <= 0) {
       return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();
     }
-    shapes.push_back(size);
+    shape.push_back(size);
   }
 
   // Initialize the vector of pointers and compute the number of elements in the output
-  int num_inputs = shapes.size();
+  int num_inputs = shape.size();
   std::vector<size_t> index_pointers(num_inputs, 0);
   int output_size = 1;
 
   for (size_t i = 0; i < num_inputs; ++i) {
-    output_size *= shapes[i];
+    output_size *= shape[i];
   }
 
   // Iterate through all the combinations and fill the array with functions output
@@ -304,7 +345,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   for (int i = 1; i < output_size; ++i) {
     int j = num_inputs - 1;
 
-    while (index_pointers[j] >= shapes[j] - 1) {
+    while (index_pointers[j] >= shape[j] - 1) {
       index_pointers[j] = 0;
       auto val = array_inputs[j][index_pointers[j]];
       assign_val(val, j);
@@ -319,10 +360,10 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   }
 
   // Transform the raw pointer and return nb::ndarray
-
   nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
 
-  auto result_array = nb::ndarray<double, nb::numpy>(results, shapes.size(), shapes.data(), nb::handle(owner)).cast();
+  auto result_array =
+      nb::ndarray<double, nb::numpy>(results, output_shape.size(), output_shape.data(), nb::handle(owner)).cast();
   return result_array;
 }
 
