@@ -114,14 +114,14 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
 
   for (const auto& input_vector : array_inputs) {
     ssize_t size = input_vector.size();
-    if (size <= 0) {
+    if (size == 0) {
       return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();
     }
     shape.push_back(size);
   }
 
   // Initialize the vector of pointers and compute the number of elements in the output
-  int num_inputs = shape.size();
+  size_t num_inputs = shape.size();
   std::vector<size_t> index_pointers(num_inputs, 0);
   int output_size = 1;
 
@@ -151,7 +151,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   results[0] = func(args);
 
   for (size_t i = 1; i < output_size; ++i) {
-    int j = num_inputs - 1;
+    size_t j = num_inputs - 1;
 
     while (index_pointers[j] >= shape[j] - 1) {
       index_pointers[j] = 0;
