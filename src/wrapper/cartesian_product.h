@@ -113,7 +113,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   std::vector<size_t> shape;
 
   for (const auto& input_vector : array_inputs) {
-    ssize_t size = input_vector.size();
+    size_t size = input_vector.size();
     if (size == 0) {
       return nb::ndarray<double, nb::numpy>(nullptr, {0}).cast();
     }
