@@ -41,7 +41,7 @@ template <typename T>
 inline bool is_c_contiguous(const nb::ndarray<T>& arr) {
   if (arr.size() == 0) return true;
   size_t expected_stride = 1;
-  for (ssize_t i = arr.ndim() - 1; i >= 0; --i) {
+  for (size_t i = arr.ndim() - 1; i >= 0; --i) {
     if (arr.stride(i) != expected_stride) return false;
     expected_stride *= arr.shape(i);
   }
