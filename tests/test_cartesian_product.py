@@ -58,7 +58,7 @@ def compare_coords(output: np.ndarray, inputs: tuple, coords: list[tuple[int, ..
 
     args = []
     for inp, coord in zip(inputs, coords):
-        if isinstance(input, list):
+        if isinstance(inp, list):
             args.append(inp[coord[0]])
         else:
             args.append(inp[*coord])
