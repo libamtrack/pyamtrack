@@ -25,7 +25,26 @@ inline bool check_int_dtype(const nb::object& array) {
          nb::isinstance<nb::ndarray<int64_t>>(array) || nb::isinstance<nb::ndarray<uint64_t>>(array);
 }
 
-// Function to check whether given ndarray is c_contigous (row-major contigous)
+// Function to check whether given ndarray is C-contiguous (row-major contiguous).
+//
+// C-contiguous means the array is stored in memory row by row (like in C),
+// opposite to to Fortran’s column-major format.
+//
+// Ndarrays can become non-contiguous, for example after a slicing operation
+// like array[::2], where the elements are no longer stored in one continuous block.
+//
+// To keep track of where each element lives in memory, NumPy uses strides.
+// A stride tells you how many steps in memory you must move
+// to advance by 1 element along a given axis.
+//   - In NumPy’s Python API, strides are expressed in bytes.
+//   - In nanobind, strides are expressed in number of elements
+//
+// Example: for a 2D array of shape (3, 4):
+//   stride[1] = 1      -> moving along columns steps through consecutive elements
+//   stride[0] = 4      -> moving to the next row skips over 4 elements
+//
+// For an array to be C-contiguous, the last stride must always be 1,
+// and each preceding stride must equal the product of all dimensions after it.
 template <typename T>
 inline bool is_c_contiguous(const nb::ndarray<T>& arr) {
   if (arr.size() == 0) return true;
@@ -69,7 +88,7 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
       auto input_array = nb::cast<nb::ndarray<const double>>(input);
 
       if (!is_c_contiguous(input_array)) {
-        throw nb::type_error(
+        throw nb::value_error(
             "NDArray must be C-contiguous. "
             "Use numpy.ascontiguousarray(your_array) before passing it.");
       }
@@ -212,12 +231,22 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
   }
 }
 
+/**
+ * Flattens a NumPy array (ndarray) or scalar into a 1-dimensional vector of nb::object.
+ * Records the original shape of the array in output_shape, except for 0-dimensional arrays.
+ * Ensures the array is C-contiguous (row-major); raises a value_error otherwise.
+ *
+ * @tparam T             The element type of the ndarray.
+ * @param argument       A nanobind handle representing the input ndarray or scalar.
+ * @param array_inputs   Vector of vectors to which the flattened array is appended.
+ * @param output_shape   Vector to record the shape of the input array.
+ */
 template <typename T>
 inline void process_array(nb::handle argument, std::vector<std::vector<nb::object>>& array_inputs,
                           std::vector<size_t>& output_shape) {
   auto arr = nb::cast<nb::ndarray<T>>(argument);
   if (!is_c_contiguous(arr)) {
-    throw nb::type_error(
+    throw nb::value_error(
         "NDArray must be C-contiguous. "
         "Use numpy.ascontiguousarray(your_array) before passing it.");
   }
@@ -342,7 +371,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
 
   results[0] = func(args);
 
-  for (int i = 1; i < output_size; ++i) {
+  for (size_t i = 1; i < output_size; ++i) {
     int j = num_inputs - 1;
 
     while (index_pointers[j] >= shape[j] - 1) {

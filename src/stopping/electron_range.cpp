@@ -78,6 +78,6 @@ nb::object electron_range(const nb::object& energy_MeV, const nb::object& materi
 
     return AT_max_electron_range_m(energy, mat_id, model_id);
   };
-  if (!cartesian_product) return wrap_multiargument_function(electron_range_vector, arguments_vector);
-  return wrap_cartesian_product_function(electron_range_vector, arguments_vector);
+  if (cartesian_product) return wrap_cartesian_product_function(electron_range_vector, arguments_vector);
+  return wrap_multiargument_function(electron_range_vector, arguments_vector);
 }

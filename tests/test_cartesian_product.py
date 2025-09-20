@@ -5,11 +5,30 @@ import pytest
 
 from pyamtrack.stopping import electron_range
 
-Shape = Union[int | tuple[int, ...]]
+Shape = Union[int, tuple[int, ...]]
 
 
 def check_correct_shape(output: np.ndarray, size1: Shape, size2: Shape, size3: Shape) -> bool:
-    output_shape = sum([s if isinstance(s, tuple) else (s,) for s in [size1, size2, size3]], start=())
+    """
+    Check whether a NumPy array has the expected shape based on three size specifications.
+
+    If one of the sizes is zero, it means that an empty array or empty list was given,
+    and the expected output should also be an empty array. In this case, the function
+    returns True, meaning no further checks are needed.
+
+    Otherwise, the expected output shape is a concatenation of the given shapes.
+    """
+
+    # Ensure each size is a tuple, then concatenate them into a single tuple
+    sizes = []
+    for s in (size1, size2, size3):
+        if isinstance(s, int):
+            sizes.append((s,))
+        else:
+            sizes.append(s)
+
+    # Concatenate all tuples, into one
+    output_shape = sum(sizes, ())
     if min(output_shape) <= 0:
         assert output.shape == (0,)
         return True
@@ -19,10 +38,17 @@ def check_correct_shape(output: np.ndarray, size1: Shape, size2: Shape, size3: S
 
 
 def draw_random_coords(size1: Shape, size2: Shape, size3: Shape) -> list[tuple[int, ...]]:
-    rand_coords = [
-        (np.random.randint(size),) if isinstance(size, int) else tuple(np.random.randint(s) for s in size)
-        for size in [size1, size2, size3]
-    ]
+    """
+    Generate random coordinates based on three size specifications.
+    """
+    rand_coords = []
+
+    for size in (size1, size2, size3):
+        if isinstance(size, int):
+            coord = (np.random.randint(size),)
+        else:
+            coord = tuple(np.random.randint(s) for s in size)
+        rand_coords.append(coord)
 
     return rand_coords
 
@@ -142,7 +168,12 @@ def test_with_scalar_input(size1, size2, size3):
         cartesian_product=True,
     )
 
-    expected_shape = sum(
-        [s if isinstance(s, tuple) else (s,) if s > 1 else () for s in [size1, size2, size3]], start=()
-    )
+    expected_shape = ()
+
+    for s in (size1, size2, size3):
+        if isinstance(s, tuple):
+            expected_shape += s
+        elif s > 1:
+            expected_shape += (s,)
+
     assert output.shape == expected_shape
