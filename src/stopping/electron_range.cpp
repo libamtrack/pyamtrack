@@ -4,7 +4,8 @@
 #include <string>     // For std::string
 #include <vector>     // For std::vector
 
-#include "../wrapper_template.h"  // Should contain wrap_function
+#include "../wrapper/cartesian_product.h"
+#include "../wrapper/multi_argument.h"
 
 extern "C" {
 #include "AT_ElectronRange.h"  // Contains AT_max_electron_range_m definition
