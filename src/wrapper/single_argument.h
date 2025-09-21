@@ -10,7 +10,20 @@
 
 namespace nb = nanobind;
 
-// The wrapper function
+/**
+ * Wraps a single-argument C++ function to support scalar, Python list, or NumPy array inputs.
+ *
+ * @param func   A single-argument function of type `Func` (e.g., `double func(double)`).
+ * @param input  A Python object representing the argument. Can be a float, int, list, or ndarray.
+ * @return       The result of applying `func`:
+ *                 - scalar nb::object if input is scalar
+ *                 - nb::list if input is a Python list
+ *                 - nb::ndarray<double> if input is a NumPy array
+ *
+ * @throws nb::type_error  If the input or list elements are not numeric, or if ndarray dtype cannot be cast to double.
+ * @throws nb::value_error If a NumPy array is not C-contiguous.
+ * @throws std::runtime_error For other errors during processing of NumPy arrays.
+ */
 inline nb::object wrap_function(Func func, const nb::object& input) {
   // 1. Check for scalar types (float or int)
   if (PyFloat_Check(input.ptr()) || PyLong_Check(input.ptr())) {

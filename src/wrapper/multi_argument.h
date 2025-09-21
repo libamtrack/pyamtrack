@@ -10,6 +10,12 @@
 
 namespace nb = nanobind;
 
+/**
+ * Prepares a 1-D NumPy array filled with copies of a scalar value.
+ * @param scalar  A Python scalar (int or float) to be broadcasted.
+ * @param shape   The size of the resulting 1-D NumPy array.
+ * @return        A 1-D nb::ndarray<double> where all elements are equal to `scalar`.
+ */
 inline nb::object prepare_array_argument(const nb::object& scalar, std::size_t shape) {
   double* results = new double[shape];
   for (std::size_t i = 0; i < shape; i++) {
@@ -21,6 +27,21 @@ inline nb::object prepare_array_argument(const nb::object& scalar, std::size_t s
   return result_array;
 }
 
+/**
+ * Wraps a multi-argument function to support vectorized or scalar inputs.
+ * The function returns either a single scalar (if all inputs were scalars) or a
+ * 1-D NumPy array of results corresponding to each set of arguments.
+ *
+ * @param func   The multi-argument function to wrap. Accepts a vector of
+ *               std::variant<double, int> and returns a double.
+ * @param input  Vector of nb::object representing the arguments (scalars, lists, or 1-D arrays).
+ * @return       Either a scalar nb::object (if all inputs are scalars) or a 1-D
+ *               nb::ndarray<double> containing results of `func` applied element-wise.
+ *
+ * @throws nb::type_error  If any input is not a float, int, list, or 1-D NumPy array.
+ * @throws nb::value_error If lists/arrays have incompatible lengths.
+ * @throws std::runtime_error For other errors during processing of 1-D arrays.
+ */
 inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, const std::vector<nb::object>& input) {
   // Check for scalar types (float or int)
   bool scalars_only = true;

@@ -19,6 +19,8 @@ namespace nb = nanobind;
  * @param argument       A nanobind handle representing the input ndarray or scalar.
  * @param array_inputs   Vector of vectors to which the flattened array is appended.
  * @param output_shape   Vector to record the shape of the input array.
+ *
+ * @throws nb::value_error if an input is not a non C-contigous Numpy array
  */
 template <typename T>
 inline void process_array(nb::handle argument, std::vector<std::vector<nb::object>>& array_inputs,
@@ -51,7 +53,20 @@ inline void process_array(nb::handle argument, std::vector<std::vector<nb::objec
   }
 }
 
-// Parse the input consisting of lists, arrays and scalars and unify their representation
+/**
+ * Parses a sequence of Python arguments (lists, ndarrays, or scalars) into a unified
+ * internal representation for later cartesian product computation.
+ *
+ * @param input   Vector of nanobind objects, each representing a function argument
+ *                (list, ndarray, or scalar).
+ * @return        A pair consisting of:
+ *                  - array_inputs: a vector of vectors of nb::object, each representing
+ *                                  one argument’s expanded elements.
+ *                  - output_shape: a vector of sizes (one per input) describing the
+ *                                  number of elements from each argument.
+ *
+ * @throws nb::type_error if an input is not a float, int, list, or NumPy array.
+ */
 inline std::pair<std::vector<std::vector<nb::object>>, std::vector<size_t>> parse_input(
     const std::vector<nb::object>& input) {
   std::vector<std::vector<nb::object>> array_inputs;
@@ -83,14 +98,14 @@ inline std::pair<std::vector<std::vector<nb::object>>, std::vector<size_t>> pars
       array_inputs.push_back({argument});
     } else {
       // Handle unsupported types
-      throw nb::type_error("Input must be a float, int, list, or 0-D/1-D NumPy array.");
+      throw nb::type_error("Input must be a float, int, list, or NumPy array.");
     }
   }
   return {array_inputs, output_shape};
 }
 
 /**
- * This function applies a multi-argument function to the cartesian product of input argument lists or arrays.
+ * Applies a multi-argument function to the cartesian product of input arguments (each being lists or arrays).
  * For each argument in the input vector, if it is a list or ndarray, it is expanded into its elements.
  * The function then computes the cartesian product of all such argument sets, and applies the provided
  * MultiargumentFunc to each combination, collecting the results in a nested list structure.
@@ -100,6 +115,8 @@ inline std::pair<std::vector<std::vector<nb::object>>, std::vector<size_t>> pars
  *               list, or ndarray. Lists and ndarrays are expanded; scalars are treated as single values.
  * @return       A nested nanobind list (nb::object) containing the results of applying func to each
  *               combination of arguments from the cartesian product.
+ *
+ * @throws nb::type_error if input array contents are not integers or floats
  *
  * Differs from wrap_multiargument_function in that this function computes the cartesian product of argument
  * lists/arrays, applying the function to every possible combination, whereas wrap_multiargument_function
@@ -123,7 +140,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   // Initialize the vector of pointers and compute the number of elements in the output
   size_t num_inputs = shape.size();
   std::vector<size_t> index_pointers(num_inputs, 0);
-  int output_size = 1;
+  size_t output_size = 1;
 
   for (size_t i = 0; i < num_inputs; ++i) {
     output_size *= shape[i];
@@ -143,7 +160,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
     }
   };
 
-  for (int j = 0; j < num_inputs; ++j) {
+  for (size_t j = 0; j < num_inputs; ++j) {
     auto val = array_inputs[j][index_pointers[j]];
     assign_val(val, j);
   }
@@ -151,7 +168,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   results[0] = func(args);
 
   for (size_t i = 1; i < output_size; ++i) {
-    size_t j = num_inputs - 1;
+    size_t j = int(num_inputs) - 1;
 
     while (index_pointers[j] >= shape[j] - 1) {
       index_pointers[j] = 0;
