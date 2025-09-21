@@ -168,9 +168,9 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   results[0] = func(args);
 
   for (size_t i = 1; i < output_size; ++i) {
-    size_t j = int(num_inputs) - 1;
+    size_t j = num_inputs - 1;
 
-    while (index_pointers[j] >= shape[j] - 1) {
+    while (j > 0 && index_pointers[j] >= shape[j] - 1) {
       index_pointers[j] = 0;
       auto val = array_inputs[j][index_pointers[j]];
       assign_val(val, j);
