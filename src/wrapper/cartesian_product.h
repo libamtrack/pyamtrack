@@ -188,7 +188,7 @@ inline nb::object wrap_cartesian_product_function(const MultiargumentFunc& func,
   nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
 
   auto result_array =
-      nb::ndarray<double, nb::numpy>(results, output_shape.size(), output_shape.data(), nb::handle(owner)).cast();
+      nb::ndarray<double, nb::numpy>(results, output_shape.size(), output_shape.data(), owner).cast();
   return result_array;
 }
 
