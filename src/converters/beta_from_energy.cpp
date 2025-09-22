@@ -1,6 +1,6 @@
 #include "beta_from_energy.h"
 
-#include "../wrapper_template.h"
+#include "../wrapper/single_argument.h"
 
 extern "C" {
 #include "AT_PhysicsRoutines.h"

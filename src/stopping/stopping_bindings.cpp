@@ -22,6 +22,7 @@ NB_MODULE(stopping, m) {
   m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
 
   m.def("electron_range", &electron_range, nb::arg("energy_MeV"), nb::arg("material") = 1, nb::arg("model") = "tabata",
+        nb::arg("cartesian_product") = false,
         R"pbdoc(
         Calculate electron range in meters using various models.
 
@@ -45,12 +46,15 @@ NB_MODULE(stopping, m) {
             - "edmund" (id=6): Edmund model
             - "tabata" (id=7): Tabata model (default)
             - "scholz_new" (id=8): Updated Scholz model
+        cartesian_product: bool
+            Indicates whether to compute cartesian product over passed arguments.
 
         Returns
         -------
         float or numpy.ndarray
             The calculated electron range(s) in meters. Returns a float for a single input,
-            a NumPy array for a NumPy array input, or a Python list for a list input.
+            a NumPy array for a NumPy array input, a Python list for a list input and a NumPy array
+            when computing a cartesian product.
 
         Raises
         ------
