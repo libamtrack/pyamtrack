@@ -29,7 +29,7 @@ inline nb::object wrap_function(Func func, const nb::object& input) {
   if (PyFloat_Check(input.ptr()) || PyLong_Check(input.ptr())) {
     double input_val = nb::cast<double>(input);
     double result = func(input_val);
-    return nb::cast(static_cast<double>(result));
+    return nb::cast(result);
   }
   // 2. Check for Python list
   else if (nb::isinstance<nb::list>(input)) {

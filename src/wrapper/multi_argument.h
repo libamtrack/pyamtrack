@@ -23,7 +23,7 @@ inline nb::object prepare_array_argument(const nb::object& scalar, std::size_t s
   }
 
   nb::capsule owner(results, [](void* p) noexcept { delete[] (double*)p; });
-  auto result_array = nb::ndarray<double, nb::numpy>(results, {static_cast<std::size_t>(shape)}, owner).cast();
+  auto result_array = nb::ndarray<double, nb::numpy>(results, {shape}, owner).cast();
   return result_array;
 }
 
@@ -74,7 +74,7 @@ inline nb::object wrap_multiargument_function(const MultiargumentFunc& func, con
       }
     }
     double result = func(input_casted);
-    return nb::cast(static_cast<double>(result));
+    return nb::cast(result);
   }
   // Check for Python list and / or arrays
   else {
