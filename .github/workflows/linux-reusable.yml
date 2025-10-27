@@ -54,7 +54,7 @@ jobs:
           pytest tests/
 
       - name: Upload Linux Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: libamtrack-linux
           path: dist/*.whl
