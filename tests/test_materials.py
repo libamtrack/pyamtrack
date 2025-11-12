@@ -1,6 +1,7 @@
 import pytest
 
 import pyamtrack
+from tests.conftest import assert_list_of_type
 
 
 def test_material_initialization_by_id():
@@ -29,26 +30,17 @@ def test_material_initialization_by_invalid_name():
 
 def test_get_ids():
     ids = pyamtrack.materials.get_ids()
-    assert isinstance(ids, list)
-    assert len(ids) > 0
-    assert all(isinstance(id, int) for id in ids)
-    assert ids[0] == 1  # Check the first ID
+    assert_list_of_type(ids, int, expected_first_value=1)
 
 
 def test_get_long_names():
     names = pyamtrack.materials.get_long_names()
-    assert isinstance(names, list)
-    assert len(names) > 0
-    assert all(isinstance(name, str) for name in names)
-    assert names[0] == "Water, Liquid"  # Check the first name
+    assert_list_of_type(names, str, expected_first_value="Water, Liquid")
 
 
 def test_get_short_names():
     names = pyamtrack.materials.get_names()
-    assert isinstance(names, list)
-    assert len(names) > 0
-    assert all(isinstance(name, str) for name in names)
-    assert names[0] == "water_liquid"  # Check the first name
+    assert_list_of_type(names, str, expected_first_value="water_liquid")
 
 
 def test_via_object():

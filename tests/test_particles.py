@@ -1,6 +1,7 @@
 import pytest
 
 import pyamtrack
+from tests.conftest import assert_list_of_type
 
 
 def test_particle_initialization_by_id():
@@ -81,18 +82,12 @@ def test_particle_from_string_invalid():
 
 def test_get_names():
     names = pyamtrack.particles.get_names()
-    assert isinstance(names, list)
-    assert len(names) > 0
-    assert all(isinstance(name, str) for name in names)
-    assert names[0] == "Hydrogen"  # Check the first name
+    assert_list_of_type(names, str, expected_first_value="Hydrogen")
 
 
 def test_get_acronyms():
     names = pyamtrack.particles.get_acronyms()
-    assert isinstance(names, list)
-    assert len(names) > 0
-    assert all(isinstance(name, str) for name in names)
-    assert names[0] == "H"  # Check the first name
+    assert_list_of_type(names, str, expected_first_value="H")
 
 
 def test_via_name_object():
