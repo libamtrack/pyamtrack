@@ -8,6 +8,25 @@ from pyamtrack.stopping import electron_range
 Shape = Union[int, tuple[int, ...]]
 
 
+def generate_test_args(size1: Shape, size2: Shape, size3: Shape) -> tuple:
+    """
+    Generate test arguments for cartesian product tests.
+    
+    Args:
+        size1: Size specification for first argument (energy)
+        size2: Size specification for second argument (material)
+        size3: Size specification for third argument (model)
+    
+    Returns:
+        Tuple of (energy, material, model) arrays with specified shapes
+    """
+    return (
+        np.random.uniform(900, 1100, size1),
+        np.random.randint(2, 8, size2),
+        np.random.randint(2, 8, size3),
+    )
+
+
 def check_correct_shape(output: np.ndarray, size1: Shape, size2: Shape, size3: Shape) -> bool:
     """
     Check whether a NumPy array has the expected shape based on three size specifications.
@@ -87,11 +106,7 @@ def compare_coords(output: np.ndarray, inputs: tuple, coords: list[tuple[int, ..
 def test_cartesian_product(size1, size2, size3) -> None:
     """Simple tests for cartesian product"""
 
-    args = (
-        np.random.uniform(900, 1100, size1),
-        np.random.randint(2, 8, size2),
-        np.random.randint(2, 8, size3),
-    )
+    args = generate_test_args(size1, size2, size3)
 
     output = electron_range(
         *args,
@@ -117,11 +132,7 @@ def test_cartesian_product(size1, size2, size3) -> None:
 )
 def test_with_list_input(size1, size2, size3, arg_to_list):
     """Tests with one of the arguments being a list"""
-    args = [
-        np.random.uniform(900, 1100, size1),
-        np.random.randint(2, 8, size2),
-        np.random.randint(2, 8, size3),
-    ]
+    args = list(generate_test_args(size1, size2, size3))
 
     args[arg_to_list] = args[arg_to_list].tolist()
 
@@ -150,11 +161,7 @@ def test_with_list_input(size1, size2, size3, arg_to_list):
 def test_with_scalar_input(size1, size2, size3):
     """Tests with one of the arguments being a scalar"""
 
-    args = [
-        np.random.uniform(900, 1100, size1),
-        np.random.randint(2, 8, size2),
-        np.random.randint(2, 8, size3),
-    ]
+    args = list(generate_test_args(size1, size2, size3))
 
     for i, size in zip(range(3), [size1, size2, size3]):
         if size == 1:
