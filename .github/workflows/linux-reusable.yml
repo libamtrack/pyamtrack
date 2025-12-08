@@ -15,7 +15,7 @@ jobs:
     outputs:
       linux_status: ${{ job.status }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
@@ -64,7 +64,7 @@ jobs:
   run_build_script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
