@@ -18,7 +18,7 @@ def check_correct_shape(output: np.ndarray, size1: Shape, size2: Shape, size3: S
 
     Otherwise, the expected output shape is a concatenation of the given shapes.
     """
-
+    return False
     # Ensure each size is a tuple, then concatenate them into a single tuple
     sizes = []
     for s in (size1, size2, size3):
