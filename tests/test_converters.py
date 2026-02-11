@@ -16,3 +16,6 @@ def test_energy_from_beta_single():
     beta = 0.5
     energy = energy_from_beta(beta)
     assert energy > 80.0, "Energy should be positive for valid beta"
+
+
+dupa
