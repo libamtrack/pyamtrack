@@ -8,6 +8,27 @@ Ensure you have the following installed:
 - **GSL** (GNU Scientific Library)
 - **Git** (for fetching dependencies)
 
+### **Installing GSL**
+
+**On Debian/Ubuntu:**
+
+```bash
+sudo apt-get install libgsl-dev
+```
+
+**On Fedora/RHEL:**
+
+```bash
+sudo dnf install gsl-devel
+```
+
+<!--
+   On macOS (Homebrew):
+   ```bash
+   brew install gsl
+   ```
+ -->
+
 ## **Installation Instructions**
 
 Follow these steps to build and install the `pyamtrack` Python module as a wheel package.
@@ -20,6 +41,9 @@ To build and install the project locally, follow these steps:
    Create and activate a Python virtual environment:
    ```bash
    python3 -m venv venv
+   ```
+
+   ```bash
    source venv/bin/activate
    ```
 
