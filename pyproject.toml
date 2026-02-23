@@ -1,67 +1,68 @@
-[build-system]
-requires = ["scikit-build-core>0.10", "nanobind", "setuptools_scm>=8"]
-build-backend = "scikit_build_core.build"
+  [build-system]
+  requires = ["scikit-build-core>0.10", "nanobind", "setuptools_scm>=8"]
+  build-backend = "scikit_build_core.build"
 
-[project]
-name = "pyamtrack"
-dynamic = ["version"]
-description = "Python bindings for the libamtrack library"
-readme = "README.md"
-authors = [{ name = "Leszek Grzanka", email = "grzanka@agh.edu.pl" }]
-requires-python = ">=3.9"
-license = "GPL-3.0-or-later"
-dependencies = ["numpy"]
-classifiers = [
-  "Development Status :: 3 - Alpha",
+  [project]
+  name = "pyamtrack"
+  dynamic = ["version"]
+  description = "Python bindings for the libamtrack library"
+  readme = "README.md"
+  authors = [{ name = "Leszek Grzanka", email = "grzanka@agh.edu.pl" }]
+  requires-python = ">=3.9"
+  license = "GPL-3.0-or-later"
+  dependencies = ["numpy"]
+  classifiers = [
+    "Development Status :: 3 - Alpha",
 
-  # Specify the Python versions you support here.
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
+    # Specify the Python versions you support here.
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 
-  "Topic :: Scientific/Engineering :: Physics",
-  "Topic :: Software Development :: Libraries :: Python Modules",
-  "Intended Audience :: Science/Research",
-]
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Science/Research",
+  ]
 
-[project.urls]
-Homepage = "https://libamtrack.github.io/"
-Documentation = "https://libamtrack.github.io/docs/python/"
-Repository = "https://github.com/libamtrack/pyamtrack.git"
-Issues = "https://github.com/libamtrack/pyamtrack/issues"
+  [project.urls]
+  Homepage = "https://libamtrack.github.io/"
+  Documentation = "https://libamtrack.github.io/docs/python/"
+  Repository = "https://github.com/libamtrack/pyamtrack.git"
+  Issues = "https://github.com/libamtrack/pyamtrack/issues"
 
 
-[tool.scikit-build]
-wheel.expand-macos-universal-tags = true
+  [tool.scikit-build]
+  wheel.expand-macos-universal-tags = true
 
-wheel.exclude = ["share/libamtrack/VERSION", "include/AT_Version.h", "lib/cmake/**"]
-minimum-version = "build-system.requires"
-metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
-sdist.include = ["src/pyamtrack/_version.py"]
+  wheel.exclude = ["share/libamtrack/VERSION", "include/AT_Version.h", "lib/cmake/**"]
+  minimum-version = "build-system.requires"
+  metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+  sdist.include = ["src/pyamtrack/_version.py"]
 
-[tool.setuptools_scm]
-version_scheme = "post-release"
-local_scheme = "node-and-date"
-write_to = "src/pyamtrack/_version.py"
+  [tool.setuptools_scm]
+  version_scheme = "post-release"
+  local_scheme = "node-and-date"
+  write_to = "src/pyamtrack/_version.py"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["pyamtrack", "pyamtrack.*"]
+  [tool.setuptools.packages.find]
+  where = ["src"]
+  include = ["pyamtrack", "pyamtrack.*"]
 
-[tool.cibuildwheel]
-archs = ["auto64"]
-build = ["cp39-*", "cp310-*", "cp311-*", "cp312-*", "cp313-*"]
-skip = "cp3??t-*"
-test-requires = "pytest"
-test-command = "pytest {project}/tests"
+  [tool.cibuildwheel]
+  archs = ["auto64"]
+  build = ["cp39-*", "cp310-*", "cp311-*", "cp312-*", "cp313-*", "cp314-*"]
+  skip = "cp3??t-*"
+  test-requires = "pytest"
+  test-command = "pytest {project}/tests"
 
-[tool.cibuildwheel.linux]
-before-all = "./scripts/build_gsl.sh"
+  [tool.cibuildwheel.linux]
+  before-all = "./scripts/build_gsl.sh"
 
-[tool.cibuildwheel.macos]
-before-all = "sudo env MACOSX_DEPLOYMENT_TARGET=11.0 ./scripts/build_gsl.sh"
+  [tool.cibuildwheel.macos]
+  before-all = "sudo env MACOSX_DEPLOYMENT_TARGET=11.0 ./scripts/build_gsl.sh"
 
-[tool.cibuildwheel.windows]
-before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
+  [tool.cibuildwheel.windows]
+  before-all = "powershell.exe -ExecutionPolicy Bypass -File scripts/build_gsl.ps1"
