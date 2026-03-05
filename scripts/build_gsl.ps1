@@ -6,6 +6,13 @@ $vcpkgInstalled = "$workspace\vcpkg_installed"
 if (-Not (Test-Path $vcpkgCache)) { New-Item -ItemType Directory -Path $vcpkgCache }
 if (-Not (Test-Path $vcpkgInstalled)) { New-Item -ItemType Directory -Path $vcpkgInstalled }
 
+# Clear stale registry cache
+$registryCache = "$env:LOCALAPPDATA\vcpkg\registries"
+if (Test-Path $registryCache) {
+    Write-Output "Clearing vcpkg registry cache..."
+    Remove-Item -Recurse -Force $registryCache
+}
+
 # Restore or install vcpkg
 if (-Not (Test-Path "$workspace\vcpkg")) {
     git clone --depth 1 https://github.com/microsoft/vcpkg "$workspace\vcpkg"
