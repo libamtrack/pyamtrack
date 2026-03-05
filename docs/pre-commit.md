@@ -7,8 +7,8 @@ To set it up:
 1. **Create a Virtual Environment**:
    Create and activate a Python virtual environment:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   python3 -m venv .venv
+   source .venv/bin/activate
    ```
 
 2. **Install Development Dependencies**:
