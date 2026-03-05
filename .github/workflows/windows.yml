@@ -4,10 +4,15 @@ permissions:
   pull-requests: write
 
 on:
-    workflow_dispatch:
-    push:
-      branches:
-       - master
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+  schedule:
+    # Runs every Wednesday at 18:46 UTC
+    - cron: '46 18 * * 3'
+
 
 jobs:
   build_and_test_windows:
