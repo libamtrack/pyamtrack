@@ -9,7 +9,7 @@
         {
             "label": "Run Pytest",
             "type": "shell",
-            "command": "source venv/bin/activate && pytest tests/",
+            "command": "source .venv/bin/activate && pytest tests/",
             "group": {
                 "kind": "test",
                 "isDefault": true
@@ -23,7 +23,7 @@
         {
             "label": "Build Pyamtrack",
             "type": "shell",
-            "command": "rm -rf dist && source venv/bin/activate && pip uninstall pyamtrack --yes && python -m build --wheel && pip install dist/*.whl",
+            "command": "rm -rf dist && source .venv/bin/activate && pip uninstall pyamtrack --yes && python -m build --wheel && pip install dist/*.whl",
             "group": {
                 "kind": "build",
                 "isDefault": true
