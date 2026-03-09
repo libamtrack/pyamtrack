@@ -2,6 +2,10 @@
 
 pyamtrack is a Python wrapper for the libamtrack library, making it easier to access and use libamtrack's functionality directly from Python.
 
+This repository is intended for end users of pyamtrack - researchers and developers who want to install the package, use its functionality in Python projects, and access documentation and examples.
+
+> ⚠️ NO NEED TO CLONE TO THIS REPOSITORY
+
 ## Stable Release Information
 
 The last stable release of pyamtrack is **0.14.0** (released on **2022-10-03**). However, this version has several limitations:
@@ -18,6 +22,7 @@ pip install pyamtrack
 A new version of pyamtrack is currently being developed, addressing these limitations. The new release will include:
 - Support for **Linux, Windows, and macOS** (for Python >= 3.9).
 - Full documentation detailing all available functions, their usage, and example applications.
+<!-- - Planned support for free-threading in Python 3.14. -->
 
 The work is still in progress, and the latest **alpha release** can be installed via:
 ```bash

@@ -1,5 +1,8 @@
 # Building and Installing `pyamtrack` on Linux
 
+> ⚠️ This guide is intended for **developers** building and testing `pyamtrack`, not for end-users.
+> For the main user-oriented documentation, see the [main README](../README.md).
+
 ## **Prerequisites**
 Ensure you have the following installed:
 - **Python 3** (with development headers, at least 3.9)
