@@ -1,7 +1,7 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 
-#include "mass_stopping_power.h"
+#include "stopping_power.h"
 #include "electron_range.h"
 
 namespace nb = nanobind;
@@ -91,6 +91,16 @@ NB_MODULE(stopping, m) {
       -------
       float or numpy.ndarray
           Mass stopping power in MeV*cm2/g.
+      )pbdoc");
+
+  m.def("stopping_power", &stopping_power,
+      nb::arg("E_MeV_u"),
+      nb::arg("particle") = 1001,
+      nb::arg("material") = 1,
+      nb::arg("source") = 2,
+      nb::arg("cartesian_product") = false,
+      R"pbdoc(
+        ...
       )pbdoc");
   m.def("debug_msp", []() { return 123; });
 }

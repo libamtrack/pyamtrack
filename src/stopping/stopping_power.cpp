@@ -1,4 +1,4 @@
-#include "mass_stopping_power.h"
+#include "stopping_power.h"
 
 #include <functional>  // For std::function
 
@@ -59,6 +59,42 @@ nb::object mass_stopping_power(const nb::object& E_MeV_u,
     double result = 0.0;
 
     AT_Mass_Stopping_Power_with_no(
+        static_cast<long>(source), n, &energy, &part_no, mat_no, &result);
+
+    return result;
+  };
+
+  if (cartesian_product)
+    return wrap_cartesian_product_function(compute, arguments_vector);
+  return wrap_multiargument_function(compute, arguments_vector);
+}
+
+
+nb::object stopping_power(const nb::object& E_MeV_u,
+                               const nb::object& particle,
+                               const nb::object& material,
+                               int source,
+                               bool cartesian_product) {
+  std::vector<nb::object> arguments_vector;
+  arguments_vector.push_back(E_MeV_u);
+  arguments_vector.push_back(get_id(particle, process_particle));
+  arguments_vector.push_back(get_id(material, process_material));
+
+  // Capture source by value in the lambda
+  auto compute = [source](const std::vector<std::variant<double, int>>& vec) -> double {
+    if (vec.size() < 3) {
+      throw std::invalid_argument("Input vector must have at least three elements.");
+    }
+    double energy = variant_cast<double>(vec[0]);
+    int particle_no = variant_cast<int>(vec[1]);
+    int material_no = variant_cast<int>(vec[2]);
+
+    long n = 1;
+    long part_no = static_cast<long>(particle_no);
+    long mat_no = static_cast<long>(material_no);
+    double result = 0.0;
+
+    AT_Stopping_Power_with_no(
         static_cast<long>(source), n, &energy, &part_no, mat_no, &result);
 
     return result;
