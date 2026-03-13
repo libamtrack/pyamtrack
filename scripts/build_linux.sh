@@ -11,8 +11,8 @@ function error {
 
 # Create and activate a virtual environment
 echo "Creating and activating a virtual environment..."
-python3 -m venv venv || error "Failed to create virtual environment."
-source venv/bin/activate || error "Failed to activate virtual environment."
+python3 -m venv .venv || error "Failed to create virtual environment."
+source .venv/bin/activate || error "Failed to activate virtual environment."
 
 # Install development dependencies
 echo "Installing development dependencies..."

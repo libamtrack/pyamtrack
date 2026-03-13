@@ -1,5 +1,8 @@
 # Building and Installing `pyamtrack` on Linux
 
+> ⚠️ This guide is intended for **developers** building and testing `pyamtrack`, not for end-users.
+> For the main user-oriented documentation, see the [main README](../README.md).
+
 ## **Prerequisites**
 Ensure you have the following installed:
 - **Python 3** (with development headers, at least 3.9)
@@ -7,6 +10,27 @@ Ensure you have the following installed:
 - **Ninja** (recommended for faster builds)
 - **GSL** (GNU Scientific Library)
 - **Git** (for fetching dependencies)
+
+### **Installing GSL**
+
+**On Debian/Ubuntu:**
+
+```bash
+sudo apt-get install libgsl-dev
+```
+
+**On Fedora/RHEL:**
+
+```bash
+sudo dnf install gsl-devel
+```
+
+<!--
+   On macOS (Homebrew):
+   ```bash
+   brew install gsl
+   ```
+ -->
 
 ## **Installation Instructions**
 
@@ -19,8 +43,11 @@ To build and install the project locally, follow these steps:
 1. **Create a Virtual Environment**:
    Create and activate a Python virtual environment:
    ```bash
-   python3 -m venv venv
-   source venv/bin/activate
+   python3 -m venv .venv
+   ```
+
+   ```bash
+   source .venv/bin/activate
    ```
 
 2. **Install Development Dependencies**:
