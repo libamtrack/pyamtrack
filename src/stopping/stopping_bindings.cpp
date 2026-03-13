@@ -100,7 +100,25 @@ NB_MODULE(stopping, m) {
       nb::arg("source") = 2,
       nb::arg("cartesian_product") = false,
       R"pbdoc(
-        ...
+      Calculate stopping power in keV/um.
+
+      Parameters
+      ----------
+      E_MeV_u : float or array_like
+          Kinetic energy in MeV per nucleon.
+      particle : int or Particle, optional
+          Particle number (1000*Z + A) or Particle object. Defaults to 1001 (proton).
+      material : int or Material, optional
+          Material ID or Material object. Defaults to 1 (Liquid water).
+      source : int, optional
+          Stopping power data source. 1=Bethe, 2=PSTAR (default), 3=ICRU.
+      cartesian_product : bool, optional
+          Whether to compute cartesian product over arguments.
+
+      Returns
+      -------
+      float or numpy.ndarray
+          Stopping power in keV/um.
       )pbdoc");
   m.def("debug_msp", []() { return 123; });
 }

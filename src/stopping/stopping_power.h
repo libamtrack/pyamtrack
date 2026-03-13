@@ -32,7 +32,7 @@ nb::object mass_stopping_power(const nb::object& E_MeV_u,
                                bool cartesian_product = false);
 
 /**
- * @brief Calculate mass stopping power in MeV*cm2/g.
+ * @brief Calculate stopping power in keV/um.
  *
  * Wraps AT_Stopping_Power_with_no from libamtrack.
  *
@@ -41,7 +41,7 @@ nb::object mass_stopping_power(const nb::object& E_MeV_u,
  * @param material    Material ID or Material object. Default: 1 (liquid water).
  * @param source      Stopping power source ID. Default: 2 (PSTAR).
  * @param cartesian_product  Whether to compute cartesian product over arguments.
- * @return            Mass stopping power in MeV*cm2/g.
+ * @return            Stopping power in keV/um.
  */
 nb::object stopping_power(const nb::object& E_MeV_u,
                                const nb::object& particle = nb::int_(1001),
