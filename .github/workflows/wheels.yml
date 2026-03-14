@@ -12,6 +12,7 @@ on:
     types:
       - published
   schedule:
+    # Runs every Tuesday at 18:46 UTC
     - cron: '46 18 * * 2'
 
 env:
