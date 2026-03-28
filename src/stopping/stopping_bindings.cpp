@@ -1,8 +1,9 @@
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
 
-#include "mass_stopping_power.h"
+#include "bortfeld_proton_range.h"
 #include "electron_range.h"
+#include "mass_stopping_power.h"
 
 namespace nb = nanobind;
 
@@ -65,13 +66,9 @@ NB_MODULE(stopping, m) {
         ValueError
             If the input energy is negative or the model/material ID is invalid.
         )pbdoc");
-  m.def("mass_stopping_power", &mass_stopping_power,
-      nb::arg("E_MeV_u"),
-      nb::arg("particle") = 1001,
-      nb::arg("material") = 1,
-      nb::arg("source") = 2,
-      nb::arg("cartesian_product") = false,
-      R"pbdoc(
+  m.def("mass_stopping_power", &mass_stopping_power, nb::arg("E_MeV_u"), nb::arg("particle") = 1001,
+        nb::arg("material") = 1, nb::arg("source") = 2, nb::arg("cartesian_product") = false,
+        R"pbdoc(
       Calculate mass stopping power in MeV*cm2/g.
 
       Parameters
@@ -93,4 +90,38 @@ NB_MODULE(stopping, m) {
           Mass stopping power in MeV*cm2/g.
       )pbdoc");
   m.def("debug_msp", []() { return 123; });
+
+  m.def("bortfeld_proton_range", &bortfeld_proton_range, nb::arg("energy_MeV"), nb::arg("sigma_E_MeV"),
+        nb::arg("material") = 1, nb::arg("eps") = -1.0, nb::arg("dose_drop") = -1.0,
+        R"pbdoc(
+        Calculate proton range using Bortfeld dose model.
+
+        Calculates the range where dose drops to a specified fraction of the maximum dose value.
+
+        Parameters
+        ----------
+        energy_MeV : float
+            Initial kinetic energy of proton beam in MeV/u.
+        sigma_E_MeV : float
+            Kinetic energy spread (standard deviation) in MeV/u.
+            If negative, defaults to 0.01 * energy_MeV.
+        material : int, optional
+            Material ID. Defaults to 1 (Liquid water).
+        eps : float, optional
+            Fraction of primary fluence contributing to the tail of energy spectrum.
+            If negative, defaults to 0.03.
+        dose_drop : float, optional
+            Fraction of max dose at which range is calculated.
+            If negative, defaults to 0.8.
+
+        Returns
+        -------
+        float
+            Range in cm.
+
+        References
+        ----------
+        Bortfeld T. An analytical approximation of the Bragg curve for therapeutic proton beams.
+        See AT_ProtonAnalyticalBeamParameters.h for implementation details.
+        )pbdoc");
 }
