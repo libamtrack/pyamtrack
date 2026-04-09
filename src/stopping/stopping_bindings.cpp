@@ -120,5 +120,4 @@ NB_MODULE(stopping, m) {
       float or numpy.ndarray
           Stopping power in keV/um.
       )pbdoc");
-  m.def("debug_msp", []() { return 123; });
 }
