@@ -22,15 +22,19 @@ static int process_particle(const nb::object& particle) {
     return nb::cast<int>(particle);
   }
   // Try to treat as a Particle object with a particle_no-style encoding
-  try {
-    nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.particles");
-    nb::object ParticleType = pyamtrack_mod.attr("Particle");
-    if (nb::isinstance(particle, ParticleType)) {
-      int Z = nb::cast<int>(particle.attr("Z"));
-      int A = nb::cast<int>(particle.attr("A"));
-      return 1000 * Z + A;
+  nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.particles");
+  nb::object ParticleType = pyamtrack_mod.attr("Particle");
+  if (nb::isinstance(particle, ParticleType)) {
+    int Z = nb::cast<int>(particle.attr("Z"));
+    nb::object A_obj = particle.attr("A");
+    if (A_obj.is_none()) {
+      throw nb::type_error(
+          "Particle.A is None. Construct particles using Particle.from_number(...) "
+          "or an isotope string (e.g. '12C').");
     }
-  } catch (...) {}
+    int A = nb::cast<int>(A_obj);
+    return 1000 * Z + A;
+  }
   throw nb::type_error("Particle argument must be an integer (particle_no) or a Particle object");
 }
 
