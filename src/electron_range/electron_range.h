@@ -19,7 +19,7 @@ namespace nb = nanobind;
  * The string key is the model name used in Python, and the integer value
  * is the corresponding model ID used in the underlying C/C++ implementation.
  */
-const std::map<std::string, int> STOPPING_MODELS = {
+const std::map<std::string, int> ELECTRON_RANGE_MODELS = {
     {"butts_katz", 2},  // Butts & Katz model
     {"waligorski", 3},  // Waligorski model
     {"geiss", 4},       // Geiss model
@@ -64,7 +64,7 @@ int get_model_id(const std::string& model_name);
  *                      or if model argument is neither a string nor an integer.
  * @throws std::runtime_error If the model name/ID is invalid.
  */
-nb::object electron_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
-                          const nb::object& model = nb::str("tabata"), bool cartesian_product = false);
+nb::object max_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
+                     const nb::object& model = nb::str("tabata"), bool cartesian_product = false);
 
 #endif  // ELECTRON_RANGE_H

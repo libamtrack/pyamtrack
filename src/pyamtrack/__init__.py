@@ -37,6 +37,6 @@ if sys.platform == "win32":
             print(f"Warning: failed to load {dll_name} from {dll_path}: {e}")
 
 
-from . import converters, materials, particles, stopping
+from . import converters, electron_range, materials, particles, stopping
 
-__all__ = ["converters", "stopping", "materials", "particles"]
+__all__ = ["converters", "stopping", "materials", "particles", "electron_range"]
