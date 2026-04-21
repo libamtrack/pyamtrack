@@ -69,7 +69,7 @@ NB_MODULE(stopping, m) {
       nb::arg("E_MeV_u"),
       nb::arg("particle") = 1001,
       nb::arg("material") = 1,
-      nb::arg("source") = 2,
+      nb::arg("source") = SOURCE_PSTAR,
       nb::arg("cartesian_product") = false,
       R"pbdoc(
       Calculate mass stopping power in MeV*cm2/g.
