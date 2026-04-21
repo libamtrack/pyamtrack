@@ -76,12 +76,16 @@ NB_MODULE(stopping, m) {
 
       Parameters
       ----------
-      E_MeV_u : float or array_like
+      E_MeV_u : float, list[float], or numpy.ndarray
           Kinetic energy in MeV per nucleon.
-      particle : int or Particle, optional
-          Particle number (1000*Z + A) or Particle object. Defaults to 1001 (proton).
-      material : int or Material, optional
-          Material ID or Material object. Defaults to 1 (Liquid water).
+      particle : int, Particle, or list[int | Particle], optional
+          Particle number (1000*Z + A), Particle object, or a list thereof.
+          Defaults to 1001 (proton). Particle objects must be constructed via
+          ``Particle.from_number()`` or an isotope string (e.g. ``'12C'``) so
+          that the mass number A is available.
+      material : int, Material, or list[int | Material], optional
+          Material ID, Material object, or a list thereof.
+          Defaults to 1 (Liquid water).
       source : int, optional
           Stopping power data source. 1=Bethe, 2=PSTAR (default), 3=ICRU.
       cartesian_product : bool, optional
@@ -104,12 +108,16 @@ NB_MODULE(stopping, m) {
 
       Parameters
       ----------
-      E_MeV_u : float or array_like
+      E_MeV_u : float, list[float], or numpy.ndarray
           Kinetic energy in MeV per nucleon.
-      particle : int or Particle, optional
-          Particle number (1000*Z + A) or Particle object. Defaults to 1001 (proton).
-      material : int or Material, optional
-          Material ID or Material object. Defaults to 1 (Liquid water).
+      particle : int, Particle, or list[int | Particle], optional
+          Particle number (1000*Z + A), Particle object, or a list thereof.
+          Defaults to 1001 (proton). Particle objects must be constructed via
+          ``Particle.from_number()`` or an isotope string (e.g. ``'12C'``) so
+          that the mass number A is available.
+      material : int, Material, or list[int | Material], optional
+          Material ID, Material object, or a list thereof.
+          Defaults to 1 (Liquid water).
       source : int, optional
           Stopping power data source. 1=Bethe, 2=PSTAR (default), 3=ICRU.
       cartesian_product : bool, optional
