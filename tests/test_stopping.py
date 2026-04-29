@@ -4,6 +4,8 @@ import pytest
 import pyamtrack.materials
 import pyamtrack.particles
 import pyamtrack.stopping
+import pyamtrack.materials
+import pyamtrack.particles
 
 
 @pytest.fixture
@@ -277,3 +279,67 @@ def test_stopping_power_vectorized_material_list(proton_energy_MeV_u):
     assert isinstance(result, np.ndarray)
     assert result.shape == (2,)
     assert np.all(result > 0)
+
+
+def test_mass_stopping_power_scalar_default_positive():
+    value = pyamtrack.stopping.mass_stopping_power(10.0)
+    assert np.isscalar(value)
+    assert value > 0.0
+
+
+def test_stopping_power_scalar_default_positive():
+    value = pyamtrack.stopping.stopping_power(10.0)
+    assert np.isscalar(value)
+    assert value > 0.0
+
+
+def test_mass_stopping_power_vectorized_energy_shape_and_positivity():
+    energies = np.array([1.0, 10.0, 100.0], dtype=float)
+    values = pyamtrack.stopping.mass_stopping_power(energies, particle=1001, material=1)
+    assert isinstance(values, np.ndarray)
+    assert values.shape == energies.shape
+    assert np.all(values > 0.0)
+
+
+def test_stopping_power_vectorized_energy_shape_and_positivity():
+    energies = np.array([1.0, 10.0, 100.0], dtype=float)
+    values = pyamtrack.stopping.stopping_power(energies, particle=1001, material=1)
+    assert isinstance(values, np.ndarray)
+    assert values.shape == energies.shape
+    assert np.all(values > 0.0)
+
+
+def test_mass_stopping_power_accepts_particle_and_material_objects():
+    energies = np.array([5.0, 20.0], dtype=float)
+    proton = pyamtrack.particles.Particle.from_number(1001)
+    water = pyamtrack.materials.water_liquid
+
+    values = pyamtrack.stopping.mass_stopping_power(
+        energies, particle=proton, material=water
+    )
+    assert isinstance(values, np.ndarray)
+    assert values.shape == energies.shape
+    assert np.all(values > 0.0)
+
+
+def test_stopping_power_accepts_particle_and_material_objects():
+    energies = np.array([5.0, 20.0], dtype=float)
+    proton = pyamtrack.particles.Particle.from_number(1001)
+    water = pyamtrack.materials.water_liquid
+
+    values = pyamtrack.stopping.stopping_power(
+        energies, particle=proton, material=water
+    )
+    assert isinstance(values, np.ndarray)
+    assert values.shape == energies.shape
+    assert np.all(values > 0.0)
+
+
+def test_mass_stopping_power_invalid_particle_type_raises():
+    with pytest.raises(TypeError):
+        pyamtrack.stopping.mass_stopping_power(10.0, particle="not-a-particle", material=1)
+
+
+def test_stopping_power_invalid_material_type_raises():
+    with pytest.raises(RuntimeError):
+        pyamtrack.stopping.stopping_power(10.0, particle=1001, material="not-a-material")
