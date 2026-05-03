@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from pyamtrack.converters import beta_from_energy, energy_from_beta
-from pyamtrack.stopping import electron_range
+from pyamtrack.electron_range import max_range as electron_range
 
 # Define test parameters: function, min value, max value
 test_cases = [

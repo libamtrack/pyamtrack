@@ -191,4 +191,14 @@ NB_MODULE(electron_range, m) {
         >>> print(ranges.shape)
         (3, 2)  # 3 energies × 2 materials
       )pbdoc");
+
+  // Add backward compatibility alias
+  m.def("electron_range", &max_range, nb::arg("energy_MeV"), nb::arg("material") = nb::int_(1),
+        nb::arg("model") = nb::str("tabata"), nb::arg("cartesian_product") = false,
+        R"pbdoc(
+        Alias for max_range() for backward compatibility.
+
+        .. deprecated::
+            Use max_range() instead. This alias will be removed in a future version.
+      )pbdoc");
 }

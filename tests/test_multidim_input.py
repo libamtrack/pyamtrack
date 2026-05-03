@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 from pyamtrack.converters import beta_from_energy, energy_from_beta
-from pyamtrack.stopping import electron_range
+from pyamtrack.electron_range import max_range as electron_range
 
 zero_dim_cases = [
     (beta_from_energy, 0, 100),
