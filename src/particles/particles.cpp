@@ -24,7 +24,7 @@
 
 Particle::Particle(const std::string& isotope) {
   const auto& data = AT_Particle_Data;
-  auto [symbol, A] = parse_isotope(isotope);
+  auto [symbol, A_] = parse_isotope(isotope);
 
   std::string acronym;
   std::string element_name;
@@ -49,10 +49,10 @@ Particle::Particle(const std::string& isotope) {
   acronym = data.element_acronym[it];
   element_name = data.element_name[it];
 
-  if (A == -1) {
-    A = most_popular_iso_A[acronym];
+  if (A_ == -1) {
+    A_ = most_popular_iso_A[acronym];
   }
-
+  A = A_;
   id = it + 1;
   Z = data.Z[it];
   atomic_weight = data.atomic_weight[it];

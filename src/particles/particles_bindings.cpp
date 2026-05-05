@@ -88,14 +88,17 @@ NB_MODULE(particles, m) {
             ValueError: If the string cannot be parsed.
       )pbdoc")
       .def("info", [](const Particle &p) {
-        std::cout << "[Particle]\n"
-                  << "  id = " << p.id << "\n"
-                  << "  Z = " << p.Z << "\n"
-                  << "  A = " << p.A << "\n"
-                  << "  name = " << p.element_name << "\n"
-                  << "  acronym = " << p.element_acronym << "\n"
-                  << "  density = " << p.density_g_cm3 << "\n"
-                  << "  I/Z = " << p.I_eV_per_Z << "\n"
+        std::cout << "[Particle Info]:\n"
+                  << "  element = " << p.element_acronym << " (" << p.element_name << ")\n"
+                  << "  Z = " << p.Z << ", A = " << p.A << "\n"
+                  << "  id = " << p.id << "\n";
+        if (p.pdg) {
+          std::cout << "  PDG = " << *p.pdg << "\n";
+        } else {
+          std::cout << "  PDG = None\n";
+        }
+        std::cout << "  density = " << p.density_g_cm3 << " g/cm^3\n"
+                  << "  I/Z = " << p.I_eV_per_Z << " eV\n"
                   << std::endl;
         return nb::none();
       })
