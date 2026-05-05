@@ -1,42 +1,74 @@
 #include "particles.h"
+#include "construct_utils.h"
 
 #include <algorithm>
 #include <cctype>
 #include <optional>
 #include <stdexcept>
 
-Particle::Particle(long id) : id(id) {
-  if (id < 1 || id > AT_Particle_Data.n) {
-    throw std::invalid_argument("Invalid particle id: " + std::to_string(id));
-  }
-  size_t index = static_cast<size_t>(id - 1);
-  Z = AT_Particle_Data.Z[index];
-  atomic_weight = AT_Particle_Data.atomic_weight[index];
-  element_name = std::string(AT_Particle_Data.element_name[index]);
-  element_acronym = std::string(AT_Particle_Data.element_acronym[index]);
-  density_g_cm3 = AT_Particle_Data.density_g_cm3[index];
-  I_eV_per_Z = AT_Particle_Data.I_eV_per_Z[index];
-  A = std::nullopt;
-}
+#include <iostream>
 
-Particle::Particle(const std::string& acronym) {
+// Particle::Particle(string isotope) {
+//   if (id < 1 || id > AT_Particle_Data.n) {
+//     throw std::invalid_argument("Invalid particle id: " + std::to_string(id));
+//   }
+//   size_t index = static_cast<size_t>(id - 1);
+//   Z = AT_Particle_Data.Z[index];
+//   atomic_weight = AT_Particle_Data.atomic_weight[index];
+//   element_name = std::string(AT_Particle_Data.element_name[index]);
+//   element_acronym = std::string(AT_Particle_Data.element_acronym[index]);
+//   density_g_cm3 = AT_Particle_Data.density_g_cm3[index];
+//   I_eV_per_Z = AT_Particle_Data.I_eV_per_Z[index];
+//   A = std::nullopt;
+// }
+
+Particle::Particle(const std::string& isotope) {
   const auto& data = AT_Particle_Data;
-  auto it = std::find_if(data.element_acronym, data.element_acronym + data.n,
-                         [&acronym](const char* a) { return acronym == a; });
-
-  if (it == data.element_acronym + data.n) {
-    throw std::invalid_argument("Particle acronym not found: " + acronym);
+  auto [symbol, A] = parse_isotope(isotope);
+  
+  std::string acronym;
+  std::string element_name;
+  int it = -1;
+  for (int i = 0; i < data.n; ++i) {
+    if (data.element_acronym[i] == symbol) {
+      it = i;
+      break;
+    }
+    if (data.element_name[i] == symbol) {
+      it = i;
+      break;
+    }
   }
 
-  size_t index = std::distance(data.element_acronym, it);
-  id = index + 1;
-  Z = data.Z[index];
-  atomic_weight = data.atomic_weight[index];
-  element_name = std::string(data.element_name[index]);
+
+  if (it == -1) {
+    throw std::invalid_argument("Unknown element name or acronym: " + symbol);
+  }
+
+  acronym = data.element_acronym[it];
+  element_name = data.element_name[it];
+
+  if (A == -1) {
+    A = most_popular_iso_A[acronym];
+  }
+
+  id = it + 1;
+  Z = data.Z[it];
+  atomic_weight = data.atomic_weight[it];
+  element_name = std::string(data.element_name[it]);
   element_acronym = acronym;
-  density_g_cm3 = data.density_g_cm3[index];
-  I_eV_per_Z = data.I_eV_per_Z[index];
-  A = std::nullopt;
+  density_g_cm3 = data.density_g_cm3[it];
+  I_eV_per_Z = data.I_eV_per_Z[it];
+  // pdg = calculatePDG(Z, A);
+
+  std::cout << "[Particle DEBUG] Construction successful:\n"
+          << "  element = " << element_acronym << " (" << element_name << ")\n"
+          << "  Z = " << Z << ", A = " << A << "\n"
+          << "  id = " << id << "\n"
+          // << "  PDG = " << pdg << "\n"
+          << "  density = " << density_g_cm3 << " g/cm^3\n"
+          << "  I/Z = " << I_eV_per_Z << " eV\n"
+          << std::endl;
 }
 
 Particle Particle::from_number(long particle_no) {
@@ -50,7 +82,8 @@ Particle Particle::from_number(long particle_no) {
   const auto& data = AT_Particle_Data;
   for (int i = 0; i < data.n; ++i) {
     if (data.Z[i] == Z_candidate) {
-      Particle p(i + 1);
+      std::string acronym(data.element_acronym[i]);
+      Particle p(acronym);
       p.A = A_candidate;
       return p;
     }

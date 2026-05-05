@@ -4,6 +4,7 @@
 
 #include "AT_DataParticle.h"
 #include "particles.h"
+#include "construct_utils.h"
 
 namespace nb = nanobind;
 
@@ -23,12 +24,12 @@ NB_MODULE(particles, m) {
             density_g_cm3 (float): Density of the particle in g/cm³.
             I_eV_per_Z (float): Mean ionization potential per atomic number in eV/Z.
     )pbdoc")
-      .def(nb::init<long>(), R"pbdoc(
-        Initializes a Particle object by its internal ID.
+    //   .def(nb::init<long>(), R"pbdoc(
+    //     Initializes a Particle object by its internal ID.
 
-        Args:
-            id (int): The internal ID of the particle (1-based index).
-    )pbdoc")
+    //     Args:
+    //         id (int): The internal ID of the particle (1-based index).
+    // )pbdoc")
       .def(nb::init<const std::string&>(), R"pbdoc(
         Initializes a Particle object by its acronym.
 
@@ -109,10 +110,8 @@ NB_MODULE(particles, m) {
   )pbdoc");
 
   // Dynamically expose particles as attributes of the module
-  auto names = get_names();
   auto acronyms = get_acronyms();
-  for (size_t i = 0; i < names.size(); ++i) {
-    m.attr(names[i].c_str()) = Particle(static_cast<long>(i + 1));
-    m.attr(acronyms[i].c_str()) = Particle(static_cast<long>(i + 1));
+  for (size_t i = 0; i < acronyms.size(); ++i) {
+    m.attr(acronyms[i].c_str()) = Particle(acronyms[i]);
   }
 }

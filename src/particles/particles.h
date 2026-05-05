@@ -63,39 +63,29 @@ class Particle {
   long id;                     /**< The id of particle. */
   long Z;                      /**< Atomic number of the particle. */
   std::optional<long> A;       /**< Mass number of the particle. */
+  std::optional<int> pdg;
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
+  std::optional<int> charge;
   double density_g_cm3;        /**< Density of the particle in g/cm³. */
   double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
+  
   nb::object py_get_A() const;
+  nb::object py_get_pdg() const;
+  nb::object py_get_charge() const;
+  
   /**
-   * @brief Initializes a Particle object.
+   * @brief Initializes a Particle object from an isotope string.
    *
    * Example:
-   * >>> particle = Particle(6)
-   * >>> particle.id
-   * 6
+   * >>> particle = Particle("12C")
    * >>> particle.element_name
    * 'Carbon'
    *
-   * @param id The number of particle.
+   * @param isotope The isotope string (e.g., "12C", "He", "238U").
    */
-  Particle(long id);
-
-  /**
-   * @brief Initializes a Particle object using its acronym.
-   *
-   * Example:
-   * >>> particle = Particle("C")
-   * >>> particle.id
-   * 6
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param acronym The acronym of the particle.
-   */
-  Particle(const std::string& acronym);
+  Particle(const std::string& isotope);
 
   /**
    * @brief Initializes a Particle object from a particle number (1000*Z + A).
