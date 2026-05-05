@@ -34,6 +34,7 @@ Particle::Particle(const std::string& isotope) {
       it = i;
       break;
     }
+    std::cout << "Comparing symbol '" << symbol << "' with element name '" << data.element_name[i] << "'\n";
     if (data.element_name[i] == symbol) {
       it = i;
       break;

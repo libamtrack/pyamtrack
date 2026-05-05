@@ -87,8 +87,8 @@ NB_MODULE(particles, m) {
         Raises:
             ValueError: If the string cannot be parsed.
       )pbdoc")
-      .def("debug", [](const Particle &p) {
-        std::cout << "[Particle DEBUG]\n"
+      .def("info", [](const Particle &p) {
+        std::cout << "[Particle]\n"
                   << "  id = " << p.id << "\n"
                   << "  Z = " << p.Z << "\n"
                   << "  A = " << p.A << "\n"

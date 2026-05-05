@@ -76,7 +76,7 @@ std::map<std::string, int> most_popular_iso_A = {
 
 
 std::pair<std::string, int> parse_isotope(std::string isotope) {
-  std::regex pattern(R"(([A-Z][a-z]?|[a-z]+)(_[1-9]+[0-9]*)?)");
+  std::regex pattern(R"(([A-Z][a-z]+)(_[1-9]+[0-9]*)?)"); // (([A-Z][a-z]?|[A-Z][a-z]+)(_[1-9]+[0-9]*)?)
 
   std::smatch match;
 
