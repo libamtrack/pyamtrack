@@ -62,7 +62,7 @@ class Particle {
  public:
   long id;                     /**< The id of particle. */
   long Z;                      /**< Atomic number of the particle. */
-  std::optional<long> A;       /**< Mass number of the particle. */
+  long A;       /**< Mass number of the particle. */
   std::optional<int> pdg;
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
@@ -71,7 +71,7 @@ class Particle {
   double density_g_cm3;        /**< Density of the particle in g/cm³. */
   double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
   
-  nb::object py_get_A() const;
+  long py_get_A() const;
   nb::object py_get_pdg() const;
   nb::object py_get_charge() const;
   

@@ -6,6 +6,8 @@
 #include "particles.h"
 #include "construct_utils.h"
 
+#include <iostream>
+
 namespace nb = nanobind;
 
 NB_MODULE(particles, m) {
@@ -85,6 +87,18 @@ NB_MODULE(particles, m) {
         Raises:
             ValueError: If the string cannot be parsed.
       )pbdoc")
+      .def("debug", [](const Particle &p) {
+        std::cout << "[Particle DEBUG]\n"
+                  << "  id = " << p.id << "\n"
+                  << "  Z = " << p.Z << "\n"
+                  << "  A = " << p.A << "\n"
+                  << "  name = " << p.element_name << "\n"
+                  << "  acronym = " << p.element_acronym << "\n"
+                  << "  density = " << p.density_g_cm3 << "\n"
+                  << "  I/Z = " << p.I_eV_per_Z << "\n"
+                  << std::endl;
+        return nb::none();
+      })
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
       .def_ro("Z", &Particle::Z, "The atomic number of the particle.")
       .def_prop_ro("A", &Particle::py_get_A,
@@ -110,8 +124,8 @@ NB_MODULE(particles, m) {
   )pbdoc");
 
   // Dynamically expose particles as attributes of the module
-  auto acronyms = get_acronyms();
-  for (size_t i = 0; i < acronyms.size(); ++i) {
-    m.attr(acronyms[i].c_str()) = Particle(acronyms[i]);
-  }
+  // auto acronyms = get_acronyms();
+  // for (size_t i = 0; i < acronyms.size(); ++i) {
+  //   m.attr(acronyms[i].c_str()) = Particle(acronyms[i]);
+  // }
 }

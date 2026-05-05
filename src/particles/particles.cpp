@@ -25,7 +25,7 @@
 Particle::Particle(const std::string& isotope) {
   const auto& data = AT_Particle_Data;
   auto [symbol, A] = parse_isotope(isotope);
-  
+
   std::string acronym;
   std::string element_name;
   int it = -1;
@@ -161,10 +161,6 @@ std::vector<std::string> get_acronyms() {
   return acronyms;
 }
 
-nb::object Particle::py_get_A() const {
-  if (A) {
-    return nb::int_(*A);
-  } else {
-    return nb::none();
-  }
+long Particle::py_get_A() const {
+  return A;
 }
