@@ -76,7 +76,7 @@ std::map<std::string, int> most_popular_iso_A = {
 
 
 std::pair<std::string, int> parse_isotope(std::string isotope) {
-  std::regex pattern(R"(([A-Z][a-z]+)(_[1-9]+[0-9]*)?)"); // (([A-Z][a-z]?|[A-Z][a-z]+)(_[1-9]+[0-9]*)?)
+  std::regex pattern(R"(([A-Z][a-z]*)(_[1-9]+[0-9]*)?)");
 
   std::smatch match;
 
@@ -94,13 +94,13 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
   }
 }
 
-// long long calculatePDG(int Z, int A, int L = 0, int I = 0) {
-//   if (Z == A == 1) {
-//     return 2212;
-//   }
-//   return 1000000000LL
-//     + L * 10000000LL
-//     + Z * 10000LL
-//     + A * 10LL
-//     + I;
-// }
+long long calculatePDG(int Z, int A, int L, int I) {
+  if (Z == A == 1) {
+    return 2212;
+  }
+  return 1000000000LL
+    + L * 10000000LL
+    + Z * 10000LL
+    + A * 10LL
+    + I;
+}

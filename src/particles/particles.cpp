@@ -60,7 +60,7 @@ Particle::Particle(const std::string& isotope) {
   element_acronym = acronym;
   density_g_cm3 = data.density_g_cm3[it];
   I_eV_per_Z = data.I_eV_per_Z[it];
-  // pdg = calculatePDG(Z, A);
+  pdg = std::make_optional<long long>(calculatePDG(Z, A));
 
   std::cout << "[Particle DEBUG] Construction successful:\n"
           << "  element = " << element_acronym << " (" << element_name << ")\n"

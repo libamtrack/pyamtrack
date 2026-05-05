@@ -63,7 +63,7 @@ class Particle {
   long id;                     /**< The id of particle. */
   long Z;                      /**< Atomic number of the particle. */
   long A;       /**< Mass number of the particle. */
-  std::optional<int> pdg;
+  std::optional<long long> pdg;
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
