@@ -29,15 +29,13 @@ Particle::Particle(const std::string& isotope) {
   std::string acronym;
   std::string element_name;
 
-  // if (symbol == "proton") {
-  //   symbol = "H";
-  //   A_ = 1;
-  // } else if (symbol == "alpha") {
-  //   symbol = "He";
-  //   A_ = 4;
-  // } else {
-
-  // }
+  if (symbol == "proton") {
+    symbol = "H";
+    A_ = 1;
+  } else if (symbol == "alpha") {
+    symbol = "He";
+    A_ = 2;
+  }
 
   
   int it = -1;
@@ -218,5 +216,9 @@ long Particle::py_get_A() const {
 }
 
 std::string Particle::str() const {
-  return std::to_string(A) + element_acronym;
+  return "[Particle: " + std::to_string(A) + element_acronym + "]";
+}
+
+std::string Particle::repr() const {
+  return "[Particle " + element_name + " " + std::to_string(A) + " (Z=" + std::to_string(Z) + ", A=" + std::to_string(A) + ")]";
 }

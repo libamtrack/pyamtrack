@@ -110,6 +110,7 @@ NB_MODULE(particles, m) {
         return nb::none();
       })
       .def("__str__", &Particle::str, "String representation of the particle")
+      .def("__repr__", &Particle::repr, "Detailed string representation of the particle")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
       .def_ro("Z", &Particle::Z, "The atomic number of the particle.")
       .def_prop_ro("A", &Particle::py_get_A,
