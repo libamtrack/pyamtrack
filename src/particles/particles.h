@@ -114,7 +114,8 @@ class Particle {
    * @return A Particle object corresponding to the given particle number.
    * @throws std::invalid_argument if the particle number is invalid.
    */
-  static Particle from_number(long particle_no);
+
+  // static Particle from_number(long particle_no);
 
   /**
    * @brief Initializes a Particle object from a string representation.
@@ -136,7 +137,8 @@ class Particle {
    * @return A Particle object corresponding to the given name.
    * @throws std::invalid_argument if the name cannot be parsed.
    */
-  static Particle from_string(const std::string& name);
+  
+  // static Particle from_string(const std::string& name);
 
   static Particle from_ZA(long long Z, long long A);
 

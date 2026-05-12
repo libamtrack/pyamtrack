@@ -38,55 +38,55 @@ NB_MODULE(particles, m) {
         Args:
             element_acronym (str): The acronym of the particle.
     )pbdoc")
-      .def_static("from_number", &Particle::from_number, R"pbdoc(
-        Initializes a Particle object from a particle number (1000*Z + A).
+    //   .def_static("from_number", &Particle::from_number, R"pbdoc(
+    //     Initializes a Particle object from a particle number (1000*Z + A).
 
-        A particle number encodes the atomic number (Z) and mass number (A)
-        according to the PyAmtrack convention:
+    //     A particle number encodes the atomic number (Z) and mass number (A)
+    //     according to the PyAmtrack convention:
 
-            particle_no = 1000 * Z + A
+    //         particle_no = 1000 * Z + A
 
-        Example:
-            >>> particle = Particle.from_number(6012)
-            >>> particle.Z
-            6
-            >>> particle.A
-            12
+    //     Example:
+    //         >>> particle = Particle.from_number(6012)
+    //         >>> particle.Z
+    //         6
+    //         >>> particle.A
+    //         12
 
-        Args:
-            particle_no (int): The particle number in the format 1000*Z + A.
+    //     Args:
+    //         particle_no (int): The particle number in the format 1000*Z + A.
 
-        Returns:
-            Particle: A Particle object corresponding to the given particle number.
+    //     Returns:
+    //         Particle: A Particle object corresponding to the given particle number.
 
-        Raises:
-            ValueError: If the particle number is invalid.
-    )pbdoc")
-      .def_static("from_string", &Particle::from_string, R"pbdoc(
-        Initializes a Particle object from a string representation.
+    //     Raises:
+    //         ValueError: If the particle number is invalid.
+    // )pbdoc")
+      // .def_static("from_string", &Particle::from_string, R"pbdoc(
+      //   Initializes a Particle object from a string representation.
 
-        The string can be:
-            - An acronym of the element ("He", "C")
-            - An isotope notation with mass number ("3He", "14C", "238U")
+      //   The string can be:
+      //       - An acronym of the element ("He", "C")
+      //       - An isotope notation with mass number ("3He", "14C", "238U")
 
-        Example:
-            >>> particle = Particle.from_string("14C")
-            >>> particle.Z
-            6
-            >>> particle.A
-            14
-            >>> particle.element_name
-            'Carbon'
+      //   Example:
+      //       >>> particle = Particle.from_string("14C")
+      //       >>> particle.Z
+      //       6
+      //       >>> particle.A
+      //       14
+      //       >>> particle.element_name
+      //       'Carbon'
 
-        Args:
-            name (str): The string representation of the particle.
+      //   Args:
+      //       name (str): The string representation of the particle.
 
-        Returns:
-            Particle: A Particle object corresponding to the given name.
+      //   Returns:
+      //       Particle: A Particle object corresponding to the given name.
 
-        Raises:
-            ValueError: If the string cannot be parsed.
-      )pbdoc")
+      //   Raises:
+      //       ValueError: If the string cannot be parsed.
+      // )pbdoc")
       .def_static("from_AZ", &Particle::from_ZA, R"pbdoc(
         Create a Particle from atomic number Z and mass number A.
       )pbdoc")

@@ -85,26 +85,26 @@ Particle::Particle(const std::string& isotope) {
   //         << std::endl;
 }
 
-Particle Particle::from_number(long particle_no) {
-  long Z_candidate = particle_no / 1000;
-  long A_candidate = AT_A_from_particle_no_single(particle_no);
+// Particle Particle::from_number(long particle_no) {
+//   long Z_candidate = particle_no / 1000;
+//   long A_candidate = AT_A_from_particle_no_single(particle_no);
 
-  if (A_candidate < 0) {
-    throw std::invalid_argument("Invalid particle number: " + std::to_string(particle_no));
-  }
+//   if (A_candidate < 0) {
+//     throw std::invalid_argument("Invalid particle number: " + std::to_string(particle_no));
+//   }
 
-  const auto& data = AT_Particle_Data;
-  for (int i = 0; i < data.n; ++i) {
-    if (data.Z[i] == Z_candidate) {
-      std::string acronym(data.element_acronym[i]);
-      Particle p(acronym);
-      p.A = A_candidate;
-      return p;
-    }
-  }
+//   const auto& data = AT_Particle_Data;
+//   for (int i = 0; i < data.n; ++i) {
+//     if (data.Z[i] == Z_candidate) {
+//       std::string acronym(data.element_acronym[i]);
+//       Particle p(acronym);
+//       p.A = A_candidate;
+//       return p;
+//     }
+//   }
 
-  throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
-}
+//   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
+// }
 
 
 
@@ -128,36 +128,37 @@ Particle Particle::from_number(long particle_no) {
  * @throws std::invalid_argument If the string is malformed
  *         (e.g. empty acronym, unknown acronym).
  */
-Particle Particle::from_string(const std::string& name) {
-  size_t pos = 0;
 
-  // Step 1: parse leading digits (mass number, e.g. "12" in "12C")
-  while (pos < name.size() && isdigit(name[pos])) {
-    ++pos;
-  }
+// Particle Particle::from_string(const std::string& name) {
+//   size_t pos = 0;
 
-  std::optional<long> mass_number;
-  if (pos > 0) {
-    mass_number = std::stol(name.substr(0, pos));
-  }
+//   // Step 1: parse leading digits (mass number, e.g. "12" in "12C")
+//   while (pos < name.size() && isdigit(name[pos])) {
+//     ++pos;
+//   }
 
-  // Step 2: extract the element acronym
-  std::string acronym = name.substr(pos);
+//   std::optional<long> mass_number;
+//   if (pos > 0) {
+//     mass_number = std::stol(name.substr(0, pos));
+//   }
 
-  if (acronym.empty()) {
-    throw std::invalid_argument("Invalid particle name: " + name);
-  }
+//   // Step 2: extract the element acronym
+//   std::string acronym = name.substr(pos);
 
-  // Step 3: construct particle from acronym
-  Particle p(acronym);
+//   if (acronym.empty()) {
+//     throw std::invalid_argument("Invalid particle name: " + name);
+//   }
 
-  // Step 4: attach mass number if one was parsed
-  if (mass_number) {
-    p.A = *mass_number;
-  }
+//   // Step 3: construct particle from acronym
+//   Particle p(acronym);
 
-  return p;
-}
+//   // Step 4: attach mass number if one was parsed
+//   if (mass_number) {
+//     p.A = *mass_number;
+//   }
+
+//   return p;
+// }
 
 Particle Particle::from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;
