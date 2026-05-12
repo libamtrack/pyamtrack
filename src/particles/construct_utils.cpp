@@ -45,6 +45,7 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
 
   if (!std::regex_match(isotope, match, pattern)) {
     if (!std::regex_match(isotope, match2, pattern_alternative)) {
+      // potentially could be type error
       throw std::invalid_argument("Invalid isotope format: " + isotope);
     } else{
       // std::cout << match2[1].str() << " " << match2[2].str() << "\n";

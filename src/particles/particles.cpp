@@ -60,7 +60,7 @@ Particle::Particle(const std::string& isotope) {
 
   if (it == -1) {
     // nb
-    throw std::invalid_argument("Unknown element name or acronym: " + symbol);
+    throw nb::value_error("Unknown element name or acronym: " + symbol);
   }
 
   acronym = data.element_acronym[it];
@@ -70,7 +70,7 @@ Particle::Particle(const std::string& isotope) {
 
   if (A_ != -1) {
     if (A_ < l || A_ > h) {
-      throw std::invalid_argument("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")");
+      throw nb::value_error("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")");
     }
   } else if (A_ == -1) {
     A_ = most_popular_iso_A[acronym];
@@ -192,10 +192,10 @@ Particle Particle::from_pdg(long long pdg_code) {
 
 
   if (pdg_code < 1000000000) {
-    throw std::invalid_argument("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code));
+    throw nb::value_error("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code));
   }
   if (pdg_code > 11000000000) {
-    throw std::invalid_argument("PDG code is too large to be a valid nucleus: " + std::to_string(pdg_code));
+    throw nb::value_error("PDG code is too large to be a valid nucleus: " + std::to_string(pdg_code));
   }
 
   long long Z = (pdg_code / 10000) % 1000;
