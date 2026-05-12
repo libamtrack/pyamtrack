@@ -28,13 +28,25 @@ Particle::Particle(const std::string& isotope) {
 
   std::string acronym;
   std::string element_name;
+
+  // if (symbol == "proton") {
+  //   symbol = "H";
+  //   A_ = 1;
+  // } else if (symbol == "alpha") {
+  //   symbol = "He";
+  //   A_ = 4;
+  // } else {
+
+  // }
+
+  
   int it = -1;
   for (int i = 0; i < data.n; ++i) {
     if (data.element_acronym[i] == symbol) {
       it = i;
       break;
     }
-    std::cout << "Comparing symbol '" << symbol << "' with element name '" << data.element_name[i] << "'\n";
+    // std::cout << "Comparing symbol '" << symbol << "' with element name '" << data.element_name[i] << "'\n";
     if (data.element_name[i] == symbol) {
       it = i;
       break;
@@ -43,6 +55,7 @@ Particle::Particle(const std::string& isotope) {
 
 
   if (it == -1) {
+    // nb
     throw std::invalid_argument("Unknown element name or acronym: " + symbol);
   }
 
@@ -58,18 +71,18 @@ Particle::Particle(const std::string& isotope) {
   atomic_weight = data.atomic_weight[it];
   element_name = std::string(data.element_name[it]);
   element_acronym = acronym;
-  density_g_cm3 = data.density_g_cm3[it];
-  I_eV_per_Z = data.I_eV_per_Z[it];
+  // density_g_cm3 = data.density_g_cm3[it];
+  // I_eV_per_Z = data.I_eV_per_Z[it];
   pdg = std::make_optional<long long>(calculatePDG(Z, A));
 
-  std::cout << "[Particle DEBUG] Construction successful:\n"
-          << "  element = " << element_acronym << " (" << element_name << ")\n"
-          << "  Z = " << Z << ", A = " << A << "\n"
-          << "  id = " << id << "\n"
-          // << "  PDG = " << pdg << "\n"
-          << "  density = " << density_g_cm3 << " g/cm^3\n"
-          << "  I/Z = " << I_eV_per_Z << " eV\n"
-          << std::endl;
+  // std::cout << "[Particle DEBUG] Construction successful:\n"
+  //         << "  element = " << element_acronym << " (" << element_name << ")\n"
+  //         << "  Z = " << Z << ", A = " << A << "\n"
+  //         << "  id = " << id << "\n"
+  //         // << "  PDG = " << pdg << "\n"
+  //         << "  density = " << density_g_cm3 << " g/cm^3\n"
+  //         << "  I/Z = " << I_eV_per_Z << " eV\n"
+  //         << std::endl;
 }
 
 Particle Particle::from_number(long particle_no) {

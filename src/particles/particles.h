@@ -67,9 +67,9 @@ class Particle {
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
-  std::optional<int> charge;
-  double density_g_cm3;        /**< Density of the particle in g/cm³. */
-  double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
+  // 
+  //double density_g_cm3;        /**< Density of the particle in g/cm³. */
+  //double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
   
   long py_get_A() const;
   nb::object py_get_pdg() const;

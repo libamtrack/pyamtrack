@@ -97,9 +97,10 @@ NB_MODULE(particles, m) {
         } else {
           std::cout << "  PDG = None\n";
         }
-        std::cout << "  density = " << p.density_g_cm3 << " g/cm^3\n"
-                  << "  I/Z = " << p.I_eV_per_Z << " eV\n"
-                  << std::endl;
+        // std::cout << "  density = " << p.density_g_cm3 << " g/cm^3\n"
+        //           << "  I/Z = " << p.I_eV_per_Z << " eV\n"
+        //           << std::endl;
+        std::cout << std::endl;
         return nb::none();
       })
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
@@ -109,8 +110,9 @@ NB_MODULE(particles, m) {
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")
-      .def_ro("density_g_cm3", &Particle::density_g_cm3, "The density of the particle in g/cm³.")
-      .def_ro("I_eV_per_Z", &Particle::I_eV_per_Z, "The mean ionization potential per atomic number in eV/Z.");
+      // .def_ro("density_g_cm3", &Particle::density_g_cm3, "The density of the particle in g/cm³.")
+      // .def_ro("I_eV_per_Z", &Particle::I_eV_per_Z, "The mean ionization potential per atomic number in eV/Z.")
+      ;
 
   m.def("get_names", &get_names, R"pbdoc(
       Retrieves the names of all particles.
