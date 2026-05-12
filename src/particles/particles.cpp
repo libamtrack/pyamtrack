@@ -42,12 +42,14 @@ Particle::Particle(const std::string& isotope) {
   
   int it = -1;
   for (int i = 0; i < data.n; ++i) {
-    if (data.element_acronym[i] == symbol) {
+    // std::cout << "Comparing symbol '" << to_lower_case(symbol) << "' with element acronym '" << to_lower_case(data.element_acronym[i]) << "'\n";
+    if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
       it = i;
+
       break;
     }
-    // std::cout << "Comparing symbol '" << symbol << "' with element name '" << data.element_name[i] << "'\n";
-    if (data.element_name[i] == symbol) {
+    // std::cout << "Comparing symbol '" << to_lower_case(symbol) << "' with element acronym '" << to_lower_case(data.element_name[i]) << "'\n";
+    if (to_lower_case(data.element_name[i]) == to_lower_case(symbol)) {
       it = i;
       break;
     }

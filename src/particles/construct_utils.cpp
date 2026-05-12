@@ -5,6 +5,8 @@
 
 #include "construct_utils.h"
 
+#include <iostream>
+
 // std::map<std::string, int> pdg_to_symbol = {
 //   {"gamma", 1},
 //   {"e-", 2},
@@ -30,22 +32,39 @@
 
 
 std::pair<std::string, int> parse_isotope(std::string isotope) {
-  std::regex pattern(R"(([A-Z][a-z]*)(_?[1-9]+[0-9]*)?)");
+  std::regex pattern(R"(([A-Za-z]+)[_-]?([1-9][0-9]*)?)");
+
+  std::regex pattern_alternative(R"(([1-9][0-9]*)[_-]?([A-Za-z]+))");
 
   std::smatch match;
 
+  std::smatch match2;
+
+  int A;
+  std::string symbol;
+
   if (!std::regex_match(isotope, match, pattern)) {
-    throw std::invalid_argument("Invalid particle format: " + isotope);
-  }
-
-
-  std::string symbol = match[1];
-  if (match[2] == "") {
-    return {symbol, -1};
+    if (!std::regex_match(isotope, match2, pattern_alternative)) {
+      throw std::invalid_argument("Invalid isotope format: " + isotope);
+    } else{
+      // std::cout << match2[1].str() << " " << match2[2].str() << "\n";
+      A = std::stoi(match2[1].str());
+      symbol = match2[2];
+      return {symbol, A};
+    }
   } else {
-    int A = std::stoi(match[2].str().substr(1));
-    return {symbol, A};
+    symbol = match[1];
+    if (match[2] == "") {
+      return {symbol, -1};
+    } else {
+      A = std::stoi(match[2].str());
+      return {symbol, A};
+    }
+
   }
+
+
+  
 }
 
 long long calculatePDG(int Z, int A, int L, int I) {

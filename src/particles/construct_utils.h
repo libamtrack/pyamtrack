@@ -8,6 +8,8 @@ extern std::pair<std::string, int> parse_isotope(std::string isotope);
 
 long long calculatePDG(int Z, int A, int L = 0, int I = 0);
 
+std::string to_lower_case(const std::string& s);
+
 inline std::map<std::string, int> most_popular_iso_A = {
 	{"H", 1},    // protium
 	{"He", 4},
