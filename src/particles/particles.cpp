@@ -161,6 +161,40 @@ Particle Particle::from_string(const std::string& name) {
   return p;
 }
 
+Particle Particle::from_ZA(long long Z, long long A) {
+  const auto& data = AT_Particle_Data;
+  for (int i = 0; i < data.n; ++i) {
+    if (data.Z[i] == Z) {
+      std::string acronym(data.element_acronym[i]);
+      Particle p(acronym + std::to_string(A));
+      return p;
+    }
+  }
+
+  throw std::invalid_argument("Particle with Z=" + std::to_string(Z) + " not found");
+}
+
+Particle Particle::from_pdg(long long pdg_code) {
+  // if (pdg_code == 2212) {
+  //   return Particle("proton");
+  // }
+
+  const auto& data = AT_Particle_Data;
+
+
+  if (pdg_code < 1000000000) {
+    throw std::invalid_argument("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code));
+  }
+  if (pdg_code > 11000000000) {
+    throw std::invalid_argument("PDG code is too large to be a valid nucleus: " + std::to_string(pdg_code));
+  }
+
+  long long Z = (pdg_code / 10000) % 1000;
+  long long A = (pdg_code / 10) % 1000;
+
+  return from_ZA(Z, A);
+}
+
 std::vector<std::string> get_names() {
   std::vector<std::string> names;
   names.reserve(AT_Particle_Data.n);

@@ -87,6 +87,12 @@ NB_MODULE(particles, m) {
         Raises:
             ValueError: If the string cannot be parsed.
       )pbdoc")
+      .def_static("from_AZ", &Particle::from_ZA, R"pbdoc(
+        Create a Particle from atomic number Z and mass number A.
+      )pbdoc")
+      .def_static("from_pdg", &Particle::from_pdg, R"pbdoc(
+        Create a Particle from a PDG code (nuclear encoding).
+      )pbdoc")
       .def("info", [](const Particle &p) {
         std::cout << "[Particle Info]:\n"
                   << "  element = " << p.element_acronym << " (" << p.element_name << ")\n"

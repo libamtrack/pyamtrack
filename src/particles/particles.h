@@ -136,6 +136,10 @@ class Particle {
    * @throws std::invalid_argument if the name cannot be parsed.
    */
   static Particle from_string(const std::string& name);
+
+  static Particle from_ZA(long long Z, long long A);
+
+  static Particle from_pdg(long long pdg_code);
 };
 
 #endif  // PARTICLE_H
