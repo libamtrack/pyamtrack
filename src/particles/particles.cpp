@@ -53,6 +53,10 @@ Particle::Particle(const std::string& isotope) {
     }
   }
 
+  // isotope validation
+
+  
+
 
   if (it == -1) {
     // nb
@@ -62,7 +66,13 @@ Particle::Particle(const std::string& isotope) {
   acronym = data.element_acronym[it];
   element_name = data.element_name[it];
 
-  if (A_ == -1) {
+  auto [l, h] = isotope_A_range[acronym];
+
+  if (A_ != -1) {
+    if (A_ < l || A_ > h) {
+      throw std::invalid_argument("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")");
+    }
+  } else if (A_ == -1) {
     A_ = most_popular_iso_A[acronym];
   }
   A = A_;
