@@ -74,7 +74,8 @@ class Particle {
   long py_get_A() const;
   nb::object py_get_pdg() const;
   nb::object py_get_charge() const;
-  
+  std::string str() const;
+
   /**
    * @brief Initializes a Particle object from an isotope string.
    *

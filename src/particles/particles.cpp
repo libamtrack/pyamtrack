@@ -106,6 +106,8 @@ Particle Particle::from_number(long particle_no) {
   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
 }
 
+
+
 /**
  * @brief Constructs a Particle from a string representation.
  *
@@ -177,4 +179,8 @@ std::vector<std::string> get_acronyms() {
 
 long Particle::py_get_A() const {
   return A;
+}
+
+std::string Particle::str() const {
+  return std::to_string(A) + element_acronym;
 }

@@ -58,3 +58,10 @@ long long calculatePDG(int Z, int A, int L, int I) {
     + A * 10LL
     + I;
 }
+
+std::string to_lower_case(const std::string& s) {
+  std::string result = s;
+  std::transform(result.begin(), result.end(), result.begin(),
+                 [](unsigned char c){ return std::tolower(c); });
+  return result;
+}
