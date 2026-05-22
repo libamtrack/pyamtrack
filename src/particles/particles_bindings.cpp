@@ -5,6 +5,7 @@
 #include "AT_DataParticle.h"
 #include "particles.h"
 #include "construct_utils.h"
+#include "ions/ions.h"
 
 #include <iostream>
 
@@ -16,15 +17,14 @@ NB_MODULE(particles, m) {
   nb::class_<Particle>(m, "Particle", R"pbdoc(
         Represents a particle with various physical properties.
 
+        For regular atoms/isotopes, use particles.create() which returns an Ion.
+        For special particles (p, e, n), you can use Particle() constructor directly.
+
         Attributes:
             id (int): Internal ID of the particle (row index in AT_Particle_Data).
-            Z (int): Atomic number of the particle.
-            A (int): Mass number of the particle.
             atomic_weight (float): Atomic weight of the particle.
             element_name (str): Name of the particle.
             element_acronym (str): Acronym of the particle.
-            density_g_cm3 (float): Density of the particle in g/cm³.
-            I_eV_per_Z (float): Mean ionization potential per atomic number in eV/Z.
     )pbdoc")
     //   .def(nb::init<long>(), R"pbdoc(
     //     Initializes a Particle object by its internal ID.
@@ -35,8 +35,11 @@ NB_MODULE(particles, m) {
       .def(nb::init<const std::string&>(), R"pbdoc(
         Initializes a Particle object by its acronym.
 
+        For special particles only: proton (p), electron (e), neutron (n).
+        For regular atoms/isotopes, use particles.create() instead.
+
         Args:
-            element_acronym (str): The acronym of the particle.
+            acronym (str): The acronym of the special particle (p, e, or n).
     )pbdoc")
     //   .def_static("from_number", &Particle::from_number, R"pbdoc(
     //     Initializes a Particle object from a particle number (1000*Z + A).
@@ -96,25 +99,18 @@ NB_MODULE(particles, m) {
       .def("info", [](const Particle &p) {
         std::cout << "[Particle Info]:\n"
                   << "  element = " << p.element_acronym << " (" << p.element_name << ")\n"
-                  << "  Z = " << p.Z << ", A = " << p.A << "\n"
                   << "  id = " << p.id << "\n";
         if (p.pdg) {
           std::cout << "  PDG = " << *p.pdg << "\n";
         } else {
           std::cout << "  PDG = None\n";
         }
-        // std::cout << "  density = " << p.density_g_cm3 << " g/cm^3\n"
-        //           << "  I/Z = " << p.I_eV_per_Z << " eV\n"
-        //           << std::endl;
         std::cout << std::endl;
         return nb::none();
       })
       .def("__str__", &Particle::str, "String representation of the particle")
       .def("__repr__", &Particle::repr, "Detailed string representation of the particle")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
-      .def_ro("Z", &Particle::Z, "The atomic number of the particle.")
-      .def_prop_ro("A", &Particle::py_get_A,
-                   "The mass number of the particle. Available if constructed via from_number(), else None.")
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")
@@ -135,6 +131,26 @@ NB_MODULE(particles, m) {
       Returns:
           list[str]: A list of particle acronyms.
   )pbdoc");
+
+  m.def("create", &create_particle, R"pbdoc(
+      Factory function that creates either a Particle or Ion based on the isotope string.
+      
+      For special particles (proton, electron, neutron), returns a Particle.
+      For regular atoms/ions, returns an Ion with Z and A set.
+      
+      Args:
+          isotope (str): Isotope string (e.g., "12C", "He", "p", "e", "n").
+      
+      Returns:
+          Particle or Ion: Appropriate particle type.
+      
+      Example:
+          >>> ion = particles.create("12C")    # Returns Ion with Z=6, A=12
+          >>> proton = particles.create("p")   # Returns Particle
+  )pbdoc");
+
+  auto ions_module = m.def_submodule("ions");
+  init_ions(ions_module);
 
   // Dynamically expose particles as attributes of the module
   // auto acronyms = get_acronyms();

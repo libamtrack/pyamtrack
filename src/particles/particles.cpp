@@ -1,5 +1,6 @@
 #include "particles.h"
 #include "construct_utils.h"
+#include "ions/ion.h"
 
 #include <algorithm>
 #include <cctype>
@@ -59,8 +60,7 @@ Particle::Particle(const std::string& isotope) {
 
 
   if (it == -1) {
-    // nb
-    throw nb::value_error("Unknown element name or acronym: " + symbol);
+    throw nb::value_error(("Unknown element name or acronym: " + symbol).c_str());
   }
 
   acronym = data.element_acronym[it];
@@ -70,20 +70,18 @@ Particle::Particle(const std::string& isotope) {
 
   if (A_ != -1) {
     if (A_ < l || A_ > h) {
-      throw nb::value_error("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")");
+      throw nb::value_error(("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")").c_str());
     }
   } else if (A_ == -1) {
     A_ = most_popular_iso_A[acronym];
   }
-  A = A_;
+  // Note: Z and A are now only set in Ion subclass, not in Particle
   id = it + 1;
-  Z = data.Z[it];
   atomic_weight = data.atomic_weight[it];
   element_name = std::string(data.element_name[it]);
   element_acronym = acronym;
-  // density_g_cm3 = data.density_g_cm3[it];
-  // I_eV_per_Z = data.I_eV_per_Z[it];
-  pdg = std::make_optional<long long>(calculatePDG(Z, A));
+  // PDG is set by Ion subclass if needed
+  // pdg stays as nullopt for Particle
 
   // std::cout << "[Particle DEBUG] Construction successful:\n"
   //         << "  element = " << element_acronym << " (" << element_name << ")\n"
@@ -184,18 +182,18 @@ Particle Particle::from_ZA(long long Z, long long A) {
 }
 
 Particle Particle::from_pdg(long long pdg_code) {
-  // if (pdg_code == 2212) {
-  //   return Particle("proton");
-  // }
+  if (pdg_code == 2212) {
+    return Particle("proton");
+  }
 
   const auto& data = AT_Particle_Data;
 
 
   if (pdg_code < 1000000000) {
-    throw nb::value_error("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code));
+    throw nb::value_error(("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code)).c_str());
   }
   if (pdg_code > 11000000000) {
-    throw nb::value_error("PDG code is too large to be a valid nucleus: " + std::to_string(pdg_code));
+    throw nb::value_error(("PDG code is too large to be a valid nucleus: " + std::to_string(pdg_code)).c_str());
   }
 
   long long Z = (pdg_code / 10000) % 1000;
@@ -223,13 +221,31 @@ std::vector<std::string> get_acronyms() {
 }
 
 long Particle::py_get_A() const {
-  return A;
+  // Particles don't have A - this is only for Ion
+  // Return a sentinel value or throw
+  return -1;
 }
 
 std::string Particle::str() const {
-  return "[Particle: " + std::to_string(A) + element_acronym + "]";
+  return "[Particle: " + element_acronym + "]";
 }
 
 std::string Particle::repr() const {
-  return "[Particle " + element_name + " " + std::to_string(A) + " (Z=" + std::to_string(Z) + ", A=" + std::to_string(A) + ")]";
+  return "[Particle " + element_name + " (id=" + std::to_string(id) + ")]";
+}
+
+nb::object create_particle(const std::string& isotope) {
+  // Check for special particles
+  if (isotope == "p" || isotope == "proton") {
+    return nb::cast(Particle(isotope));
+  }
+  if (isotope == "e" || isotope == "electron") {
+    return nb::cast(Particle(isotope));
+  }
+  if (isotope == "n" || isotope == "neutron") {
+    return nb::cast(Particle(isotope));
+  }
+  
+  // For regular atoms/ions, return an Ion
+  return nb::cast(Ion(isotope));
 }

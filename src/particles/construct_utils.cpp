@@ -30,11 +30,11 @@
 // };
 
 
-
 std::pair<std::string, int> parse_isotope(std::string isotope) {
   std::regex pattern(R"(([A-Za-z]+)[_-]?([1-9][0-9]*)?)");
 
   std::regex pattern_alternative(R"(([1-9][0-9]*)[_-]?([A-Za-z]+))");
+  // 12C, 12-C, 12_C, 12Carbon, 12cArbon
 
   std::smatch match;
 
@@ -68,6 +68,7 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
   
 }
 
+// uint
 long long calculatePDG(int Z, int A, int L, int I) {
   if (Z == A == 1) {
     return 2212;
@@ -79,6 +80,7 @@ long long calculatePDG(int Z, int A, int L, int I) {
     + I;
 }
 
+// Opisać że nie modyfikujemy oryginalnych danych, tylko tworzymy mapy pomocnicze do walidacji i domyślnych wartości A. W ten sposób zachowujemy integralność danych, a jednocześnie ułatwiamy konstrukcję cząstek na podstawie symbolu i opcjonalnie liczby masowej.
 std::string to_lower_case(const std::string& s) {
   std::string result = s;
   std::transform(result.begin(), result.end(), result.begin(),

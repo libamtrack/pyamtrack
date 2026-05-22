@@ -50,8 +50,6 @@ std::vector<std::string> get_acronyms();
  *
  * Attributes:
  * - id (long): The id of particle.
- * - Z (long): Atomic number of the particle.
- * - A (optional long): Mass number of the particle.
  * - atomic_weight (double): Atomic weight of the particle.
  * - element_name (std::string): Name of the particle.
  * - element_acronym (std::string): Acronym of the particle.
@@ -61,9 +59,7 @@ std::vector<std::string> get_acronyms();
 class Particle {
  public:
   long id;                     /**< The id of particle. */
-  long Z;                      /**< Atomic number of the particle. */
-  long A;       /**< Mass number of the particle. */
-  std::optional<long long> pdg;
+  std::optional<long long> pdg; 
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
@@ -140,9 +136,25 @@ class Particle {
   
   // static Particle from_string(const std::string& name);
 
+  // move outside the class
   static Particle from_ZA(long long Z, long long A);
 
   static Particle from_pdg(long long pdg_code);
 };
+
+/**
+ * @brief Factory function that creates either a Particle or Ion based on the isotope string.
+ *
+ * For special particles (proton, electron, neutron), returns a Particle.
+ * For regular atoms/ions, returns an Ion with Z and A set.
+ *
+ * Example:
+ * >>> ion = create_particle("12C")  # Returns Ion
+ * >>> p = create_particle("p")      # Returns Particle (proton)
+ *
+ * @param isotope The isotope string (e.g., "12C", "He", "p", "e", "n").
+ * @return nb::object A Particle or Ion object.
+ */
+nb::object create_particle(const std::string& isotope);
 
 #endif  // PARTICLE_H
