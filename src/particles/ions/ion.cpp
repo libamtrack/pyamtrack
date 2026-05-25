@@ -10,7 +10,6 @@ Ion::Ion(const std::string& isotope) : Particle(isotope) {
   const auto& data = AT_Particle_Data;
   auto [symbol, A_] = parse_isotope(isotope);
 
-  // Handle special cases
   if (symbol == "proton") {
     symbol = "H";
     A_ = 1;
@@ -19,7 +18,6 @@ Ion::Ion(const std::string& isotope) : Particle(isotope) {
     A_ = 2;
   }
 
-  // Find the element index
   int it = -1;
   for (int i = 0; i < data.n; ++i) {
     if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
@@ -35,7 +33,6 @@ Ion::Ion(const std::string& isotope) : Particle(isotope) {
   if (it != -1) {
     Z = data.Z[it];
     A = A_;
-    // Calculate and set PDG code for Ion
     pdg = std::make_optional<long long>(calculatePDG(Z, A));
   }
 }

@@ -137,36 +137,18 @@ Particle::Particle(const std::string& isotope) {
  *         (e.g. empty acronym, unknown acronym).
  */
 
-// Particle Particle::from_string(const std::string& name) {
-//   size_t pos = 0;
+nb::object Particle::from_string(const std::string& name) {
+  auto [symbol, A_] = parse_isotope(isotope);
+  // logic for creating either Particle or Ion
 
-//   // Step 1: parse leading digits (mass number, e.g. "12" in "12C")
-//   while (pos < name.size() && isdigit(name[pos])) {
-//     ++pos;
-//   }
+  if (symbol == "proton" || symbol == "p" || symbol == "electron" || symbol == "e" || symbol == "neutron" || symbol == "n") {
+    return nb::cast(Particle(symbol));
+  } else {
+    return nb::cast(Ion(isotope));
+  }
 
-//   std::optional<long> mass_number;
-//   if (pos > 0) {
-//     mass_number = std::stol(name.substr(0, pos));
-//   }
-
-//   // Step 2: extract the element acronym
-//   std::string acronym = name.substr(pos);
-
-//   if (acronym.empty()) {
-//     throw std::invalid_argument("Invalid particle name: " + name);
-//   }
-
-//   // Step 3: construct particle from acronym
-//   Particle p(acronym);
-
-//   // Step 4: attach mass number if one was parsed
-//   if (mass_number) {
-//     p.A = *mass_number;
-//   }
-
-//   return p;
-// }
+  
+}
 
 Particle Particle::from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;

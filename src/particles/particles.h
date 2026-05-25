@@ -57,6 +57,19 @@ std::vector<std::string> get_acronyms();
  * - I_eV_per_Z (double): Mean ionization potential per atomic number in eV/Z.
  */
 class Particle {
+ private:
+    /**
+   * @brief Initializes a Particle object from an isotope string.
+   *
+   * Example:
+   * >>> particle = Particle("12C")
+   * >>> particle.element_name
+   * 'Carbon'
+   *
+   * @param isotope The isotope string (e.g., "12C", "He", "238U").
+   */
+  Particle(const std::string& isotope);
+
  public:
   long id;                     /**< The id of particle. */
   std::optional<long long> pdg; 
@@ -73,17 +86,6 @@ class Particle {
   std::string str() const;
   std::string repr() const;
 
-  /**
-   * @brief Initializes a Particle object from an isotope string.
-   *
-   * Example:
-   * >>> particle = Particle("12C")
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param isotope The isotope string (e.g., "12C", "He", "238U").
-   */
-  Particle(const std::string& isotope);
 
   /**
    * @brief Initializes a Particle object from a particle number (1000*Z + A).
@@ -134,7 +136,7 @@ class Particle {
    * @throws std::invalid_argument if the name cannot be parsed.
    */
   
-  // static Particle from_string(const std::string& name);
+  static nb::object Particle::from_string(const std::string& name);
 
   // move outside the class
   static Particle from_ZA(long long Z, long long A);

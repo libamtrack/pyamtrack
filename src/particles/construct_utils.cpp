@@ -7,34 +7,12 @@
 
 #include <iostream>
 
-// std::map<std::string, int> pdg_to_symbol = {
-//   {"gamma", 1},
-//   {"e-", 2},
-//   {"e+", 3},
-//   {"mu-", 4},
-//   {"mu+", 5},
-//   {"pi0", 6},
-//   {"pi-", 7},
-//   {"pi+", 8},
-//   {"K0L", 9},
-//   {"K0S", 10},
-//   {"K-", 11},
-//   {"K+", 12},
-//   {"p", 13},
-//   {"n", 14},
-//   {"nu_e", 15},
-//   {"anti_nu_e", 16},
-//   {"nu_mu", 17},
-//   {"anti_nu_mu", 18},
-  
-// };
-
-
 std::pair<std::string, int> parse_isotope(std::string isotope) {
+  // carbon, c, C, C12, C-12, caRbOn_12, ...
   std::regex pattern(R"(([A-Za-z]+)[_-]?([1-9][0-9]*)?)");
 
+  // 12C, 12-C, 12_C, 12Carbon, 12cArbon, ...
   std::regex pattern_alternative(R"(([1-9][0-9]*)[_-]?([A-Za-z]+))");
-  // 12C, 12-C, 12_C, 12Carbon, 12cArbon
 
   std::smatch match;
 
@@ -45,7 +23,6 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
 
   if (!std::regex_match(isotope, match, pattern)) {
     if (!std::regex_match(isotope, match2, pattern_alternative)) {
-      // potentially could be type error
       throw std::invalid_argument("Invalid isotope format: " + isotope);
     } else{
       // std::cout << match2[1].str() << " " << match2[2].str() << "\n";
@@ -81,6 +58,8 @@ long long calculatePDG(int Z, int A, int L, int I) {
 }
 
 // Opisać że nie modyfikujemy oryginalnych danych, tylko tworzymy mapy pomocnicze do walidacji i domyślnych wartości A. W ten sposób zachowujemy integralność danych, a jednocześnie ułatwiamy konstrukcję cząstek na podstawie symbolu i opcjonalnie liczby masowej.
+
+// Does not modify original data, just creates auxiliary maps for validation and default A values. This way we preserve data integrity while facilitating particle construction based on symbol and optional mass number.
 std::string to_lower_case(const std::string& s) {
   std::string result = s;
   std::transform(result.begin(), result.end(), result.begin(),

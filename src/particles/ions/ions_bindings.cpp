@@ -28,5 +28,11 @@ void init_ions(nb::module_ &ions) {
         Create an Ion from a PDG code.
     )pbdoc")
       .def_ro("Z", &Ion::Z, "The atomic number of the ion.")
-      .def_ro("A", &Ion::A, "The mass number of the ion.");
+      .def_ro("A", &Ion::A, "The mass number of the ion.")
+      .def("__str__", [](const Ion &ion) {
+        return "[Ion: " + std::to_string(ion.A) + ion.element_acronym + "]";
+      })
+      .def("__repr__", [](const Ion &ion) {
+        return "[Ion " + ion.element_name + " (Z=" + std::to_string(ion.Z) + ", A=" + std::to_string(ion.A) + ")]";
+      });
 }
