@@ -138,16 +138,21 @@ Particle::Particle(const std::string& isotope) {
  */
 
 nb::object Particle::from_string(const std::string& name) {
-  auto [symbol, A_] = parse_isotope(isotope);
-  // logic for creating either Particle or Ion
+  auto [symbol, A_] = parse_isotope(name);
 
-  if (symbol == "proton" || symbol == "p" || symbol == "electron" || symbol == "e" || symbol == "neutron" || symbol == "n") {
+  // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to support them as special particles.
+
+  if (symbol == "p" || symbol == "proton") {
     return nb::cast(Particle(symbol));
-  } else {
-    return nb::cast(Ion(isotope));
   }
-
+  if (symbol == "e" || symbol == "electron") {
+    return nb::cast(Particle(symbol));
+  }
+  if (symbol == "n" || symbol == "neutron") {
+    return nb::cast(Particle(symbol));
+  }
   
+  return nb::cast(Ion(symbol));
 }
 
 Particle Particle::from_ZA(long long Z, long long A) {
@@ -216,18 +221,18 @@ std::string Particle::repr() const {
   return "[Particle " + element_name + " (id=" + std::to_string(id) + ")]";
 }
 
-nb::object create_particle(const std::string& isotope) {
-  // Check for special particles
-  if (isotope == "p" || isotope == "proton") {
-    return nb::cast(Particle(isotope));
-  }
-  if (isotope == "e" || isotope == "electron") {
-    return nb::cast(Particle(isotope));
-  }
-  if (isotope == "n" || isotope == "neutron") {
-    return nb::cast(Particle(isotope));
-  }
+// nb::object create_particle(const std::string& isotope) {
+//   // Check for special particles
+//   if (isotope == "p" || isotope == "proton") {
+//     return nb::cast(Particle(isotope));
+//   }
+//   if (isotope == "e" || isotope == "electron") {
+//     return nb::cast(Particle(isotope));
+//   }
+//   if (isotope == "n" || isotope == "neutron") {
+//     return nb::cast(Particle(isotope));
+//   }
   
-  // For regular atoms/ions, return an Ion
-  return nb::cast(Ion(isotope));
-}
+//   // For regular atoms/ions, return an Ion
+//   return nb::cast(Ion(isotope));
+// }

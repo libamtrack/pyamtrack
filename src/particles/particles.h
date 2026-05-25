@@ -57,7 +57,7 @@ std::vector<std::string> get_acronyms();
  * - I_eV_per_Z (double): Mean ionization potential per atomic number in eV/Z.
  */
 class Particle {
- private:
+ public: // should be protected or private TODO
     /**
    * @brief Initializes a Particle object from an isotope string.
    *
@@ -136,7 +136,7 @@ class Particle {
    * @throws std::invalid_argument if the name cannot be parsed.
    */
   
-  static nb::object Particle::from_string(const std::string& name);
+  static nb::object from_string(const std::string& name);
 
   // move outside the class
   static Particle from_ZA(long long Z, long long A);
@@ -157,6 +157,6 @@ class Particle {
  * @param isotope The isotope string (e.g., "12C", "He", "p", "e", "n").
  * @return nb::object A Particle or Ion object.
  */
-nb::object create_particle(const std::string& isotope);
+// nb::object create_particle(const std::string& isotope);
 
 #endif  // PARTICLE_H

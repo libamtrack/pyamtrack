@@ -132,22 +132,22 @@ NB_MODULE(particles, m) {
           list[str]: A list of particle acronyms.
   )pbdoc");
 
-  m.def("create", &create_particle, R"pbdoc(
-      Factory function that creates either a Particle or Ion based on the isotope string.
+  // m.def("create", &create_particle, R"pbdoc(
+  //     Factory function that creates either a Particle or Ion based on the isotope string.
       
-      For special particles (proton, electron, neutron), returns a Particle.
-      For regular atoms/ions, returns an Ion with Z and A set.
+  //     For special particles (proton, electron, neutron), returns a Particle.
+  //     For regular atoms/ions, returns an Ion with Z and A set.
       
-      Args:
-          isotope (str): Isotope string (e.g., "12C", "He", "p", "e", "n").
+  //     Args:
+  //         isotope (str): Isotope string (e.g., "12C", "He", "p", "e", "n").
       
-      Returns:
-          Particle or Ion: Appropriate particle type.
+  //     Returns:
+  //         Particle or Ion: Appropriate particle type.
       
-      Example:
-          >>> ion = particles.create("12C")    # Returns Ion with Z=6, A=12
-          >>> proton = particles.create("p")   # Returns Particle
-  )pbdoc");
+  //     Example:
+  //         >>> ion = particles.create("12C")    # Returns Ion with Z=6, A=12
+  //         >>> proton = particles.create("p")   # Returns Particle
+  // )pbdoc");
 
   auto ions_module = m.def_submodule("ions");
   init_ions(ions_module);
