@@ -76,6 +76,7 @@ class Particle {
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
+  
   // 
   //double density_g_cm3;        /**< Density of the particle in g/cm³. */
   //double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
@@ -86,6 +87,7 @@ class Particle {
   std::string str() const;
   std::string repr() const;
 
+  static const Particle proton;
 
   /**
    * @brief Initializes a Particle object from a particle number (1000*Z + A).
@@ -136,7 +138,7 @@ class Particle {
    * @throws std::invalid_argument if the name cannot be parsed.
    */
   
-  static nb::object from_string(const std::string& name);
+  
 
   // move outside the class
   static Particle from_ZA(long long Z, long long A);
@@ -144,19 +146,21 @@ class Particle {
   static Particle from_pdg(long long pdg_code);
 };
 
-/**
- * @brief Factory function that creates either a Particle or Ion based on the isotope string.
- *
- * For special particles (proton, electron, neutron), returns a Particle.
- * For regular atoms/ions, returns an Ion with Z and A set.
- *
- * Example:
- * >>> ion = create_particle("12C")  # Returns Ion
- * >>> p = create_particle("p")      # Returns Particle (proton)
- *
- * @param isotope The isotope string (e.g., "12C", "He", "p", "e", "n").
- * @return nb::object A Particle or Ion object.
- */
+// /**
+//  * @brief Factory function that creates either a Particle or Ion based on the isotope string.
+//  *
+//  * For special particles (proton, electron, neutron), returns a Particle.
+//  * For regular atoms/ions, returns an Ion with Z and A set.
+//  *
+//  * Example:
+//  * >>> ion = create_particle("12C")  # Returns Ion
+//  * >>> p = create_particle("p")      # Returns Particle (proton)
+//  *
+//  * @param isotope The isotope string (e.g., "12C", "He", "p", "e", "n").
+//  * @return nb::object A Particle or Ion object.
+//  */
 // nb::object create_particle(const std::string& isotope);
+
+nb::object from_string(const std::string& name);
 
 #endif  // PARTICLE_H

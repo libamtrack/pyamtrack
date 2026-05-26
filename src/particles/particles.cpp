@@ -137,7 +137,7 @@ Particle::Particle(const std::string& isotope) {
  *         (e.g. empty acronym, unknown acronym).
  */
 
-nb::object Particle::from_string(const std::string& name) {
+nb::object from_string(const std::string& name) {
   auto [symbol, A_] = parse_isotope(name);
 
   // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to support them as special particles.
@@ -221,8 +221,11 @@ std::string Particle::repr() const {
   return "[Particle " + element_name + " (id=" + std::to_string(id) + ")]";
 }
 
+const Particle Particle::proton("proton");
+
+
 // nb::object create_particle(const std::string& isotope) {
-//   // Check for special particles
+
 //   if (isotope == "p" || isotope == "proton") {
 //     return nb::cast(Particle(isotope));
 //   }
@@ -233,6 +236,5 @@ std::string Particle::repr() const {
 //     return nb::cast(Particle(isotope));
 //   }
   
-//   // For regular atoms/ions, return an Ion
 //   return nb::cast(Ion(isotope));
 // }

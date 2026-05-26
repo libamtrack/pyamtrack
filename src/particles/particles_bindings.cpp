@@ -65,31 +65,7 @@ NB_MODULE(particles, m) {
     //     Raises:
     //         ValueError: If the particle number is invalid.
     // )pbdoc")
-      .def_static("from_string", &Particle::from_string, R"pbdoc(
-        Initializes a Particle object from a string representation.
-
-        The string can be:
-            - An acronym of the element ("He", "C")
-            - An isotope notation with mass number ("3He", "14C", "238U")
-
-        Example:
-            >>> particle = Particle.from_string("14C")
-            >>> particle.Z
-            6
-            >>> particle.A
-            14
-            >>> particle.element_name
-            'Carbon'
-
-        Args:
-            name (str): The string representation of the particle.
-
-        Returns:
-            Particle: A Particle object corresponding to the given name.
-
-        Raises:
-            ValueError: If the string cannot be parsed.
-      )pbdoc")
+      
       .def_static("from_AZ", &Particle::from_ZA, R"pbdoc(
         Create a Particle from atomic number Z and mass number A.
       )pbdoc")
@@ -131,6 +107,34 @@ NB_MODULE(particles, m) {
       Returns:
           list[str]: A list of particle acronyms.
   )pbdoc");
+
+  m.def("from_string", &from_string, R"pbdoc(
+        Initializes a Particle object from a string representation.
+
+        The string can be:
+            - An acronym of the element ("He", "C")
+            - An isotope notation with mass number ("3He", "14C", "238U")
+
+        Example:
+            >>> particle = Particle.from_string("14C")
+            >>> particle.Z
+            6
+            >>> particle.A
+            14
+            >>> particle.element_name
+            'Carbon'
+
+        Args:
+            name (str): The string representation of the particle.
+
+        Returns:
+            Particle: A Particle object corresponding to the given name.
+
+        Raises:
+            ValueError: If the string cannot be parsed.
+      )pbdoc");
+
+  m.attr("proton") = &Particle::proton;
 
   // m.def("create", &create_particle, R"pbdoc(
   //     Factory function that creates either a Particle or Ion based on the isotope string.
