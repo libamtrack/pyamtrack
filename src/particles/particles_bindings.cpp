@@ -6,6 +6,7 @@
 #include "particles.h"
 #include "construct_utils.h"
 #include "ions/ions.h"
+#include "ions/ion.h"
 
 #include <iostream>
 
@@ -134,7 +135,21 @@ NB_MODULE(particles, m) {
             ValueError: If the string cannot be parsed.
       )pbdoc");
 
+
+  auto ions_module = m.def_submodule("ions");
+  init_ions(ions_module);
   m.attr("proton") = &Particle::proton;
+  
+  auto acronyms = get_acronyms();
+  for (const auto& acronym : acronyms) {
+    try {
+      // std::cout << "Creating particle for acronym: " << acronym.c_str() << "\n";
+      m.attr(acronym.c_str()) = Ion(acronym);
+    } catch (const std::exception& e) {
+      std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << "\n";
+    }
+  }
+
 
   // m.def("create", &create_particle, R"pbdoc(
   //     Factory function that creates either a Particle or Ion based on the isotope string.
@@ -153,8 +168,7 @@ NB_MODULE(particles, m) {
   //         >>> proton = particles.create("p")   # Returns Particle
   // )pbdoc");
 
-  auto ions_module = m.def_submodule("ions");
-  init_ions(ions_module);
+
 
   // Dynamically expose particles as attributes of the module
   // auto acronyms = get_acronyms();
