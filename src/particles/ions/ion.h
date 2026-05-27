@@ -4,6 +4,7 @@
 class Ion : public Particle {
  private:
   friend nb::object from_string(const std::string& name);
+  friend Ion from_ZA(long long Z, long long A);
   
   /**
    * @brief Initializes an Ion from an isotope string.
