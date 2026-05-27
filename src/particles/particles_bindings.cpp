@@ -18,8 +18,8 @@ NB_MODULE(particles, m) {
   nb::class_<Particle>(m, "Particle", R"pbdoc(
         Represents a particle with various physical properties.
 
-        For regular atoms/isotopes, use particles.create() which returns an Ion.
-        For special particles (p, e, n), you can use Particle() constructor directly.
+        Use particles.from_string() to create particle instances.
+        Pre-instantiated particles are available as module attributes (e.g., particles.proton, particles.C, particles.He).
 
         Attributes:
             id (int): Internal ID of the particle (row index in AT_Particle_Data).
@@ -33,15 +33,6 @@ NB_MODULE(particles, m) {
     //     Args:
     //         id (int): The internal ID of the particle (1-based index).
     // )pbdoc")
-      .def(nb::init<const std::string&>(), R"pbdoc(
-        Initializes a Particle object by its acronym.
-
-        For special particles only: proton (p), electron (e), neutron (n).
-        For regular atoms/isotopes, use particles.create() instead.
-
-        Args:
-            acronym (str): The acronym of the special particle (p, e, or n).
-    )pbdoc")
     //   .def_static("from_number", &Particle::from_number, R"pbdoc(
     //     Initializes a Particle object from a particle number (1000*Z + A).
 
@@ -143,8 +134,7 @@ NB_MODULE(particles, m) {
   auto acronyms = get_acronyms();
   for (const auto& acronym : acronyms) {
     try {
-      // std::cout << "Creating particle for acronym: " << acronym.c_str() << "\n";
-      m.attr(acronym.c_str()) = Ion(acronym);
+      m.attr(acronym.c_str()) = from_string(acronym);
     } catch (const std::exception& e) {
       std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << "\n";
     }

@@ -14,12 +14,8 @@ void init_ions(nb::module_ &ions) {
 
         Inherits all properties and methods from Particle.
         Additionally exposes Z and A attributes.
-    )pbdoc")
-      .def(nb::init<const std::string&>(), R"pbdoc(
-        Initializes an Ion from an acronym or isotope string.
-
-        Args:
-            isotope (str): The acronym or isotope notation (e.g., "He", "12C").
+        
+        Use particles.from_string() to create Ion instances.
     )pbdoc")
       .def_static("from_AZ", &Ion::from_ZA, R"pbdoc(
         Create an Ion from atomic number Z and mass number A.
