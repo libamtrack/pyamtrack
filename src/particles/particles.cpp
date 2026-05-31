@@ -150,7 +150,6 @@ Particle create_particle(const std::string& name) {
 }
  
 Ion create_ion(const std::string& name) {
-  std::cout << name << std::endl;
   Ion p = Ion();
   const auto& data = AT_Particle_Data;
   auto [symbol, A_] = parse_isotope(name);
