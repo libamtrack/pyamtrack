@@ -134,6 +134,9 @@ class Particle {
 Ion from_ZA(long long Z, long long A);
 
 
+Ion from_ZA(long long Z, long long A);
+
+
 nb::object from_string(const std::string& name);
 
 Particle create_particle(const std::string& name);
