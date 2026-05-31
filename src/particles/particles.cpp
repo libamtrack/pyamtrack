@@ -1,6 +1,7 @@
 #include "particles.h"
 #include "construct_utils.h"
 #include "ions/ion.h"
+#include "ions/ions.h"
 
 #include <algorithm>
 #include <cctype>
@@ -23,6 +24,14 @@
 //   A = std::nullopt;
 // }
 
+Particle::Particle() {
+  element_acronym = "unknown";
+  element_name = "unknown";
+  atomic_weight = 0.0;
+  id = -1;
+  pdg = 0;
+}
+
 Particle::Particle(const std::string& isotope) {
   const auto& data = AT_Particle_Data;
   auto [symbol, A_] = parse_isotope(isotope);
@@ -41,23 +50,16 @@ Particle::Particle(const std::string& isotope) {
   
   int it = -1;
   for (int i = 0; i < data.n; ++i) {
-    // std::cout << "Comparing symbol '" << to_lower_case(symbol) << "' with element acronym '" << to_lower_case(data.element_acronym[i]) << "'\n";
     if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
       it = i;
 
       break;
     }
-    // std::cout << "Comparing symbol '" << to_lower_case(symbol) << "' with element acronym '" << to_lower_case(data.element_name[i]) << "'\n";
     if (to_lower_case(data.element_name[i]) == to_lower_case(symbol)) {
       it = i;
       break;
     }
   }
-
-  // isotope validation
-
-  
-
 
   if (it == -1) {
     throw nb::value_error(("Unknown element name or acronym: " + symbol).c_str());
@@ -75,22 +77,11 @@ Particle::Particle(const std::string& isotope) {
   } else if (A_ == -1) {
     A_ = most_popular_iso_A[acronym];
   }
-  // Note: Z and A are now only set in Ion subclass, not in Particle
   id = it + 1;
   atomic_weight = data.atomic_weight[it];
   element_name = std::string(data.element_name[it]);
   element_acronym = acronym;
-  // PDG is set by Ion subclass if needed
-  // pdg stays as nullopt for Particle
 
-  // std::cout << "[Particle DEBUG] Construction successful:\n"
-  //         << "  element = " << element_acronym << " (" << element_name << ")\n"
-  //         << "  Z = " << Z << ", A = " << A << "\n"
-  //         << "  id = " << id << "\n"
-  //         // << "  PDG = " << pdg << "\n"
-  //         << "  density = " << density_g_cm3 << " g/cm^3\n"
-  //         << "  I/Z = " << I_eV_per_Z << " eV\n"
-  //         << std::endl;
 }
 
 // Particle Particle::from_number(long particle_no) {
@@ -138,22 +129,83 @@ Particle::Particle(const std::string& isotope) {
  */
 
 nb::object from_string(const std::string& name) {
-  auto [symbol, A_] = parse_isotope(name);
 
   // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to support them as special particles.
 
-  if (symbol == "p" || symbol == "proton") {
-    return nb::cast(Particle(symbol));
-  }
-  if (symbol == "e" || symbol == "electron") {
-    return nb::cast(Particle(symbol));
-  }
-  if (symbol == "n" || symbol == "neutron") {
-    return nb::cast(Particle(symbol));
+  if (name == "neutron" || name == "electron") {
+    return nb::cast(create_particle(name));
   }
   
-  return nb::cast(Ion(symbol));
+  return nb::cast(create_ion(name));
 }
+
+// helper functions for creating particles and ions. The point is to isolate the logic of choosing to create either the Particle or the Ion from construction
+Particle create_particle(const std::string& name) {
+  Particle p = Particle();
+  p.element_name = name;
+  p.element_acronym = name[0];
+  p.pdg = (name == "neutron") ? 2112 : 11;
+  
+  return p;
+}
+ 
+Ion create_ion(const std::string& name) {
+  std::cout << name << std::endl;
+  Ion p = Ion();
+  const auto& data = AT_Particle_Data;
+  auto [symbol, A_] = parse_isotope(name);
+
+  std::string acronym;
+  std::string element_name;
+
+  if (symbol == "proton") {
+    symbol = "H";
+    A_ = 1;
+  } else if (symbol == "alpha") {
+    symbol = "He";
+    A_ = 2;
+  }
+
+  
+  int it = -1;
+  for (int i = 0; i < data.n; ++i) {
+    if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
+      it = i;
+
+      break;
+    }
+    if (to_lower_case(data.element_name[i]) == to_lower_case(symbol)) {
+      it = i;
+      break;
+    }
+  }
+
+  if (it == -1) {
+    throw nb::value_error(("Unknown element name or acronym: " + symbol).c_str());
+  }
+
+  acronym = data.element_acronym[it];
+
+  auto [l, h] = isotope_A_range[acronym];
+
+  if (A_ != -1) {
+    if (A_ < l || A_ > h) {
+      throw nb::value_error(("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")").c_str());
+    }
+  } else if (A_ == -1) {
+    A_ = most_popular_iso_A[acronym];
+  }
+  p.id = it + 1;
+  p.atomic_weight = data.atomic_weight[it];
+  p.element_name = std::string(data.element_name[it]);
+  p.element_acronym = acronym;
+  p.Z = data.Z[it];
+  p.A = A_;
+  
+  
+  return p;
+}
+
 
 Particle Particle::from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;

@@ -27,12 +27,12 @@ NB_MODULE(particles, m) {
             element_name (str): Name of the particle.
             element_acronym (str): Acronym of the particle.
     )pbdoc")
-    //   .def(nb::init<long>(), R"pbdoc(
-    //     Initializes a Particle object by its internal ID.
+      .def(nb::init<>(), R"pbdoc(
+        Initializes a Particle object by its internal ID.
 
-    //     Args:
-    //         id (int): The internal ID of the particle (1-based index).
-    // )pbdoc")
+        Args:
+            id (int): The internal ID of the particle (1-based index).
+    )pbdoc")
     //   .def_static("from_number", &Particle::from_number, R"pbdoc(
     //     Initializes a Particle object from a particle number (1000*Z + A).
 

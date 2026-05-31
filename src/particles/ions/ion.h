@@ -2,10 +2,7 @@
 #include "../particles.h"
 
 class Ion : public Particle {
- private:
-  friend nb::object from_string(const std::string& name);
-  friend Ion from_ZA(long long Z, long long A);
-  
+ public:
   /**
    * @brief Initializes an Ion from an isotope string.
    *
@@ -14,8 +11,8 @@ class Ion : public Particle {
    * @param isotope The isotope string (e.g., "12C", "He").
    */
   Ion(const std::string& isotope);
+  Ion();
 
- public:
   long Z;  /**< Atomic number of the ion. */
   long A;  /**< Mass number of the ion. */
 };

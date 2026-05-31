@@ -5,6 +5,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+
 #include <optional>
 #include <string>
 #include <vector>
@@ -14,6 +15,9 @@ extern "C" {
 }
 
 namespace nb = nanobind;
+
+// forward declaration
+class Ion;
 
 /**
  * @brief Retrieves the list of particles names.
@@ -57,11 +61,10 @@ std::vector<std::string> get_acronyms();
  * - I_eV_per_Z (double): Mean ionization potential per atomic number in eV/Z.
  */
 class Particle {
- private:
-  friend class Ion;
-  friend nb::object from_string(const std::string& name);
-  
-    /**
+
+
+ public:
+  /**
    * @brief Initializes a Particle object from an isotope string.
    *
    * Use from_string() instead to create Particle objects.
@@ -69,8 +72,8 @@ class Particle {
    * @param isotope The isotope string (e.g., "12C", "He", "238U").
    */
   Particle(const std::string& isotope);
+  Particle();
 
- public:
   long id;                     /**< The id of particle. */
   std::optional<long long> pdg; 
   double atomic_weight;        /**< Atomic weight of the particle. */
@@ -144,7 +147,11 @@ class Particle {
   static Particle from_ZA(long long Z, long long A);
 
   static Particle from_pdg(long long pdg_code);
+
+
 };
+
+#include "ions/ion.h"
 
 // /**
 //  * @brief Factory function that creates either a Particle or Ion based on the isotope string.
@@ -162,5 +169,8 @@ class Particle {
 // nb::object create_particle(const std::string& isotope);
 
 nb::object from_string(const std::string& name);
+
+Particle create_particle(const std::string& name);
+Ion create_ion(const std::string& name);
 
 #endif  // PARTICLE_H

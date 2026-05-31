@@ -36,3 +36,12 @@ Ion::Ion(const std::string& isotope) : Particle(isotope) {
     pdg = std::make_optional<long long>(calculatePDG(Z, A));
   }
 }
+
+Ion::Ion() : Particle() {
+  Z = -1;
+  A = -1;
+  element_acronym = "unknown";
+  element_name = "unknown";
+  atomic_weight = 0.0;
+  pdg = 0;
+}
