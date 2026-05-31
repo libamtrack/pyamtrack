@@ -144,7 +144,6 @@ class Particle {
   
 
   // move outside the class
-  static Particle from_ZA(long long Z, long long A);
 
   static Particle from_pdg(long long pdg_code);
 
@@ -167,6 +166,9 @@ class Particle {
 //  * @return nb::object A Particle or Ion object.
 //  */
 // nb::object create_particle(const std::string& isotope);
+
+Ion from_ZA(long long Z, long long A);
+
 
 nb::object from_string(const std::string& name);
 

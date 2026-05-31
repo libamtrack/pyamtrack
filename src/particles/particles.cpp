@@ -206,17 +206,26 @@ Ion create_ion(const std::string& name) {
 }
 
 
-Particle Particle::from_ZA(long long Z, long long A) {
+Ion from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;
   for (int i = 0; i < data.n; ++i) {
     if (data.Z[i] == Z) {
       std::string acronym(data.element_acronym[i]);
-      Particle p(acronym + std::to_string(A));
-      return p;
+      nb::object result = from_string(acronym + std::to_string(A));
+      try {
+        Ion ion = nb::cast<Ion>(result);
+        return ion;
+      } catch (const nb::cast_error&) {
+        throw std::invalid_argument(
+          "Expected Ion type for Z=" + std::to_string(Z) + 
+          ", A=" + std::to_string(A) + 
+          ", but got Particle instead"
+        );
+      }
     }
   }
 
-  throw std::invalid_argument("Particle with Z=" + std::to_string(Z) + " not found");
+  throw std::invalid_argument("Ion with Z=" + std::to_string(Z) + " not found");
 }
 
 Particle Particle::from_pdg(long long pdg_code) {

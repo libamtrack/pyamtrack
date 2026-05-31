@@ -57,8 +57,6 @@ long long calculatePDG(int Z, int A, int L, int I) {
     + I;
 }
 
-// Opisać że nie modyfikujemy oryginalnych danych, tylko tworzymy mapy pomocnicze do walidacji i domyślnych wartości A. W ten sposób zachowujemy integralność danych, a jednocześnie ułatwiamy konstrukcję cząstek na podstawie symbolu i opcjonalnie liczby masowej.
-
 // Does not modify original data, just creates auxiliary maps for validation and default A values. This way we preserve data integrity while facilitating particle construction based on symbol and optional mass number.
 std::string to_lower_case(const std::string& s) {
   std::string result = s;

@@ -58,9 +58,7 @@ NB_MODULE(particles, m) {
     //         ValueError: If the particle number is invalid.
     // )pbdoc")
       
-      .def_static("from_AZ", &Particle::from_ZA, R"pbdoc(
-        Create a Particle from atomic number Z and mass number A.
-      )pbdoc")
+
       .def_static("from_pdg", &Particle::from_pdg, R"pbdoc(
         Create a Particle from a PDG code (nuclear encoding).
       )pbdoc")
@@ -127,10 +125,14 @@ NB_MODULE(particles, m) {
       )pbdoc");
 
 
+
+
   auto ions_module = m.def_submodule("ions");
   init_ions(ions_module);
   m.attr("proton") = &Particle::proton;
   
+
+
   auto acronyms = get_acronyms();
   for (const auto& acronym : acronyms) {
     try {
@@ -139,6 +141,10 @@ NB_MODULE(particles, m) {
       std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << "\n";
     }
   }
+
+  m.def("from_AZ", &from_ZA, R"pbdoc(
+    Create an Ion from atomic number Z and mass number A.
+  )pbdoc");
 
 
   // m.def("create", &create_particle, R"pbdoc(
