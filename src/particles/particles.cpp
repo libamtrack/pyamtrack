@@ -34,28 +34,6 @@ Particle::Particle(long long pdg_code) {
   }
 }
 
-// Particle Particle::from_number(long particle_no) {
-//   long Z_candidate = particle_no / 1000;
-//   long A_candidate = AT_A_from_particle_no_single(particle_no);
-
-//   if (A_candidate < 0) {
-//     throw std::invalid_argument("Invalid particle number: " + std::to_string(particle_no));
-//   }
-
-//   const auto& data = AT_Particle_Data;
-//   for (int i = 0; i < data.n; ++i) {
-//     if (data.Z[i] == Z_candidate) {
-//       std::string acronym(data.element_acronym[i]);
-//       Particle p(acronym);
-//       p.A = A_candidate;
-//       return p;
-//     }
-//   }
-
-//   throw std::invalid_argument("Particle with Z=" + std::to_string(Z_candidate) + " not found");
-// }
-
-
 
 /**
  * @brief Constructs a Particle from a string representation.
@@ -224,11 +202,6 @@ std::vector<std::string> get_acronyms() {
   return acronyms;
 }
 
-long Particle::py_get_A() const {
-  // Particles don't have A - this is only for Ion
-  // Return a sentinel value or throw
-  return -1;
-}
 
 std::string Particle::str() const {
   return "[Particle: " + element_acronym + "]";

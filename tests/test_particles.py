@@ -64,15 +64,15 @@ def test_from_string_elementary_particles():
     assert electron.element_acronym == "e"
 
 
-def test_from_AZ():
-    ion = particles.from_AZ(6, 12)
+def test_from_ZA():
+    ion = particles.from_ZA(6, 12)
 
     assert_carbon_12(ion)
 
 
-def test_from_AZ_invalid_atomic_number():
+def test_from_ZA_invalid_atomic_number():
     with pytest.raises(ValueError):
-        particles.from_AZ(999, 12)
+        particles.from_ZA(999, 12)
 
 
 def test_from_pdg_ion():

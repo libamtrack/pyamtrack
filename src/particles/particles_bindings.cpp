@@ -29,31 +29,6 @@ NB_MODULE(particles, m) {
     )pbdoc")
       .def(nb::init<long long>(), R"pbdoc()pbdoc")
       
-    //   .def_static("from_number", &Particle::from_number, R"pbdoc(
-    //     Initializes a Particle object from a particle number (1000*Z + A).
-
-    //     A particle number encodes the atomic number (Z) and mass number (A)
-    //     according to the PyAmtrack convention:
-
-    //         particle_no = 1000 * Z + A
-
-    //     Example:
-    //         >>> particle = Particle.from_number(6012)
-    //         >>> particle.Z
-    //         6
-    //         >>> particle.A
-    //         12
-
-    //     Args:
-    //         particle_no (int): The particle number in the format 1000*Z + A.
-
-    //     Returns:
-    //         Particle: A Particle object corresponding to the given particle number.
-
-    //     Raises:
-    //         ValueError: If the particle number is invalid.
-    // )pbdoc")
-      
 
       
       .def("info", [](const Particle &p) {
@@ -74,8 +49,6 @@ NB_MODULE(particles, m) {
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")
-      // .def_ro("density_g_cm3", &Particle::density_g_cm3, "The density of the particle in g/cm³.")
-      // .def_ro("I_eV_per_Z", &Particle::I_eV_per_Z, "The mean ionization potential per atomic number in eV/Z.")
       ;
 
   m.def("get_names", &get_names, R"pbdoc(
@@ -139,37 +112,7 @@ NB_MODULE(particles, m) {
     }
   }
 
-  m.def("from_AZ", &from_ZA, R"pbdoc(
+  m.def("from_ZA", &from_ZA, R"pbdoc(
     Create an Ion from atomic number Z and mass number A.
   )pbdoc");
-
-  m.def("from_AZ", &from_ZA, R"pbdoc(
-    Create an Ion from atomic number Z and mass number A.
-  )pbdoc");
-
-
-  // m.def("create", &create_particle, R"pbdoc(
-  //     Factory function that creates either a Particle or Ion based on the isotope string.
-      
-  //     For special particles (proton, electron, neutron), returns a Particle.
-  //     For regular atoms/ions, returns an Ion with Z and A set.
-      
-  //     Args:
-  //         isotope (str): Isotope string (e.g., "12C", "He", "p", "e", "n").
-      
-  //     Returns:
-  //         Particle or Ion: Appropriate particle type.
-      
-  //     Example:
-  //         >>> ion = particles.create("12C")    # Returns Ion with Z=6, A=12
-  //         >>> proton = particles.create("p")   # Returns Particle
-  // )pbdoc");
-
-
-
-  // Dynamically expose particles as attributes of the module
-  // auto acronyms = get_acronyms();
-  // for (size_t i = 0; i < acronyms.size(); ++i) {
-  //   m.attr(acronyms[i].c_str()) = Particle(acronyms[i]);
-  // }
 }

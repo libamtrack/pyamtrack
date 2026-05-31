@@ -116,25 +116,9 @@ class Particle {
 
 #include "ions/ion.h"
 
-// /**
-//  * @brief Factory function that creates either a Particle or Ion based on the isotope string.
-//  *
-//  * For special particles (proton, electron, neutron), returns a Particle.
-//  * For regular atoms/ions, returns an Ion with Z and A set.
-//  *
-//  * Example:
-//  * >>> ion = create_particle("12C")  # Returns Ion
-//  * >>> p = create_particle("p")      # Returns Particle (proton)
-//  *
-//  * @param isotope The isotope string (e.g., "12C", "He", "p", "e", "n").
-//  * @return nb::object A Particle or Ion object.
-//  */
-// nb::object create_particle(const std::string& isotope);
 
 Ion from_ZA(long long Z, long long A);
 
-
-Ion from_ZA(long long Z, long long A);
 
 
 nb::object from_string(const std::string& name);

@@ -18,9 +18,6 @@ void init_ions(nb::module_ &ions) {
         Use particles.from_string() to create Ion instances.
     )pbdoc")
       .def(nb::init<long long>(), R"pbdoc()pbdoc")
-    //   .def_static("from_AZ", &Ion::from_ZA, R"pbdoc(
-    //     Create an Ion from atomic number Z and mass number A.
-    // )pbdoc")
       .def_ro("Z", &Ion::Z, "The atomic number of the ion.")
       .def_ro("A", &Ion::A, "The mass number of the ion.")
       .def("__str__", [](const Ion &ion) {
