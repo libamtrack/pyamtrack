@@ -10,19 +10,6 @@
 
 #include <iostream>
 
-// Particle::Particle(string isotope) {
-//   if (id < 1 || id > AT_Particle_Data.n) {
-//     throw std::invalid_argument("Invalid particle id: " + std::to_string(id));
-//   }
-//   size_t index = static_cast<size_t>(id - 1);
-//   Z = AT_Particle_Data.Z[index];
-//   atomic_weight = AT_Particle_Data.atomic_weight[index];
-//   element_name = std::string(AT_Particle_Data.element_name[index]);
-//   element_acronym = std::string(AT_Particle_Data.element_acronym[index]);
-//   density_g_cm3 = AT_Particle_Data.density_g_cm3[index];
-//   I_eV_per_Z = AT_Particle_Data.I_eV_per_Z[index];
-//   A = std::nullopt;
-// }
 
 Particle::Particle() {
   element_acronym = "unknown";
@@ -32,56 +19,19 @@ Particle::Particle() {
   pdg = 0;
 }
 
-Particle::Particle(const std::string& isotope) {
-  const auto& data = AT_Particle_Data;
-  auto [symbol, A_] = parse_isotope(isotope);
-
-  std::string acronym;
-  std::string element_name;
-
-  if (symbol == "proton") {
-    symbol = "H";
-    A_ = 1;
-  } else if (symbol == "alpha") {
-    symbol = "He";
-    A_ = 2;
+Particle::Particle(long long pdg_code) {
+  nb::object p;
+  try {
+    p = from_pdg(pdg_code);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument("Invalid PDG code: " + std::to_string(pdg_code));
   }
-
-  
-  int it = -1;
-  for (int i = 0; i < data.n; ++i) {
-    if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
-      it = i;
-
-      break;
-    }
-    if (to_lower_case(data.element_name[i]) == to_lower_case(symbol)) {
-      it = i;
-      break;
-    }
+  try {
+    *this = nb::cast<Ion>(p);
+    throw std::invalid_argument("Use particles.ions.Ion() constructor for PDG codes corresponding to ions");
+  } catch (const nb::cast_error&) {
+    *this = nb::cast<Particle>(p);
   }
-
-  if (it == -1) {
-    throw nb::value_error(("Unknown element name or acronym: " + symbol).c_str());
-  }
-
-  acronym = data.element_acronym[it];
-  element_name = data.element_name[it];
-
-  auto [l, h] = isotope_A_range[acronym];
-
-  if (A_ != -1) {
-    if (A_ < l || A_ > h) {
-      throw nb::value_error(("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")").c_str());
-    }
-  } else if (A_ == -1) {
-    A_ = most_popular_iso_A[acronym];
-  }
-  id = it + 1;
-  atomic_weight = data.atomic_weight[it];
-  element_name = std::string(data.element_name[it]);
-  element_acronym = acronym;
-
 }
 
 // Particle Particle::from_number(long particle_no) {
@@ -206,22 +156,38 @@ Ion create_ion(const std::string& name) {
 }
 
 
-Particle Particle::from_ZA(long long Z, long long A) {
+Ion from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;
   for (int i = 0; i < data.n; ++i) {
     if (data.Z[i] == Z) {
       std::string acronym(data.element_acronym[i]);
-      Particle p(acronym + std::to_string(A));
-      return p;
+      nb::object result = from_string(acronym + std::to_string(A));
+      try {
+        Ion ion = nb::cast<Ion>(result);
+        return ion;
+      } catch (const nb::cast_error&) {
+        throw std::invalid_argument(
+          "Expected Ion type for Z=" + std::to_string(Z) + 
+          ", A=" + std::to_string(A) + 
+          ", but got Particle instead"
+        );
+      }
     }
   }
 
-  throw std::invalid_argument("Particle with Z=" + std::to_string(Z) + " not found");
+  throw std::invalid_argument("Ion with Z=" + std::to_string(Z) + " not found");
 }
 
-Particle Particle::from_pdg(long long pdg_code) {
+nb::object from_pdg(long long pdg_code) {
   if (pdg_code == 2212) {
-    return Particle("proton");
+    return nb::cast(from_ZA(1, 1));
+  }
+  
+  if (pdg_code == 2112) {
+    return nb::cast(from_string("neutron"));
+  }
+  if (pdg_code == 11) {
+    return nb::cast(from_string("electron"));
   }
 
   const auto& data = AT_Particle_Data;
@@ -237,7 +203,7 @@ Particle Particle::from_pdg(long long pdg_code) {
   long long Z = (pdg_code / 10000) % 1000;
   long long A = (pdg_code / 10) % 1000;
 
-  return from_ZA(Z, A);
+  return nb::cast(from_ZA(Z, A));
 }
 
 std::vector<std::string> get_names() {
@@ -269,23 +235,5 @@ std::string Particle::str() const {
 }
 
 std::string Particle::repr() const {
-  return "[Particle " + element_name + " (id=" + std::to_string(id) + ")]";
+  return "[Particle " + element_name +  ")]";
 }
-
-const Particle Particle::proton("proton");
-
-
-// nb::object create_particle(const std::string& isotope) {
-
-//   if (isotope == "p" || isotope == "proton") {
-//     return nb::cast(Particle(isotope));
-//   }
-//   if (isotope == "e" || isotope == "electron") {
-//     return nb::cast(Particle(isotope));
-//   }
-//   if (isotope == "n" || isotope == "neutron") {
-//     return nb::cast(Particle(isotope));
-//   }
-  
-//   return nb::cast(Ion(isotope));
-// }

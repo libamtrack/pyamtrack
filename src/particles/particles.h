@@ -71,7 +71,7 @@ class Particle {
    *
    * @param isotope The isotope string (e.g., "12C", "He", "238U").
    */
-  Particle(const std::string& isotope);
+  Particle(long long pdg_code);
   Particle();
 
   long id;                     /**< The id of particle. */
@@ -90,35 +90,6 @@ class Particle {
   std::string str() const;
   std::string repr() const;
 
-  static const Particle proton;
-
-  /**
-   * @brief Initializes a Particle object from a particle number (1000*Z + A).
-   *
-   * A particle number encodes the atomic number (Z) and mass number (A)
-   * according to the convention:
-   *
-   *   particle_no = 1000 * Z + A
-   *
-   * where:
-   *   - Z is the atomic number (1 ≤ Z ≤ 118)
-   *   - A is the mass number (1 ≤ A ≤ 300)
-   *
-   * Example:
-   * >>> particle = Particle::from_number(6012)
-   * >>> particle.Z
-   * 6
-   * >>> particle.A
-   * 12
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param particle_no The particle number in the format 1000*Z + A.
-   * @return A Particle object corresponding to the given particle number.
-   * @throws std::invalid_argument if the particle number is invalid.
-   */
-
-  // static Particle from_number(long particle_no);
 
   /**
    * @brief Initializes a Particle object from a string representation.
@@ -140,14 +111,6 @@ class Particle {
    * @return A Particle object corresponding to the given name.
    * @throws std::invalid_argument if the name cannot be parsed.
    */
-  
-  
-
-  // move outside the class
-  static Particle from_ZA(long long Z, long long A);
-
-  static Particle from_pdg(long long pdg_code);
-
 
 };
 
@@ -168,9 +131,14 @@ class Particle {
 //  */
 // nb::object create_particle(const std::string& isotope);
 
+Ion from_ZA(long long Z, long long A);
+
+
 nb::object from_string(const std::string& name);
 
 Particle create_particle(const std::string& name);
 Ion create_ion(const std::string& name);
+
+nb::object from_pdg(long long pdg_code);
 
 #endif  // PARTICLE_H

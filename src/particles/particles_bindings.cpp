@@ -27,12 +27,8 @@ NB_MODULE(particles, m) {
             element_name (str): Name of the particle.
             element_acronym (str): Acronym of the particle.
     )pbdoc")
-      .def(nb::init<>(), R"pbdoc(
-        Initializes a Particle object by its internal ID.
-
-        Args:
-            id (int): The internal ID of the particle (1-based index).
-    )pbdoc")
+      .def(nb::init<long long>(), R"pbdoc()pbdoc")
+      
     //   .def_static("from_number", &Particle::from_number, R"pbdoc(
     //     Initializes a Particle object from a particle number (1000*Z + A).
 
@@ -58,12 +54,8 @@ NB_MODULE(particles, m) {
     //         ValueError: If the particle number is invalid.
     // )pbdoc")
       
-      .def_static("from_AZ", &Particle::from_ZA, R"pbdoc(
-        Create a Particle from atomic number Z and mass number A.
-      )pbdoc")
-      .def_static("from_pdg", &Particle::from_pdg, R"pbdoc(
-        Create a Particle from a PDG code (nuclear encoding).
-      )pbdoc")
+
+      
       .def("info", [](const Particle &p) {
         std::cout << "[Particle Info]:\n"
                   << "  element = " << p.element_acronym << " (" << p.element_name << ")\n"
@@ -125,12 +117,19 @@ NB_MODULE(particles, m) {
         Raises:
             ValueError: If the string cannot be parsed.
       )pbdoc");
+  m.def("from_pdg", &from_pdg, R"pbdoc(
+        Create a Particle from a PDG code (nuclear encoding).
+      )pbdoc");
+
+
 
 
   auto ions_module = m.def_submodule("ions");
   init_ions(ions_module);
-  m.attr("proton") = &Particle::proton;
+  m.attr("proton") = from_ZA(1,1);
   
+
+
   auto acronyms = get_acronyms();
   for (const auto& acronym : acronyms) {
     try {
@@ -139,6 +138,10 @@ NB_MODULE(particles, m) {
       std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << "\n";
     }
   }
+
+  m.def("from_AZ", &from_ZA, R"pbdoc(
+    Create an Ion from atomic number Z and mass number A.
+  )pbdoc");
 
 
   // m.def("create", &create_particle, R"pbdoc(

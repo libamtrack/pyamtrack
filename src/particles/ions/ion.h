@@ -10,7 +10,7 @@ class Ion : public Particle {
    *
    * @param isotope The isotope string (e.g., "12C", "He").
    */
-  Ion(const std::string& isotope);
+  Ion(long long pdg_code);
   Ion();
 
   long Z;  /**< Atomic number of the ion. */

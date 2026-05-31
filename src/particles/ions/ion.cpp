@@ -6,34 +6,17 @@ extern "C" {
 #include "AT_DataParticle.h"
 }
 
-Ion::Ion(const std::string& isotope) : Particle(isotope) {
-  const auto& data = AT_Particle_Data;
-  auto [symbol, A_] = parse_isotope(isotope);
-
-  if (symbol == "proton") {
-    symbol = "H";
-    A_ = 1;
-  } else if (symbol == "alpha") {
-    symbol = "He";
-    A_ = 2;
+Ion::Ion(long long pdg_code) {
+  nb::object p;
+  try {
+    p = from_pdg(pdg_code);
+  } catch (const std::exception& e) {
+    throw std::invalid_argument("Invalid PDG code: " + std::to_string(pdg_code));
   }
-
-  int it = -1;
-  for (int i = 0; i < data.n; ++i) {
-    if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
-      it = i;
-      break;
-    }
-    if (to_lower_case(data.element_name[i]) == to_lower_case(symbol)) {
-      it = i;
-      break;
-    }
-  }
-
-  if (it != -1) {
-    Z = data.Z[it];
-    A = A_;
-    pdg = std::make_optional<long long>(calculatePDG(Z, A));
+  try {
+    *this = nb::cast<Ion>(p);
+  } catch (const nb::cast_error&) {
+    throw std::invalid_argument("Use particles.Particle() constructor for PDG codes corresponding to non-ions");
   }
 }
 
