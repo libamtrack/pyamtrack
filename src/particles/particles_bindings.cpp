@@ -143,6 +143,10 @@ NB_MODULE(particles, m) {
     Create an Ion from atomic number Z and mass number A.
   )pbdoc");
 
+  m.def("from_AZ", &from_ZA, R"pbdoc(
+    Create an Ion from atomic number Z and mass number A.
+  )pbdoc");
+
 
   // m.def("create", &create_particle, R"pbdoc(
   //     Factory function that creates either a Particle or Ion based on the isotope string.
