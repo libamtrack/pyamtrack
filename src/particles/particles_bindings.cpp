@@ -49,6 +49,7 @@ NB_MODULE(particles, m) {
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")
+      .def_ro("pdg", &Particle::pdg, "The PDG code of the particle.")
       ;
 
   m.def("get_names", &get_names, R"pbdoc(
