@@ -128,7 +128,7 @@ Ion create_ion(const std::string& name) {
   p.element_acronym = acronym;
   p.Z = data.Z[it];
   p.A = A_;
-  
+  p.pdg = calculatePDG(p.Z, p.A, 0, 0);
   
   return p;
 }
