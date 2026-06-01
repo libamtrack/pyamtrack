@@ -90,7 +90,7 @@ Ion create_ion(const std::string& name) {
     A_ = 1;
   } else if (symbol == "alpha") {
     symbol = "He";
-    A_ = 2;
+    A_ = 4;
   }
 
   

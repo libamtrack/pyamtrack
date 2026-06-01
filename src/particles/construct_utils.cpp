@@ -47,7 +47,7 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
 
 // uint
 long long calculatePDG(int Z, int A, int L, int I) {
-  if (Z == A == 1) {
+  if (Z == 1 && A == 1) {
     return 2212;
   }
   return 1000000000LL
