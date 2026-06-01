@@ -65,39 +65,3 @@ std::string to_lower_case(const std::string& s) {
   return result;
 }
 
-
-std::string decode_pdg_to_string(const int pdg, bool called_by_particle_constr) {
-  if (abs(pdg) < 1000000000 && pdg != 2212) {
-    return decode_elementary(pdg);
-  }
-  else {
-      return decode_ion(pdg);
-  }
-}
-
-std::string decode_elementary(const int pdg) {
-  switch (pdg) {
-    case 2112:
-      return "neutron";
-    case 11:
-      return "electron";
-    default:
-      throw std::invalid_argument("Unknown particle PDG code: " + std::to_string(pdg));
-  }
-}
-
-std::string decode_ion(const int pdg) {
-  const auto& data = AT_Particle_Data;
-
-  long long Z = (pdg / 10000) % 1000;
-  long long A = (pdg / 10) % 1000;
-
-  for (int i = 0; i < data.n; ++i) {
-    if (data.Z[i] == Z) {
-      std::string acronym(data.element_acronym[i]);
-      return acronym + std::to_string(A);
-    }
-  }
-
-  throw std::invalid_argument("Unknown ion PDG code: " + std::to_string(pdg));
-}

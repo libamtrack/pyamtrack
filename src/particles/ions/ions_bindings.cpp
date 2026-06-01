@@ -21,9 +21,12 @@ void init_ions(nb::module_ &ions) {
       .def_ro("Z", &Ion::Z, "The atomic number of the ion.")
       .def_ro("A", &Ion::A, "The mass number of the ion.")
       .def("__str__", [](const Ion &ion) {
-        return "[Ion: " + std::to_string(ion.A) + ion.element_acronym + "]";
+        return std::to_string(ion.A) + ion.element_acronym;  // e.g. "4He", "12C"
       })
       .def("__repr__", [](const Ion &ion) {
-        return "[Ion " + ion.element_name + " (Z=" + std::to_string(ion.Z) + ", A=" + std::to_string(ion.A) + ")]";
+        return "Ion(element_name=\"" + ion.element_name +
+          "\", element_acronym=\"" + ion.element_acronym +
+          "\", Z=" + std::to_string(ion.Z) +
+          ", A=" + std::to_string(ion.A) + ")";
       });
 }

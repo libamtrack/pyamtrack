@@ -204,9 +204,10 @@ std::vector<std::string> get_acronyms() {
 
 
 std::string Particle::str() const {
-  return "[Particle: " + element_acronym + "]";
+    return element_acronym;  
 }
 
 std::string Particle::repr() const {
-  return "[Particle " + element_name +  ")]";
+    return "Particle(name=\"" + element_name +
+           "\", acronym=\"" + element_acronym + "\")";
 }
