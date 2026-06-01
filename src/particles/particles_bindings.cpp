@@ -43,20 +43,6 @@ NB_MODULE(particles, m) {
             ValueError: If the PDG code is invalid or corresponds to an ion.
       )pbdoc")
       
-
-      
-      // .def("info", [](const Particle &p) {
-      //   std::cout << "[Particle Info]:" << std::endl
-      //             << "  element = " << p.element_acronym << " (" << p.element_name << ")" << std::endl
-      //             << "  id = " << p.id << std::endl;
-      //   if (p.pdg) {
-      //     std::cout << "  PDG = " << *p.pdg << std::endl;
-      //   } else {
-      //     std::cout << "  PDG = None" << std::endl;
-      //   }
-      //   std::cout << std::endl;
-      //   return nb::none();
-      // })
       .def("__str__", &Particle::str, "Return the element acronym (e.g., 'C').")
       .def("__repr__", &Particle::repr, "Return a detailed, debug-friendly representation.")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
