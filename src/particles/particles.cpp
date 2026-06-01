@@ -92,7 +92,7 @@ Particle create_particle(const std::string& name) {
   Particle p = Particle();
   p.element_name = name;
   p.element_acronym = name[0];
-  p.pdg = (name == "neutron") ? 2112 : 11;
+  p.pdg = pdg_for_nonions[name];
   
   return p;
 }

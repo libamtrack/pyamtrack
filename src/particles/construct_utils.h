@@ -255,3 +255,9 @@ inline std::map<std::string, std::pair<int, int>> isotope_A_range = {
   {"Bk", {247, 247}},
   {"Cf", {249, 251}}
 };
+
+
+inline std::map<std::string, long long> pdg_for_nonions = {
+  {"neutron", 2122},
+  {"electron", 11}
+};
