@@ -10,6 +10,9 @@
 
 
 
+/**
+ * @brief Default constructor for Particle.
+ */
 Particle::Particle() {
   element_acronym = "unknown";
   element_name = "unknown";
@@ -18,6 +21,12 @@ Particle::Particle() {
   pdg = 0;
 }
 
+/**
+ * @brief Construct Particle from PDG code.
+ *
+ * @param pdg_code PDG code.
+ * @throws std::invalid_argument If PDG code is invalid or corresponds to an ion.
+ */
 Particle::Particle(long long pdg_code) {
   nb::object p;
   try {
@@ -55,6 +64,13 @@ Particle::Particle(long long pdg_code) {
  *         (e.g. empty acronym, unknown acronym).
  */
 
+/**
+ * @brief Create a Particle or Ion from a string label.
+ *
+ * @param name Element acronym/name, isotope label, or special name.
+ * @return nb::object Particle or Ion.
+ * @throws std::invalid_argument or nb::value_error on invalid input.
+ */
 nb::object from_string(const std::string& name) {
 
   // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to support them as special particles.
@@ -66,7 +82,12 @@ nb::object from_string(const std::string& name) {
   return nb::cast(create_ion(name));
 }
 
-// helper functions for creating particles and ions. The point is to isolate the logic of choosing to create either the Particle or the Ion from construction
+/**
+ * @brief Create a non-ion special particle by name.
+ *
+ * @param name Supported names: "neutron", "electron".
+ * @return Particle
+ */
 Particle create_particle(const std::string& name) {
   Particle p = Particle();
   p.element_name = name;
@@ -76,6 +97,13 @@ Particle create_particle(const std::string& name) {
   return p;
 }
  
+/**
+ * @brief Create an Ion from element or isotope string.
+ *
+ * @param name Element acronym/name or isotope label (e.g., "12C", "U").
+ * @return Ion
+ * @throws nb::value_error If element or mass number is invalid.
+ */
 Ion create_ion(const std::string& name) {
   Ion p = Ion();
   const auto& data = AT_Particle_Data;
@@ -136,6 +164,14 @@ Ion create_ion(const std::string& name) {
 }
 
 
+/**
+ * @brief Create an Ion from atomic number Z and mass number A.
+ *
+ * @param Z Atomic number.
+ * @param A Mass number.
+ * @return Ion
+ * @throws std::invalid_argument If the element or isotope is not found.
+ */
 Ion from_ZA(long long Z, long long A) {
   const auto& data = AT_Particle_Data;
   for (int i = 0; i < data.n; ++i) {
@@ -158,6 +194,13 @@ Ion from_ZA(long long Z, long long A) {
   throw std::invalid_argument("Ion with Z=" + std::to_string(Z) + " not found");
 }
 
+/**
+ * @brief Create a Particle or Ion from a PDG code.
+ *
+ * @param pdg_code PDG code.
+ * @return nb::object Particle or Ion.
+ * @throws nb::value_error If the code is not valid nuclear PDG encoding.
+ */
 nb::object from_pdg(long long pdg_code) {
   if (pdg_code == 2212) {
     return nb::cast(from_ZA(1, 1));
@@ -186,6 +229,11 @@ nb::object from_pdg(long long pdg_code) {
   return nb::cast(from_ZA(Z, A));
 }
 
+/**
+ * @brief Get all element names.
+ *
+ * @return std::vector<std::string> Names of supported elements.
+ */
 std::vector<std::string> get_names() {
   std::vector<std::string> names;
   names.reserve(AT_Particle_Data.n);
@@ -195,6 +243,11 @@ std::vector<std::string> get_names() {
   return names;
 }
 
+/**
+ * @brief Get all element acronyms.
+ *
+ * @return std::vector<std::string> Acronyms of supported elements.
+ */
 std::vector<std::string> get_acronyms() {
   std::vector<std::string> acronyms;
   acronyms.reserve(AT_Particle_Data.n);
@@ -205,10 +258,16 @@ std::vector<std::string> get_acronyms() {
 }
 
 
+/**
+ * @brief Short string representation.
+ */
 std::string Particle::str() const {
     return element_acronym;  
 }
 
+/**
+ * @brief Detailed string representation.
+ */
 std::string Particle::repr() const {
     return "Particle(name=\"" + element_name +
            "\", acronym=\"" + element_acronym + "\")";

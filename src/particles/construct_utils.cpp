@@ -6,6 +6,17 @@
 #include "construct_utils.h"
 
 
+/**
+ * @brief Parse an isotope string into element symbol and mass number.
+ *
+ * Supported formats:
+ * - "C", "C12", "C-12", "Carbon_12" (element-first)
+ * - "12C", "12-C", "12_C", "12Carbon" (mass-first)
+ *
+ * @param isotope Input isotope string.
+ * @return std::pair<std::string, int> Pair of (symbol, A). A is -1 when absent.
+ * @throws std::invalid_argument If the format is invalid.
+ */
 std::pair<std::string, int> parse_isotope(std::string isotope) {
   // carbon, c, C, C12, C-12, caRbOn_12, ...
   std::regex pattern(R"(([A-Za-z]+)[_-]?([1-9][0-9]*)?)");
@@ -44,7 +55,15 @@ std::pair<std::string, int> parse_isotope(std::string isotope) {
   
 }
 
-// uint
+/**
+ * @brief Calculate PDG nuclear code from Z and A.
+ *
+ * @param Z Atomic number.
+ * @param A Mass number.
+ * @param L Lambda count.
+ * @param I Isomer level.
+ * @return long long PDG code.
+ */
 long long calculatePDG(int Z, int A, int L, int I) {
   if (Z == 1 && A == 1) {
     return 2212;
@@ -56,7 +75,12 @@ long long calculatePDG(int Z, int A, int L, int I) {
     + I;
 }
 
-// Does not modify original data, just creates auxiliary maps for validation and default A values. This way we preserve data integrity while facilitating particle construction based on symbol and optional mass number.
+/**
+ * @brief Convert a string to lowercase.
+ *
+ * @param s Input string.
+ * @return std::string Lowercased copy.
+ */
 std::string to_lower_case(const std::string& s) {
   std::string result = s;
   std::transform(result.begin(), result.end(), result.begin(),

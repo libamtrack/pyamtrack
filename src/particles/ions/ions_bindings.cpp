@@ -10,16 +10,26 @@ void init_ions(nb::module_ &ions) {
   ions.doc() = "Ion-specific functionality.";
 
   nb::class_<Ion, Particle>(ions, "Ion", R"pbdoc(
-        Represents an ion (charged particle).
+        Represents an ion (nucleus) with atomic number Z and mass number A.
 
-        Inherits all properties and methods from Particle.
-        Additionally exposes Z and A attributes.
-        
-        Use particles.from_string() to create Ion instances.
+        Inherits all properties and methods from Particle, and adds:
+            - Z: atomic number
+            - A: mass number
+
+        Prefer using particles.from_string() or particles.from_ZA() to
+        create ions. Use the constructor for PDG-code-based creation.
     )pbdoc")
-      .def(nb::init<long long>(), R"pbdoc()pbdoc")
-      .def_ro("Z", &Ion::Z, "The atomic number of the ion.")
-      .def_ro("A", &Ion::A, "The mass number of the ion.")
+      .def(nb::init<long long>(), R"pbdoc(
+        Create an Ion from a PDG code.
+
+        Args:
+            pdg_code (int): PDG code for a nucleus.
+
+        Raises:
+            ValueError: If the PDG code is invalid or corresponds to a non-ion.
+      )pbdoc")
+      .def_ro("Z", &Ion::Z, "Atomic number (Z).")
+      .def_ro("A", &Ion::A, "Mass number (A).")
       .def("__str__", [](const Ion &ion) {
         return std::to_string(ion.A) + ion.element_acronym;  // e.g. "4He", "12C"
       })

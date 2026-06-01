@@ -8,12 +8,43 @@ extern "C" {
 }
 
 
+/**
+ * @brief Parse an isotope string into element symbol and mass number.
+ *
+ * Accepts element-first (e.g. "C", "C-12", "Carbon_12") or
+ * mass-first (e.g. "12C", "12-Carbon") forms. Case-insensitive for
+ * element symbols/names.
+ *
+ * @param isotope The input isotope string.
+ * @return std::pair<std::string, int> Pair of (symbol, A). A is -1 when absent.
+ * @throws std::invalid_argument If the format is invalid.
+ */
 extern std::pair<std::string, int> parse_isotope(std::string isotope);
 
+/**
+ * @brief Calculate PDG nuclear code from Z and A.
+ *
+ * Uses the PDG nuclear encoding: $10^9 + L\cdot10^7 + Z\cdot10^4 + A\cdot10 + I$.
+ *
+ * @param Z Atomic number.
+ * @param A Mass number.
+ * @param L Lambda count (default 0).
+ * @param I Isomer level (default 0).
+ * @return long long PDG code.
+ */
 long long calculatePDG(int Z, int A, int L = 0, int I = 0);
 
+/**
+ * @brief Convert a string to lowercase.
+ *
+ * @param s Input string.
+ * @return std::string Lowercased copy.
+ */
 std::string to_lower_case(const std::string& s);
 
+/**
+ * @brief Default mass numbers for elements when A is omitted.
+ */
 inline std::map<std::string, int> most_popular_iso_A = {
   {"H", 1},    // protium
   {"He", 4},
@@ -118,6 +149,9 @@ inline std::map<std::string, int> most_popular_iso_A = {
   {"Cf", 251}
 };
 
+/**
+ * @brief Valid mass-number ranges for supported elements.
+ */
 inline std::map<std::string, std::pair<int, int>> isotope_A_range = {
   {"H",  {1, 3}},
   {"He", {3, 4}},
