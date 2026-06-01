@@ -8,6 +8,8 @@
 #include "ions/ions.h"
 #include "ions/ion.h"
 
+#include <iostream>
+
 namespace nb = nanobind;
 
 NB_MODULE(particles, m) {
@@ -129,7 +131,7 @@ NB_MODULE(particles, m) {
     try {
       m.attr(acronym.c_str()) = from_string(acronym);
     } catch (const std::exception& e) {
-      std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << "\n";
+      std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << std::endl;
     }
   }
 
