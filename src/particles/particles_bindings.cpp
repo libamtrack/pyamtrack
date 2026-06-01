@@ -109,6 +109,7 @@ NB_MODULE(particles, m) {
   auto ions_module = m.def_submodule("ions");
   init_ions(ions_module);
   m.attr("proton") = from_ZA(1,1);
+  m.attr("alpha") = from_string("alpha");
   
 
 
