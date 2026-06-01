@@ -31,18 +31,18 @@ NB_MODULE(particles, m) {
       
 
       
-      .def("info", [](const Particle &p) {
-        std::cout << "[Particle Info]:\n"
-                  << "  element = " << p.element_acronym << " (" << p.element_name << ")\n"
-                  << "  id = " << p.id << "\n";
-        if (p.pdg) {
-          std::cout << "  PDG = " << *p.pdg << "\n";
-        } else {
-          std::cout << "  PDG = None\n";
-        }
-        std::cout << std::endl;
-        return nb::none();
-      })
+      // .def("info", [](const Particle &p) {
+      //   std::cout << "[Particle Info]:" << std::endl
+      //             << "  element = " << p.element_acronym << " (" << p.element_name << ")" << std::endl
+      //             << "  id = " << p.id << std::endl;
+      //   if (p.pdg) {
+      //     std::cout << "  PDG = " << *p.pdg << std::endl;
+      //   } else {
+      //     std::cout << "  PDG = None" << std::endl;
+      //   }
+      //   std::cout << std::endl;
+      //   return nb::none();
+      // })
       .def("__str__", &Particle::str, "String representation of the particle")
       .def("__repr__", &Particle::repr, "Detailed string representation of the particle")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
