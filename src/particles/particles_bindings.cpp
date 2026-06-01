@@ -8,8 +8,6 @@
 #include "ions/ions.h"
 #include "ions/ion.h"
 
-#include <iostream>
-
 namespace nb = nanobind;
 
 NB_MODULE(particles, m) {

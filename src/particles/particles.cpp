@@ -8,7 +8,6 @@
 #include <optional>
 #include <stdexcept>
 
-#include <iostream>
 
 
 Particle::Particle() {
@@ -113,7 +112,10 @@ Ion create_ion(const std::string& name) {
 
   acronym = data.element_acronym[it];
 
-  auto [l, h] = isotope_A_range[acronym];
+  auto rng = isotope_A_range.find(acronym);
+  if (rng == isotope_A_range.end())
+      throw nb::value_error(("No isotope data for element " + acronym).c_str());
+  auto [l, h] = rng->second;
 
   if (A_ != -1) {
     if (A_ < l || A_ > h) {

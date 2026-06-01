@@ -5,7 +5,6 @@
 
 #include "construct_utils.h"
 
-#include <iostream>
 
 std::pair<std::string, int> parse_isotope(std::string isotope) {
   // carbon, c, C, C12, C-12, caRbOn_12, ...
