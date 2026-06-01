@@ -112,7 +112,7 @@ NB_MODULE(particles, m) {
     }
   }
 
-  m.def("from_ZA", &from_ZA, R"pbdoc(
+  m.def("from_ZA", &from_ZA, nb::arg("Z"), nb::arg("A"), R"pbdoc(
     Create an Ion from atomic number Z and mass number A.
   )pbdoc");
 }
