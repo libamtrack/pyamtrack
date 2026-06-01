@@ -1,10 +1,6 @@
 #include "ion.h"
-#include "../construct_utils.h"
 #include "../particles.h"
 
-extern "C" {
-#include "AT_DataParticle.h"
-}
 
 Ion::Ion(long long pdg_code) {
   nb::object p;
