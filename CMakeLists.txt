@@ -150,11 +150,11 @@ if(APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-# Create the Python module from the source file
-nanobind_add_module(_core src/main.cpp)
+  # Create the Python module from the source file
+  nanobind_add_module(_core src/main.cpp)
 
-# Define a list of targets to link against the required libraries.
-set(PYAMTRACK_TARGETS converters stopping materials particles)
+  # Define a list of targets to link against the required libraries.
+  set(PYAMTRACK_TARGETS converters stopping materials particles proton_models)
 
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
