@@ -39,4 +39,4 @@ if sys.platform == "win32":
 
 from . import converters, materials, particles, stopping
 
-__all__ = ["converters", "stopping", "materials", "particles"]
+__all__ = ["converters", "stopping", "materials", "particles", "proton_models"]
