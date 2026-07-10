@@ -66,7 +66,8 @@ NB_MODULE(proton_models, m) {
         Parameters
         ----------
         depth_cm : float, list[float], or numpy.ndarray
-            Depth(s) in medium [cm].
+            Depth(s) in medium [cm]. Must be >= 0; negative values have no physical
+            meaning (the beam does not exist before the material surface).
         material : int
             Material ID (e.g., 1 for liquid water).
         energy_MeV : float
@@ -91,7 +92,7 @@ NB_MODULE(proton_models, m) {
         Raises
         ------
         ValueError
-            If averaging is not "dose" or "track".
+            If averaging is not "dose" or "track", or if any depth_cm value is < 0.
         TypeError
             If depth_cm is not a float, list, or NumPy array.
       )pbdoc");
