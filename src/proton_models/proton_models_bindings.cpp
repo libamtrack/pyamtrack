@@ -14,9 +14,12 @@ NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
   m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_MeV"), nb::arg("material") = 1, nb::arg("eps") = -1.0, nb::arg("cartesian_product") = false,
+        nb::arg("sigma_E_MeV"), nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
+
+        Reference: T. Bortfeld, "An analytical approximation of the Bragg curve for therapeutic
+        proton beams", Med. Phys. 24(12), 2024 (1997).
 
         Parameters
         ----------
@@ -27,54 +30,69 @@ NB_MODULE(proton_models, m) {
         E_MeV : float or array_like
             Initial kinetic energy [MeV]. Can be a float, a Python list, or a NumPy array.
         sigma_E_MeV : float or array_like
-            Kinetic energy spread (standard deviation) [MeV]. If negative, libamtrack uses
-            the default value 0.01 * E_MeV.
-        material : int, Material, list[int | Material] or numpy array with int as dtype, optional
-            Medium material specification. Accepts:
-              - material ID (int), or
-              - pyamtrack.materials.Material object.
-            Defaults to 1 (Liquid water).
+            Kinetic energy spread (standard deviation) [MeV]. If negative, defaults to
+            0.01 * E_MeV.
+        material : int or Material, optional
+            Material ID or pyamtrack.materials.Material object. Default: 1 (liquid water).
         eps : float or array_like, optional
             Fraction of primary fluence contributing to the tail of the energy spectrum.
-            If negative, libamtrack uses the default value 0.03. Default: -1.0.
-        cartesian_product: bool
-            If True, compute the cartesian product (all possible combinations) across iterable/array
-            arguments. If False, compute elementwise (vectorized) results.
+            Default: 0.03.
+        cartesian_product : bool, optional
+            If True, compute all combinations of iterable/array arguments (cartesian product).
+            If False, compute elementwise. Default: False.
 
         Returns
         -------
         float or numpy.ndarray
-            Dose [Gy] at depth. Returns:
-              - float if all inputs are scalars,
-              - numpy.ndarray if any input is a NumPy array or when cartesian_product=True,
-              - list-like behavior depends on wrapper implementation (but typically numpy.ndarray).
+            Dose [Gy] at the specified depth(s).
 
         Raises
         ------
         TypeError
-            If material is neither an int nor a pyamtrack.materials.Material object,
-            or if unsupported input types are provided.
+            If material is not an int or pyamtrack.materials.Material, or inputs are unsupported types.
         ValueError
-            For invalid model/material IDs or invalid inputs, depending on underlying libamtrack checks.
+            For invalid material IDs or out-of-range inputs.
       )pbdoc");
 
-  m.def("let_dose", &let_dose, R"pbdoc(
-        Calculate the LET dose using Wilkens' model.
+  m.def("let_wilkens", &let_wilkens,
+        nb::arg("depth_cm"), nb::arg("material"), nb::arg("energy_MeV"), nb::arg("energy_spread_MeV"),
+        nb::arg("averaging") = "dose",
+        R"pbdoc(
+        Compute LET at depth for proton beams using the analytical model of Wilkens & Oelfke (2003).
 
-        This function computes the LET dose at a given depth for a proton beam
-        using the analytical model developed by Wilkens. It accounts for energy
-        spread and material properties.
+        Reference: J. J. Wilkens & U. Oelfke, "Analytical linear energy transfer calculations
+        for proton therapy", Med. Phys. 30(5), 806 (2003).
 
-        Args:
-            depth_cm (float or list[float]): Depth(s) in centimeters where the LET dose is calculated.
-            material (int): Material ID (e.g., 1 for liquid water).
-            energy_MeV (float): Initial proton energy in MeV.
-            energy_spread_MeV (float): Energy spread of the proton beam in MeV.
+        Parameters
+        ----------
+        depth_cm : float, list[float], or numpy.ndarray
+            Depth(s) in medium [cm].
+        material : int
+            Material ID (e.g., 1 for liquid water).
+        energy_MeV : float
+            Initial kinetic energy of the proton beam [MeV].
+        energy_spread_MeV : float
+            Energy spread (standard deviation) of the proton beam [MeV].
+            If negative, defaults to 0.01 * energy_MeV.
+        averaging : str, optional
+            LET averaging convention:
+              - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution.
+                          Standard choice for RBE calculations. Calls AT_LET_d_Wilkens_keV_um.
+              - "track" : track-averaged LET (LET_t) — plain fluence-weighted mean of stopping power.
+                          Calls AT_LET_t_Wilkens_keV_um.
+            Default: "dose".
 
-        Returns:
-            float or list[float]: The calculated LET dose at the specified depth(s).
+        Returns
+        -------
+        float or list[float]
+            LET [keV/µm] at the specified depth(s). LET_d >= LET_t always; the difference
+            grows near the Bragg peak.
 
-        Raises:
-            TypeError: If `depth_cm` is not a float or list of floats.
+        Raises
+        ------
+        ValueError
+            If averaging is not "dose" or "track".
+        TypeError
+            If depth_cm is not a float, list, or NumPy array.
       )pbdoc");
 }
