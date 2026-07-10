@@ -159,6 +159,11 @@ set(PYAMTRACK_TARGETS converters stopping materials particles)
 foreach(TARGET ${PYAMTRACK_TARGETS})
   # Create a library for each target.
   file(GLOB SOURCES src/${TARGET}/*.cpp)
+  # Include subdirectory files for specific targets
+  if(${TARGET} STREQUAL "particles")
+    file(GLOB ION_SOURCES src/${TARGET}/ions/*.cpp)
+    list(APPEND SOURCES ${ION_SOURCES})
+  endif()
   nanobind_add_module(${TARGET} ${SOURCES})
 endforeach()
 
