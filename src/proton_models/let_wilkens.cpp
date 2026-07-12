@@ -7,12 +7,25 @@ extern "C" {
 #include "AT_ProtonAnalyticalModels.h"
 }
 
-nb::object let_wilkens(nb::object depth_cm, long material, double energy_MeV, double energy_spread_MeV,
+nb::object let_wilkens(nb::object depth_cm, long material, double energy_MeV, double energy_spread_fraction,
                        const std::string& averaging) {
+  
+  
+
+  if (energy_MeV < 0.1 || energy_MeV > 10000.0) {
+    throw std::invalid_argument("energy_MeV must in range [0.1, 10000.0], got: " + std::to_string(energy_MeV));
+  }
+  if (!(0.0 < energy_spread_fraction && energy_spread_fraction < 1.0)) {
+    throw std::invalid_argument("energy_spread_fraction must be in range (0, 1), got: " + std::to_string(energy_spread_fraction));
+  }
+  
   if (averaging != "dose" && averaging != "track") {
     throw std::invalid_argument("averaging must be \"dose\" or \"track\", got: " + averaging);
   }
+  
+
   const bool dose_averaged = (averaging == "dose");
+  const double energy_spread_MeV = energy_spread_fraction * energy_MeV;
 
   auto validate_depths = [](const std::vector<double>& depths) {
     for (double d : depths) {
