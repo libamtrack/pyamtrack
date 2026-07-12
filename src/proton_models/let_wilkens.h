@@ -11,7 +11,7 @@
 #include "../particles/ions/ion.h"
 
 
-nb::object let_wilkens(nb::object depth_cm, long material, double energy_MeV, double energy_spread_MeV,
+nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_MeV, double energy_spread_MeV,
                        const std::string& averaging = "dose");
 
 #endif  // LET_WILKENS_H
