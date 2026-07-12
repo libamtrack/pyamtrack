@@ -68,13 +68,16 @@ NB_MODULE(proton_models, m) {
         depth_cm : float, list[float], or numpy.ndarray
             Depth(s) in medium [cm]. Must be >= 0; negative values have no physical
             meaning (the beam does not exist before the material surface).
-        material : int
-            Material ID (e.g., 1 for liquid water).
+        material : int or Material
+            Material ID in range [1, 24], or a pyamtrack.materials.Material object.
+            Use 1 for liquid water.
         energy_MeV : float
-            Initial kinetic energy of the proton beam [MeV].
-        energy_spread_MeV : float
-            Energy spread (standard deviation) of the proton beam [MeV].
-            If negative, defaults to 0.01 * energy_MeV.
+            Initial kinetic energy of the proton beam [MeV]. Must be in [0.1, 10000.0].
+        energy_spread_fraction : float
+            Energy spread (standard deviation) expressed as a fraction of energy_MeV.
+            Must be in (0, 1). For example, 0.01 means a 1% energy spread.
+            Internally converted to sigma_E = energy_spread_fraction * energy_MeV before
+            calling libamtrack.
         averaging : str, optional
             LET averaging convention:
               - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution.
@@ -92,8 +95,15 @@ NB_MODULE(proton_models, m) {
         Raises
         ------
         ValueError
-            If averaging is not "dose" or "track", or if any depth_cm value is < 0.
+            If averaging is not "dose" or "track", or any depth_cm value is < 0,
+            or energy_MeV is outside [0.1, 10000.0], or energy_spread_fraction is
+            outside (0, 1), or material ID is outside [1, 24].
         TypeError
-            If depth_cm is not a float, list, or NumPy array.
+            If depth_cm is not a float, list, or NumPy array, or material is not
+            an int or Material object.
       )pbdoc");
+  nb::enum_<Averaging>(m, "Averaging")
+    .value("DOSE",  Averaging::Dose)
+    .value("TRACK", Averaging::Track)
+    .export_values();
 }

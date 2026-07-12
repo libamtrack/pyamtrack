@@ -8,7 +8,7 @@ extern "C" {
 }
 
 nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_MeV, double energy_spread_fraction,
-                       const std::string& averaging) {
+                      nb::object averaging) {
 
   auto validate_depths = [](const std::vector<double>& depths) {
     for (double d : depths) {
@@ -19,7 +19,6 @@ nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_M
     }
   };
   
-  
 
   if (energy_MeV < 0.1 || energy_MeV > 10000.0) {
     throw std::invalid_argument("energy_MeV must in range [0.1, 10000.0], got: " + std::to_string(energy_MeV));
@@ -28,12 +27,23 @@ nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_M
     throw std::invalid_argument("energy_spread_fraction must be in range (0, 1), got: " + std::to_string(energy_spread_fraction));
   }
   
-  if (averaging != "dose" && averaging != "track") {
-    throw std::invalid_argument("averaging must be \"dose\" or \"track\", got: " + averaging);
-  }
+  // if (!nb::isinstance<Averaging>(averaging) && averaging != "dose" && averaging != "track") {
+  //   throw std::invalid_argument("averaging must be \"dose\" or \"track\" or an instance of pyamtrack.proton_models.Averaging, got: " + averaging);
+  // }
   
 
-  const bool dose_averaged = (averaging == "dose");
+  bool dose_averaged;
+  if (nb::isinstance<Averaging>(averaging)) {
+      dose_averaged = (nb::cast<Averaging>(averaging) == Averaging::Dose);
+  } else if (nb::isinstance<nb::str>(averaging)) {
+      std::string avg_str = nb::cast<std::string>(averaging);
+      if (avg_str == "dose")       dose_averaged = true;
+      else if (avg_str == "track") dose_averaged = false;
+      else throw std::invalid_argument(
+          "averaging must be \"dose\" or \"track\", got: " + avg_str);
+  } else {
+      throw nb::type_error("averaging must be an Averaging enum value or a string");
+  }
   const double energy_spread_MeV = energy_spread_fraction * energy_MeV;
 
   auto get_material_id = [](nb::object& material) -> long {

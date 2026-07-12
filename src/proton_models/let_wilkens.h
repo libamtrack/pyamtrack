@@ -10,8 +10,12 @@
 #include "../particles/particles.h"
 #include "../particles/ions/ion.h"
 
+enum class Averaging {
+    Dose,
+    Track
+};
 
-nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_MeV, double energy_spread_MeV,
-                       const std::string& averaging = "dose");
+nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_MeV,
+                       double energy_spread_fraction, nb::object averaging = nb::cast(std::string("dose")));
 
 #endif  // LET_WILKENS_H
