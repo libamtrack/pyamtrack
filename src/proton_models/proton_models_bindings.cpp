@@ -55,7 +55,7 @@ NB_MODULE(proton_models, m) {
       )pbdoc");
 
   m.def("let_wilkens", &let_wilkens,
-        nb::arg("depth_cm"), nb::arg("material"), nb::arg("energy_MeV"), nb::arg("energy_spread_fraction"),
+        nb::arg("depth_cm"), nb::arg("material") = 1, nb::arg("energy_MeV"), nb::arg("energy_spread_fraction") = 0.01,
         nb::arg("averaging") = "dose",
         R"pbdoc(
         Compute LET at depth for proton beams using the analytical model of Wilkens & Oelfke (2003).
