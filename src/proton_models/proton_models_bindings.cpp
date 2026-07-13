@@ -14,7 +14,7 @@ NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
   m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_MeV"), nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false,
+        nb::arg("sigma_E_fraction"), nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
 
@@ -24,19 +24,22 @@ NB_MODULE(proton_models, m) {
         Parameters
         ----------
         z_cm : float or array_like
-            Depth in medium [cm]. Can be a float, a Python list, or a NumPy array.
+            Depth in medium [cm]. Must be >= 0. Can be a float, a Python list, or a NumPy array.
         fluence_cm2 : float or array_like
             Proton fluence [1/cm^2]. Can be a float, a Python list, or a NumPy array.
         E_MeV : float or array_like
-            Initial kinetic energy [MeV]. Can be a float, a Python list, or a NumPy array.
-        sigma_E_MeV : float or array_like
-            Kinetic energy spread (standard deviation) [MeV]. If negative, defaults to
-            0.01 * E_MeV.
-        material : int or Material, optional
-            Material ID or pyamtrack.materials.Material object. Default: 1 (liquid water).
+            Initial kinetic energy [MeV]. Must be in [0.1, 10000.0].
+            Can be a float, a Python list, or a NumPy array.
+        sigma_E_fraction : float or array_like
+            Energy spread (standard deviation) expressed as a fraction of E_MeV. Must be in (0, 1).
+            For example, 0.01 means a 1% energy spread. Internally converted to
+            sigma_E_MeV = sigma_E_fraction * E_MeV before calling libamtrack.
+        material : int, Material, list[int | Material], or numpy int array, optional
+            Material ID in range [1, 24], or a pyamtrack.materials.Material object.
+            Default: 1 (liquid water).
         eps : float or array_like, optional
-            Fraction of primary fluence contributing to the tail of the energy spectrum.
-            Default: 0.03.
+            Fraction of primary fluence contributing to the nuclear interaction tail. Must be
+            in [0, 1). Default: 0.03.
         cartesian_product : bool, optional
             If True, compute all combinations of iterable/array arguments (cartesian product).
             If False, compute elementwise. Default: False.
@@ -49,9 +52,11 @@ NB_MODULE(proton_models, m) {
         Raises
         ------
         TypeError
-            If material is not an int or pyamtrack.materials.Material, or inputs are unsupported types.
+            If material is not an int, Material, list, or int numpy array, or if other inputs
+            are unsupported types.
         ValueError
-            For invalid material IDs or out-of-range inputs.
+            If z_cm < 0, E_MeV outside [0.1, 10000.0], sigma_E_fraction outside (0, 1),
+            eps outside [0, 1), or material ID outside [1, 24].
       )pbdoc");
 
   m.def("let_wilkens", &let_wilkens,
