@@ -19,18 +19,12 @@ nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_M
     }
   };
   
-
   if (energy_MeV < 0.1 || energy_MeV > 10000.0) {
     throw std::invalid_argument("energy_MeV must in range [0.1, 10000.0], got: " + std::to_string(energy_MeV));
   }
   if (!(0.0 < energy_spread_fraction && energy_spread_fraction < 1.0)) {
     throw std::invalid_argument("energy_spread_fraction must be in range (0, 1), got: " + std::to_string(energy_spread_fraction));
   }
-  
-  // if (!nb::isinstance<Averaging>(averaging) && averaging != "dose" && averaging != "track") {
-  //   throw std::invalid_argument("averaging must be \"dose\" or \"track\" or an instance of pyamtrack.proton_models.Averaging, got: " + averaging);
-  // }
-  
 
   bool dose_averaged;
   if (nb::isinstance<Averaging>(averaging)) {
