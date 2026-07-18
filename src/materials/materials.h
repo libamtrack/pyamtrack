@@ -148,4 +148,18 @@ class Material {
   Material(const std::string& name);
 };
 
+inline long get_material_id(const nb::object& material) {
+  if (nb::isinstance<nb::int_>(material)) {
+    long id = nb::cast<long>(material);
+    if (id < 1 || id > 24) {
+      throw std::invalid_argument("invalid material ID");
+    }
+    return id;
+  }
+  if (nb::isinstance<Material>(material)) {
+    return nb::cast<Material>(material).id;
+  }
+  throw nb::type_error("material must be an int or a Material object");
+}
+
 #endif  // MATERIALS_H

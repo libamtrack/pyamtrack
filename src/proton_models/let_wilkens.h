@@ -16,6 +16,7 @@ enum class Averaging {
 };
 
 nb::object let_wilkens(nb::object depth_cm, nb::object material, double energy_MeV,
-                       double energy_spread_fraction, nb::object averaging = nb::cast(std::string("dose")));
+                       double energy_spread_fraction, nb::object averaging = nb::cast(std::string("dose"))
+                       );
 
 #endif  // LET_WILKENS_H

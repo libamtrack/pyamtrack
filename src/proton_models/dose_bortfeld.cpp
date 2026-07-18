@@ -12,26 +12,6 @@ extern "C" {
 #include "AT_ProtonAnalyticalModels.h"  // adjust to the correct header providing AT_dose_Bortfeld_Gy_*
 }
 
-using ids_getter = std::function<int(const nb::object&)>;
-
-static nb::object get_id(const nb::object& object, const ids_getter& getter) {
-  if (nb::isinstance<nb::list>(object)) {
-    auto list = nb::cast<nb::list>(object);
-    nb::list id;
-    for (int i = 0; i < nb::len(list); i++) {
-      id.append(getter(nb::cast(list[i])));
-    }
-    return nb::cast(id);
-  } else if (check_int_dtype(object)) {
-    return object;  // int numpy array stays as-is
-  } else if (nb::isinstance<nb::ndarray<>>(object)) {
-    throw nb::type_error("numpy arrays of type other than int unsupported");
-  } else {
-    int id = getter(object);
-    return nb::cast(id);
-  }
-}
-
 nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, const nb::object& E_MeV,
                          const nb::object& sigma_E_fraction, const nb::object& material, const nb::object& eps,
                          bool cartesian_product) {
@@ -40,10 +20,7 @@ nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, 
   arguments_vector.push_back(fluence_cm2);
   arguments_vector.push_back(E_MeV);
   arguments_vector.push_back(sigma_E_fraction);
-
-  // normalize material into int IDs (scalar/list/int ndarray supported)
-  arguments_vector.push_back(get_id(material, process_material));
-
+  arguments_vector.push_back(nb::cast(get_material_id(material)));
   arguments_vector.push_back(eps);
 
   auto dose_bortfeld_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
