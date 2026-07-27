@@ -13,8 +13,8 @@ namespace nb = nanobind;
 NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
-  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_fraction"), nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false,
+  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
+        nb::arg("sigma_E_fraction"),
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
 
