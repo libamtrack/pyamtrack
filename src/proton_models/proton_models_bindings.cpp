@@ -61,7 +61,7 @@ NB_MODULE(proton_models, m) {
 
   m.def("let_wilkens", &let_wilkens,
         nb::arg("depth_cm"), nb::arg("material") = 1, nb::arg("energy_MeV"), nb::arg("energy_spread_fraction") = 0.01,
-        nb::arg("averaging") = "dose",
+        nb::arg("averaging") = "dose", nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute LET at depth for proton beams using the analytical model of Wilkens & Oelfke (2003).
 
@@ -70,19 +70,21 @@ NB_MODULE(proton_models, m) {
 
         Parameters
         ----------
-        depth_cm : float, list[float], or numpy.ndarray
+        depth_cm : float or array_like
             Depth(s) in medium [cm]. Must be >= 0; negative values have no physical
             meaning (the beam does not exist before the material surface).
+            Can be a float, a Python list, or a NumPy array.
         material : int or Material
             Material ID in range [1, 24], or a pyamtrack.materials.Material object.
-            Use 1 for liquid water.
-        energy_MeV : float
+            Use 1 for liquid water. Default: 1 (liquid water).
+        energy_MeV : float or array_like
             Initial kinetic energy of the proton beam [MeV]. Must be in [0.1, 10000.0].
-        energy_spread_fraction : float
+            Can be a float, a Python list, or a NumPy array.
+        energy_spread_fraction : float or array_like
             Energy spread (standard deviation) expressed as a fraction of energy_MeV.
             Must be in (0, 1). For example, 0.01 means a 1% energy spread.
             Internally converted to sigma_E = energy_spread_fraction * energy_MeV before
-            calling libamtrack.
+            calling libamtrack. Can be a float, a Python list, or a NumPy array.
         averaging : str, optional
             LET averaging convention:
               - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution.
@@ -90,10 +92,13 @@ NB_MODULE(proton_models, m) {
               - "track" : track-averaged LET (LET_t) — plain fluence-weighted mean of stopping power.
                           Calls AT_LET_t_Wilkens_keV_um.
             Default: "dose".
+        cartesian_product : bool, optional
+            If True, compute all combinations of iterable/array arguments (cartesian product).
+            If False, compute elementwise. Default: False.
 
         Returns
         -------
-        float or list[float]
+        float or numpy.ndarray
             LET [keV/µm] at the specified depth(s). LET_d >= LET_t always; the difference
             grows near the Bragg peak.
 
