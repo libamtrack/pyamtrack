@@ -80,9 +80,41 @@ NB_MODULE(materials, m) {
             list[str]: A list of sanitized material names.
     )pbdoc");
 
+  m.attr("valid_material_ids") = []() {
+    vector<long> ids = get_ids();
+    std::set<long> valid_ids(ids.begin(), ids.end());
+    return valid_ids;
+  }
   // Dynamically expose materials as attributes of the module
   auto names = get_names();
-  for (size_t i = 0; i < names.size(); ++i) {
-    m.attr(names[i].c_str()) = Material(static_cast<long>(i + 1));
+  for (long i : get_ids()) { 
+    Material temp = Material(static_cast<long>(i));
+    m.attr(temp.name().c_str()) = temp;
+  }
+
+  bool validate_material_argument(nb::object argument) {
+    if (nb::isinstance<Material>(argument)) {
+      return true;
+    } else if (nb::isinstance<nb::int_>(argument)) {
+      long id = nb::cast<long>(argument);
+      return valid_material_ids.contains(id);
+    } else if (nb::isinstance<nb::list>(argument)) {
+      nb::list arg_list = nb::cast<nb::list>(argument);
+      for (size_t i = 0; i < arg_list.size(); ++i) {
+        if (!validate_material_argument(arg_list[i])) {
+          return false;
+        }
+      }
+      return true;
+    } else if (nb::isinstance<nb::array>(argument)) {
+      nb::array arg_array = nb::cast<nb::array>(argument);
+      for (size_t i = 0; i < arg_array.size(); ++i) {
+        if (!validate_material_argument(arg_array[i])) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return false;
   }
 }
