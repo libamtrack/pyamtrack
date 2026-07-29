@@ -9,7 +9,7 @@
 #include "../wrapper/multi_argument.h"
 
 extern "C" {
-#include "AT_ProtonAnalyticalModels.h"  // adjust to the correct header providing AT_dose_Bortfeld_Gy_*
+#include "AT_ProtonAnalyticalModels.h"
 }
 
 nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, const nb::object& E_MeV,

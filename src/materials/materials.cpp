@@ -38,12 +38,9 @@ std::vector<std::string> get_long_names() {
 
 std::string to_name(const std::string& name) {
   std::string result = name;
-  // Replace all spaces with underscores
   std::replace(result.begin(), result.end(), ' ', '_');
-  // Remove all non-alphanumeric characters
   result.erase(std::remove_if(result.begin(), result.end(), [](char c) { return !std::isalnum(c) && c != '_'; }),
                result.end());
-  // Convert to lowercase
   std::transform(result.begin(), result.end(), result.begin(), [](unsigned char c) { return std::tolower(c); });
   return result;
 }
