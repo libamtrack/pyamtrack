@@ -29,9 +29,11 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& material, c
     throw nb::type_error("averaging must be an Averaging enum value or a string");
   }
 
+  validate_material_argument(material);
+
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(depth_cm);
-  arguments_vector.push_back(nb::cast(get_material_id(material)));
+  arguments_vector.push_back(parse_material_argument(material));
   arguments_vector.push_back(energy_MeV);
   arguments_vector.push_back(energy_spread_fraction);
 
@@ -48,8 +50,6 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& material, c
     if (depth < 0.0)
       throw std::invalid_argument("depth_cm must be >= 0. Negative depth has no physical meaning: got " +
                                   std::to_string(depth));
-    if (mat_id < 1 || mat_id > 24)
-      throw std::invalid_argument("material ID must be in [1, 24], got: " + std::to_string(mat_id));
     if (E < 0.1 || E > 10000.0)
       throw std::invalid_argument("energy_MeV must in range [0.1, 10000.0], got: " + std::to_string(E));
     if (spread_frac <= 0.0 || spread_frac >= 1.0)

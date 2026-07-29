@@ -15,12 +15,14 @@ extern "C" {
 nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, const nb::object& E_MeV,
                          const nb::object& sigma_E_fraction, const nb::object& material, const nb::object& eps,
                          bool cartesian_product) {
+  validate_material_argument(material);
+
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(z_cm);
   arguments_vector.push_back(fluence_cm2);
   arguments_vector.push_back(E_MeV);
   arguments_vector.push_back(sigma_E_fraction);
-  arguments_vector.push_back(nb::cast(get_material_id(material)));
+  arguments_vector.push_back(parse_material_argument(material));
   arguments_vector.push_back(eps);
 
   auto dose_bortfeld_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
@@ -43,8 +45,6 @@ nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, 
       throw std::invalid_argument("sigma_E_fraction must be in (0, 1), got: " + std::to_string(sigma_frac));
     if (eps_val < 0.0 || eps_val >= 1.0)
       throw std::invalid_argument("eps must be in [0, 1), got: " + std::to_string(eps_val));
-    if (mat_id < 1 || mat_id > 24)
-      throw std::invalid_argument("material ID must be in [1, 24], got: " + std::to_string(mat_id));
 
     const double sigma_E_MeV = sigma_frac * E;
 

@@ -13,8 +13,9 @@ namespace nb = nanobind;
 NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
-  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_fraction"),
+  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
+        nb::arg("sigma_E_fraction"), nb::arg("material") = 1, nb::arg("eps") = 0.03,
+        nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
 
@@ -60,8 +61,8 @@ NB_MODULE(proton_models, m) {
       )pbdoc");
 
   m.def("let_wilkens", &let_wilkens,
-        nb::arg("depth_cm"), nb::arg("material") = 1, nb::arg("energy_MeV"), nb::arg("energy_spread_fraction") = 0.01,
-        nb::arg("averaging") = "dose", nb::arg("cartesian_product") = false,
+        nb::arg("material") = 1,  nb::arg("energy_spread_fraction") = 0.01, nb::arg("cartesian_product") = false, 
+        nb::arg("depth_cm"), nb::arg("energy_MeV"), nb::arg("averaging") = "dose",
         R"pbdoc(
         Compute LET at depth for proton beams using the analytical model of Wilkens & Oelfke (2003).
 

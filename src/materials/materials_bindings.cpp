@@ -1,8 +1,9 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/set.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-#include <iostream>
+#include <set>
 
 #include "AT_DataMaterial.h"
 #include "materials.h"
@@ -81,40 +82,16 @@ NB_MODULE(materials, m) {
     )pbdoc");
 
   m.attr("valid_material_ids") = []() {
-    vector<long> ids = get_ids();
+    std::vector<long> ids = get_ids();
     std::set<long> valid_ids(ids.begin(), ids.end());
     return valid_ids;
-  }
+  }();
+
   // Dynamically expose materials as attributes of the module
   auto names = get_names();
-  for (long i : get_ids()) { 
-    Material temp = Material(static_cast<long>(i));
-    m.attr(temp.name().c_str()) = temp;
-  }
-
-  bool validate_material_argument(nb::object argument) {
-    if (nb::isinstance<Material>(argument)) {
-      return true;
-    } else if (nb::isinstance<nb::int_>(argument)) {
-      long id = nb::cast<long>(argument);
-      return valid_material_ids.contains(id);
-    } else if (nb::isinstance<nb::list>(argument)) {
-      nb::list arg_list = nb::cast<nb::list>(argument);
-      for (size_t i = 0; i < arg_list.size(); ++i) {
-        if (!validate_material_argument(arg_list[i])) {
-          return false;
-        }
-      }
-      return true;
-    } else if (nb::isinstance<nb::array>(argument)) {
-      nb::array arg_array = nb::cast<nb::array>(argument);
-      for (size_t i = 0; i < arg_array.size(); ++i) {
-        if (!validate_material_argument(arg_array[i])) {
-          return false;
-        }
-      }
-      return true;
-    }
-    return false;
+  auto ids = get_ids();
+  for (size_t i = 0; i < ids.size(); ++i) {
+    Material temp(ids[i]);
+    m.attr(names[i].c_str()) = temp;
   }
 }

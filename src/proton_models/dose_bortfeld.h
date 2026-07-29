@@ -3,7 +3,7 @@
 
 #include <nanobind/nanobind.h>
 
-#include "../materials/materials.h"  // for process_material
+#include "../materials/materials.h"  // for validate_material_argument, parse_material_argument
 
 namespace nb = nanobind;
 

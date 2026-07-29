@@ -5,7 +5,7 @@
 
 #include <string>
 
-#include "../materials/materials.h"  // for get_material_id
+#include "../materials/materials.h"  // for validate_material_argument, parse_material_argument
 
 namespace nb = nanobind;
 
