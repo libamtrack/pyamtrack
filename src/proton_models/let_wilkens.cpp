@@ -11,9 +11,9 @@ extern "C" {
 #include "AT_ProtonAnalyticalModels.h"
 }
 
-nb::object let_wilkens(const nb::object& depth_cm, const nb::object& material, const nb::object& energy_MeV,
-                       const nb::object& energy_spread_fraction, const nb::object& averaging,
-                       bool cartesian_product) {
+nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
+                       const nb::object& energy_spread_fraction, const nb::object& material,
+                       const nb::object& averaging, bool cartesian_product) {
   bool dose_averaged;
   if (nb::isinstance<Averaging>(averaging)) {
     dose_averaged = (nb::cast<Averaging>(averaging) == Averaging::Dose);
@@ -33,19 +33,19 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& material, c
 
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(depth_cm);
-  arguments_vector.push_back(parse_material_argument(material));
   arguments_vector.push_back(energy_MeV);
   arguments_vector.push_back(energy_spread_fraction);
+  arguments_vector.push_back(parse_material_argument(material));
 
   auto let_wilkens_vector = [dose_averaged](const std::vector<std::variant<double, int>>& vec) -> double {
     if (vec.size() < 4) {
       throw std::invalid_argument("Input vector must have at least four elements.");
     }
 
-    double depth       = variant_cast<double>(vec[0]);
-    int    mat_id      = variant_cast<int>(vec[1]);
-    double E           = variant_cast<double>(vec[2]);
-    double spread_frac = variant_cast<double>(vec[3]);
+    double depth = variant_cast<double>(vec[0]);
+    double E = variant_cast<double>(vec[1]);
+    double spread_frac = variant_cast<double>(vec[2]);
+    int mat_id = variant_cast<int>(vec[3]);
 
     if (depth < 0.0)
       throw std::invalid_argument("depth_cm must be >= 0. Negative depth has no physical meaning: got " +

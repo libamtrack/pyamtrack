@@ -9,10 +9,7 @@
 
 namespace nb = nanobind;
 
-enum class Averaging {
-    Dose,
-    Track
-};
+enum class Averaging { Dose, Track };
 
 /**
  * Compute proton LET at depth using the Wilkens & Oelfke analytical model.
@@ -22,16 +19,16 @@ enum class Averaging {
  *
  * Parameters correspond to libamtrack:
  * - depth_cm: depth [cm], must be >= 0
- * - material: int material_no in [1, 24] OR pyamtrack.materials.Material object
  * - energy_MeV: initial energy [MeV], must be in [0.1, 10000.0]
  * - energy_spread_fraction: energy spread as fraction of energy_MeV (dimensionless), must be in (0, 1);
  *                           internally converted to sigma_E_MeV = energy_spread_fraction * energy_MeV
+ * - material: int material_no OR pyamtrack.materials.Material object, or a list / array of either
  * - averaging: "dose"/Averaging::Dose for LET_d, "track"/Averaging::Track for LET_t
  * - cartesian_product: if true compute full cartesian product across iterable/array args
  */
-nb::object let_wilkens(const nb::object& depth_cm, const nb::object& material, const nb::object& energy_MeV,
-                       const nb::object& energy_spread_fraction,
-                       const nb::object& averaging = nb::cast(std::string("dose")),
-                       bool cartesian_product = false);
+nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
+                       const nb::object& energy_spread_fraction = nb::float_(0.01),
+                       const nb::object& material = nb::int_(1),
+                       const nb::object& averaging = nb::cast(std::string("dose")), bool cartesian_product = false);
 
 #endif  // LET_WILKENS_H

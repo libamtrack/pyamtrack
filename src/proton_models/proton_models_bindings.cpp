@@ -1,9 +1,7 @@
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/string.h>
 #include <nanobind/stl/map.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-
 
 #include "dose_bortfeld.h"
 #include "let_wilkens.h"
@@ -36,8 +34,8 @@ NB_MODULE(proton_models, m) {
             For example, 0.01 means a 1% energy spread. Internally converted to
             sigma_E_MeV = sigma_E_fraction * E_MeV before calling libamtrack.
         material : int, Material, list[int | Material], or numpy int array, optional
-            Material ID in range [1, 24], or a pyamtrack.materials.Material object.
-            Default: 1 (liquid water).
+            Any material ID listed in pyamtrack.materials.valid_material_ids, or a
+            pyamtrack.materials.Material object. Default: 1 (liquid water).
         eps : float or array_like, optional
             Fraction of primary fluence contributing to the nuclear interaction tail. Must be
             in [0, 1). Default: 0.03.
@@ -57,12 +55,12 @@ NB_MODULE(proton_models, m) {
             are unsupported types.
         ValueError
             If z_cm < 0, E_MeV outside [0.1, 10000.0], sigma_E_fraction outside (0, 1),
-            eps outside [0, 1), or material ID outside [1, 24].
+            eps outside [0, 1), or a material ID is not a known material.
       )pbdoc");
 
-  m.def("let_wilkens", &let_wilkens,
-        nb::arg("material") = 1,  nb::arg("energy_spread_fraction") = 0.01, nb::arg("cartesian_product") = false, 
-        nb::arg("depth_cm"), nb::arg("energy_MeV"), nb::arg("averaging") = "dose",
+  m.def("let_wilkens", &let_wilkens, nb::arg("depth_cm"), nb::arg("energy_MeV"),
+        nb::arg("energy_spread_fraction") = 0.01, nb::arg("material") = 1, nb::arg("averaging") = "dose",
+        nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute LET at depth for proton beams using the analytical model of Wilkens & Oelfke (2003).
 
@@ -75,23 +73,25 @@ NB_MODULE(proton_models, m) {
             Depth(s) in medium [cm]. Must be >= 0; negative values have no physical
             meaning (the beam does not exist before the material surface).
             Can be a float, a Python list, or a NumPy array.
-        material : int or Material
-            Material ID in range [1, 24], or a pyamtrack.materials.Material object.
-            Use 1 for liquid water. Default: 1 (liquid water).
         energy_MeV : float or array_like
             Initial kinetic energy of the proton beam [MeV]. Must be in [0.1, 10000.0].
             Can be a float, a Python list, or a NumPy array.
-        energy_spread_fraction : float or array_like
+        energy_spread_fraction : float or array_like, optional
             Energy spread (standard deviation) expressed as a fraction of energy_MeV.
             Must be in (0, 1). For example, 0.01 means a 1% energy spread.
             Internally converted to sigma_E = energy_spread_fraction * energy_MeV before
             calling libamtrack. Can be a float, a Python list, or a NumPy array.
-        averaging : str, optional
+            Default: 0.01.
+        material : int, Material, list[int | Material], or numpy int array, optional
+            Any material ID listed in pyamtrack.materials.valid_material_ids, or a
+            pyamtrack.materials.Material object. Default: 1 (liquid water).
+        averaging : str or Averaging, optional
             LET averaging convention:
               - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution.
                           Standard choice for RBE calculations. Calls AT_LET_d_Wilkens_keV_um.
               - "track" : track-averaged LET (LET_t) — plain fluence-weighted mean of stopping power.
                           Calls AT_LET_t_Wilkens_keV_um.
+            The Averaging.DOSE / Averaging.TRACK enum members are accepted as well.
             Default: "dose".
         cartesian_product : bool, optional
             If True, compute all combinations of iterable/array arguments (cartesian product).
@@ -108,13 +108,10 @@ NB_MODULE(proton_models, m) {
         ValueError
             If averaging is not "dose" or "track", or any depth_cm value is < 0,
             or energy_MeV is outside [0.1, 10000.0], or energy_spread_fraction is
-            outside (0, 1), or material ID is outside [1, 24].
+            outside (0, 1), or a material ID is not a known material.
         TypeError
             If depth_cm is not a float, list, or NumPy array, or material is not
-            an int or Material object.
+            an int, Material, list, or NumPy array.
       )pbdoc");
-  nb::enum_<Averaging>(m, "Averaging")
-    .value("DOSE",  Averaging::Dose)
-    .value("TRACK", Averaging::Track)
-    .export_values();
+  nb::enum_<Averaging>(m, "Averaging").value("DOSE", Averaging::Dose).value("TRACK", Averaging::Track).export_values();
 }

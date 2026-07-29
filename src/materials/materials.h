@@ -181,8 +181,7 @@ inline void validate_material_argument(const nb::object& argument) {
   } else if (nb::isinstance<nb::int_>(argument)) {
     id = nb::cast<long>(argument);
   } else {
-    throw nb::type_error(
-        "material must be an int, a Material, or a list / NumPy array of either");
+    throw nb::type_error("material must be an int, a Material, or a list / NumPy array of either");
   }
 
   if (id < 1 || AT_material_index_from_material_number(id) < 0) {
