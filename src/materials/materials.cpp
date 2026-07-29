@@ -5,7 +5,7 @@
 
 Material::Material(long id) : id(id) {
   auto material_index = AT_material_index_from_material_number(id);
-  if (material_index < 0) {
+  if (material_index < 1) {
     throw std::invalid_argument("Material not found: " + std::to_string(id));
   }
   AT_get_material_data(id, &density_g_cm3, &I_eV, &alpha_g_cm2_MeV, &p_MeV, &m_g_cm2, &average_A, &average_Z);

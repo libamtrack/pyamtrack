@@ -11,8 +11,8 @@ namespace nb = nanobind;
 NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
-  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_fraction"), nb::arg("material") = 1, nb::arg("eps") = 0.03,
+  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("depth_cm"), nb::arg("fluence_cm2"), nb::arg("energy_MeV"),
+        nb::arg("energy_spread_fraction") = 0.01, nb::arg("material") = 1, nb::arg("eps") = 0.03,
         nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
@@ -22,17 +22,17 @@ NB_MODULE(proton_models, m) {
 
         Parameters
         ----------
-        z_cm : float or array_like
+        depth_cm : float or array_like
             Depth in medium [cm]. Must be >= 0. Can be a float, a Python list, or a NumPy array.
         fluence_cm2 : float or array_like
             Proton fluence [1/cm^2]. Can be a float, a Python list, or a NumPy array.
-        E_MeV : float or array_like
+        energy_MeV : float or array_like
             Initial kinetic energy [MeV]. Must be in [0.1, 10000.0].
             Can be a float, a Python list, or a NumPy array.
-        sigma_E_fraction : float or array_like
-            Energy spread (standard deviation) expressed as a fraction of E_MeV. Must be in (0, 1).
+        energy_spread_fraction : float or array_like
+            Energy spread (standard deviation) expressed as a fraction of energy_MeV. Must be in (0, 1).
             For example, 0.01 means a 1% energy spread. Internally converted to
-            sigma_E_MeV = sigma_E_fraction * E_MeV before calling libamtrack.
+            sigma_E_MeV = energy_spread_fraction * E_MeV before calling libamtrack.
         material : int, Material, list[int | Material], or numpy int array, optional
             Any material ID listed in pyamtrack.materials.valid_material_ids, or a
             pyamtrack.materials.Material object. Default: 1 (liquid water).
@@ -113,5 +113,6 @@ NB_MODULE(proton_models, m) {
             If depth_cm is not a float, list, or NumPy array, or material is not
             an int, Material, list, or NumPy array.
       )pbdoc");
+	// enum constucted by chaining
   nb::enum_<Averaging>(m, "Averaging").value("DOSE", Averaging::Dose).value("TRACK", Averaging::Track).export_values();
 }
