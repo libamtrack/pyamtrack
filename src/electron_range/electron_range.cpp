@@ -14,15 +14,15 @@ using ids_getter = std::function<int(const nb::object&)>;
 
 std::vector<std::string> get_models() {
   std::vector<std::string> names;
-  for (const auto& [name, id] : STOPPING_MODELS) {
+  for (const auto& [name, id] : ELECTRON_RANGE_MODELS) {
     names.push_back(name);
   }
   return names;
 }
 
 int get_model_id(const std::string& model_name) {
-  auto it = STOPPING_MODELS.find(model_name);
-  if (it == STOPPING_MODELS.end()) {
+  auto it = ELECTRON_RANGE_MODELS.find(model_name);
+  if (it == ELECTRON_RANGE_MODELS.end()) {
     throw std::runtime_error("Unknown model name: " + model_name);
   }
   return it->second;
@@ -63,8 +63,8 @@ nb::object get_id(const nb::object& object, const ids_getter& getter) {
   }
 }
 
-nb::object electron_range(const nb::object& energy_MeV, const nb::object& material, const nb::object& model,
-                          const bool cartesian_product) {
+nb::object max_range(const nb::object& energy_MeV, const nb::object& material, const nb::object& model,
+                     const bool cartesian_product) {
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(energy_MeV);
   arguments_vector.push_back(get_id(material, process_material));  // unifying materials to int

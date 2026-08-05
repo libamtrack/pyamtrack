@@ -3,7 +3,7 @@ from typing import Tuple, Union
 import numpy as np
 import pytest
 
-from pyamtrack.stopping import electron_range
+from pyamtrack.electron_range import max_range as electron_range
 
 Shape = Union[int, tuple[int, ...]]
 
