@@ -13,8 +13,9 @@ namespace nb = nanobind;
 NB_MODULE(proton_models, m) {
   m.doc() = "Analytical proton beam models (e.g., Bragg curve approximations, LET, RBE).";
 
-  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("fluence_cm2"), nb::arg("E_MeV"),
-        nb::arg("sigma_E_fraction"), nb::arg("material") = 1, nb::arg("eps") = 0.03, nb::arg("cartesian_product") = false,
+  m.def("dose_bortfeld", &dose_bortfeld, nb::arg("z_cm"), nb::arg("entrance_dose_Gy"), nb::arg("E_MeV"),
+        nb::arg("sigma_E_fraction") = 0.01, nb::arg("material") = 1, nb::arg("eps") = 0.03,
+        nb::arg("cartesian_product") = false,
         R"pbdoc(
         Compute dose at depth for proton beams using the analytical model of Bortfeld (1997).
 
@@ -25,8 +26,8 @@ NB_MODULE(proton_models, m) {
         ----------
         z_cm : float or array_like
             Depth in medium [cm]. Must be >= 0. Can be a float, a Python list, or a NumPy array.
-        fluence_cm2 : float or array_like
-            Proton fluence [1/cm^2]. Can be a float, a Python list, or a NumPy array.
+        entrance_dose_Gy : float or array_like
+            Entrance dose [Gy]. Can be a float, a Python list, or a NumPy array.
         E_MeV : float or array_like
             Initial kinetic energy [MeV]. Must be in [0.1, 10000.0].
             Can be a float, a Python list, or a NumPy array.
