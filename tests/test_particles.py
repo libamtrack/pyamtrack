@@ -3,107 +3,155 @@ import pytest
 import pyamtrack
 
 
-def test_particle_initialization_by_id():
-    particle = pyamtrack.particles.Particle(6)  # Carbon
-    assert particle.id == 6
-    assert particle.element_name == "Carbon"
-    assert particle.element_acronym == "C"
-    assert particle.Z == 6
-    assert particle.atomic_weight > 0
-    assert particle.density_g_cm3 > 0
-    assert particle.I_eV_per_Z > 0
+particles = pyamtrack.particles
 
 
-def test_particle_initialization_by_acronym():
-    particle = pyamtrack.particles.Particle("He")  # Helium
-    assert particle.id == 2
-    assert particle.element_name == "Helium"
-    assert particle.element_acronym == "He"
-    assert particle.Z == 2
-    assert particle.atomic_weight > 0
-    assert particle.density_g_cm3 > 0
-    assert particle.I_eV_per_Z > 0
+def assert_carbon_12(ion):
+    assert isinstance(ion, particles.ions.Ion)
+    assert ion.id == 6
+    assert ion.Z == 6
+    assert ion.A == 12
+    assert ion.element_name == "Carbon"
+    assert ion.element_acronym == "C"
+    assert ion.atomic_weight > 0
 
 
-def test_particle_from_number():
-    particle = pyamtrack.particles.Particle.from_number(6012)  # Carbon-12
-    assert particle.Z == 6
-    assert particle.A == 12
-    assert particle.element_name == "Carbon"
-    assert particle.element_acronym == "C"
+def test_from_string_acronym_uses_default_isotope():
+    ion = particles.from_string("C")
+
+    assert_carbon_12(ion)
 
 
-def test_particle_initialization_by_id_and_acronym():
-    p1 = pyamtrack.particles.Particle.from_number(6012)
-    p2 = pyamtrack.particles.Particle.from_number(6012)
-    assert p1.Z == p2.Z == 6
-    assert p1.A == p2.A == 12
-    assert p1.element_name == p2.element_name == "Carbon"
+def test_from_string_isotope_prefix_notation():
+    ion = particles.from_string("14C")
+
+    assert isinstance(ion, particles.ions.Ion)
+    assert ion.id == 6
+    assert ion.Z == 6
+    assert ion.A == 14
+    assert ion.element_name == "Carbon"
+    assert ion.element_acronym == "C"
 
 
-def test_particle_initialization_by_invalid_id():
+def test_from_string_isotope_suffix_notation():
+    ion = particles.from_string("C-12")
+
+    assert_carbon_12(ion)
+
+
+def test_from_string_invalid_symbol():
     with pytest.raises(ValueError):
-        pyamtrack.particles.Particle(9999)  # Invalid id
+        particles.from_string("Xyz123")
 
 
-def test_particle_initialization_by_invalid_acronym():
+def test_from_string_invalid_mass_number():
     with pytest.raises(ValueError):
-        pyamtrack.particles.Particle("Invalid acronym")  # Invalid acronym
+        particles.from_string("99C")
 
 
-def test_particle_from_number_invalid():
+def test_from_string_elementary_particles():
+    neutron = particles.from_string("neutron")
+    electron = particles.from_string("electron")
+
+    assert isinstance(neutron, particles.Particle)
+    assert not isinstance(neutron, particles.ions.Ion)
+    assert neutron.element_name == "neutron"
+    assert neutron.element_acronym == "n"
+
+    assert isinstance(electron, particles.Particle)
+    assert not isinstance(electron, particles.ions.Ion)
+    assert electron.element_name == "electron"
+    assert electron.element_acronym == "e"
+
+
+def test_from_ZA():
+    ion = particles.from_ZA(6, 12)
+
+    assert_carbon_12(ion)
+
+
+def test_from_ZA_invalid_atomic_number():
     with pytest.raises(ValueError):
-        pyamtrack.particles.Particle.from_number(999999)  # Nonexistent particle
+        particles.from_ZA(999, 12)
 
 
-def test_particle_from_string_acronym():
-    particle = pyamtrack.particles.Particle.from_string("He")
-    assert particle.id == 2
-    assert particle.Z == 2
-    assert particle.element_name == "Helium"
-    assert particle.element_acronym == "He"
-    assert particle.A is None  # No mass number parsed
+def test_from_pdg_ion():
+    ion = particles.from_pdg(1000060120)
+
+    assert_carbon_12(ion)
 
 
-def test_particle_from_string_isotope():
-    particle = pyamtrack.particles.Particle.from_string("14C")
-    assert particle.id == 6
-    assert particle.Z == 6
-    assert particle.A == 14
-    assert particle.element_name == "Carbon"
-    assert particle.element_acronym == "C"
+def test_from_pdg_elementary_particles():
+    neutron = particles.from_pdg(2112)
+    electron = particles.from_pdg(11)
+
+    assert isinstance(neutron, particles.Particle)
+    assert not isinstance(neutron, particles.ions.Ion)
+    assert neutron.element_name == "neutron"
+
+    assert isinstance(electron, particles.Particle)
+    assert not isinstance(electron, particles.ions.Ion)
+    assert electron.element_name == "electron"
 
 
-def test_particle_from_string_invalid():
+def test_particle_constructor_accepts_elementary_pdg():
+    neutron = particles.Particle(2112)
+
+    assert isinstance(neutron, particles.Particle)
+    assert not isinstance(neutron, particles.ions.Ion)
+    assert neutron.element_name == "neutron"
+
+
+def test_particle_constructor_rejects_ion_pdg():
     with pytest.raises(ValueError):
-        pyamtrack.particles.Particle.from_string("Xyz123")
+        particles.Particle(1000060120)
+
+
+def test_ion_constructor_accepts_ion_pdg():
+    ion = particles.ions.Ion(1000060120)
+
+    assert_carbon_12(ion)
+
+
+def test_ion_constructor_rejects_elementary_pdg():
+    with pytest.raises(ValueError):
+        particles.ions.Ion(2112)
 
 
 def test_get_names():
-    names = pyamtrack.particles.get_names()
+    names = particles.get_names()
+
     assert isinstance(names, list)
     assert len(names) > 0
     assert all(isinstance(name, str) for name in names)
-    assert names[0] == "Hydrogen"  # Check the first name
+    assert names[0] == "Hydrogen"
 
 
 def test_get_acronyms():
-    names = pyamtrack.particles.get_acronyms()
-    assert isinstance(names, list)
-    assert len(names) > 0
-    assert all(isinstance(name, str) for name in names)
-    assert names[0] == "H"  # Check the first name
+    acronyms = particles.get_acronyms()
+
+    assert isinstance(acronyms, list)
+    assert len(acronyms) > 0
+    assert all(isinstance(acronym, str) for acronym in acronyms)
+    assert acronyms[0] == "H"
 
 
-def test_via_name_object():
-    particle = pyamtrack.particles.Carbon
-    assert particle.id == 6
-    assert particle.element_name == "Carbon"
-    assert particle.element_acronym == "C"
+def test_via_acronym_module_attribute():
+    ion = particles.He
+
+    assert isinstance(ion, particles.ions.Ion)
+    assert ion.id == 2
+    assert ion.Z == 2
+    assert ion.element_name == "Helium"
+    assert ion.element_acronym == "He"
 
 
-def test_via_acronym_object():
-    particle = pyamtrack.particles.He
-    assert particle.id == 2
-    assert particle.element_name == "Helium"
-    assert particle.element_acronym == "He"
+def test_proton_module_attribute():
+    proton = particles.proton
+
+    assert isinstance(proton, particles.ions.Ion)
+    assert proton.id == 1
+    assert proton.Z == 1
+    assert proton.A == 1
+    assert proton.element_name == "Hydrogen"
+    assert proton.element_acronym == "H"
