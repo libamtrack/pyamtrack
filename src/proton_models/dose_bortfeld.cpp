@@ -12,16 +12,16 @@ extern "C" {
 #include "AT_ProtonAnalyticalModels.h"
 }
 
-nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, const nb::object& E_MeV,
-                         const nb::object& sigma_E_fraction, const nb::object& material, const nb::object& eps,
+nb::object dose_bortfeld(const nb::object& depth_cm, const nb::object& fluence_cm2, const nb::object& energy_MeV,
+                         const nb::object& energy_spread_fraction, const nb::object& material, const nb::object& eps,
                          bool cartesian_product) {
   validate_material_argument(material);
 
   std::vector<nb::object> arguments_vector;
-  arguments_vector.push_back(z_cm);
+  arguments_vector.push_back(depth_cm);
   arguments_vector.push_back(fluence_cm2);
-  arguments_vector.push_back(E_MeV);
-  arguments_vector.push_back(sigma_E_fraction);
+  arguments_vector.push_back(energy_MeV);
+  arguments_vector.push_back(energy_spread_fraction);
   arguments_vector.push_back(parse_material_argument(material));
   arguments_vector.push_back(eps);
 
