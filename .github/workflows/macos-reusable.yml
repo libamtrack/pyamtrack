@@ -17,14 +17,14 @@ jobs:
     outputs:
       macos_status: ${{ job.status }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
       - name: Install system packages
         run: brew install gsl
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 

@@ -15,14 +15,14 @@ jobs:
     outputs:
       linux_status: ${{ job.status }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
       - name: Install system packages
         run: sudo apt-get install -y --no-install-recommends libgsl-dev
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 
@@ -64,14 +64,14 @@ jobs:
   run_build_script:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Install system packages
         run: sudo apt-get install -y --no-install-recommends libgsl-dev
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.x"
 
