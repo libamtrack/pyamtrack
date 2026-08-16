@@ -1,4 +1,4 @@
-build==1.4.0
+build==1.4.4
 cmake==4.3.2
 ninja==1.13.0
 numpy==2.2.4
@@ -7,4 +7,4 @@ scikit_build_core==0.11.6
 setuptools-scm==9.2.2
 pytest==8.4.2
 pre-commit==4.3.0
-clang-format==22.1.3
+clang-format==22.1.5
