@@ -35,19 +35,18 @@ nb::object dose_bortfeld(const nb::object& depth_cm, const nb::object& fluence_c
     double energy_MeV_ = variant_cast<double>(vec[2]);
     double energy_spread_fraction_ = variant_cast<double>(vec[3]);
     int material_id = variant_cast<int>(vec[4]);
-    double eps_val = variant_cast<double>(vec[5]);
+    double eps_ = variant_cast<double>(vec[5]);
 
     if (depth_cm_ < 0.0) throw std::invalid_argument("depth_cm must be >= 0, got: " + std::to_string(depth_cm_));
     if (energy_MeV_ < 0.1 || energy_MeV_ > 10000.0)
       throw std::invalid_argument("energy_MeV must be in [0.1, 10000.0], got: " + std::to_string(energy_MeV_));
-    if (sigma_frac <= 0.0 || sigma_frac >= 1.0)
-      throw std::invalid_argument("sigma_E_fraction must be in (0, 1), got: " + std::to_string(sigma_frac));
-    if (eps_val < 0.0 || eps_val >= 1.0)
-      throw std::invalid_argument("eps must be in [0, 1), got: " + std::to_string(eps_val));
+    if (energy_spread_fraction_ <= 0.0 || energy_spread_fraction_ >= 1.0)
+      throw std::invalid_argument("energy_spread_fraction must be in (0, 1), got: " + std::to_string(energy_spread_fraction_));
+    if (eps_ < 0.0 || eps_ >= 1.0)
+      throw std::invalid_argument("eps must be in [0, 1), got: " + std::to_string(eps_));
 
-    const double sigma_E_MeV = sigma_frac * E;
-
-    return AT_dose_Bortfeld_Gy_single(z, fluence, E, sigma_E_MeV, (long)mat_id, eps_val);
+    const double sigma_E_MeV = energy_spread_fraction_ * energy_MeV_;
+    return AT_dose_Bortfeld_Gy_single(depth_cm_, fluence_cm2_, energy_MeV_, sigma_E_MeV, (long)material_id, eps_);
   };
 
   if (cartesian_product) return wrap_cartesian_product_function(dose_bortfeld_vector, arguments_vector);
