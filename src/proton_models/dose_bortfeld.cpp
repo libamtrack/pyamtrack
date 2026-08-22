@@ -30,16 +30,16 @@ nb::object dose_bortfeld(const nb::object& depth_cm, const nb::object& fluence_c
       throw std::invalid_argument("Input vector must have at least six elements.");
     }
 
-    double z = variant_cast<double>(vec[0]);
-    double fluence = variant_cast<double>(vec[1]);
-    double E = variant_cast<double>(vec[2]);
-    double sigma_frac = variant_cast<double>(vec[3]);
-    int mat_id = variant_cast<int>(vec[4]);
+    double depth_cm_ = variant_cast<double>(vec[0]);
+    double fluence_cm2_ = variant_cast<double>(vec[1]);
+    double energy_MeV_ = variant_cast<double>(vec[2]);
+    double energy_spread_fraction_ = variant_cast<double>(vec[3]);
+    int material_id = variant_cast<int>(vec[4]);
     double eps_val = variant_cast<double>(vec[5]);
 
-    if (z < 0.0) throw std::invalid_argument("z_cm must be >= 0, got: " + std::to_string(z));
-    if (E < 0.1 || E > 10000.0)
-      throw std::invalid_argument("E_MeV must be in [0.1, 10000.0], got: " + std::to_string(E));
+    if (depth_cm_ < 0.0) throw std::invalid_argument("depth_cm must be >= 0, got: " + std::to_string(depth_cm_));
+    if (energy_MeV_ < 0.1 || energy_MeV_ > 10000.0)
+      throw std::invalid_argument("energy_MeV must be in [0.1, 10000.0], got: " + std::to_string(energy_MeV_));
     if (sigma_frac <= 0.0 || sigma_frac >= 1.0)
       throw std::invalid_argument("sigma_E_fraction must be in (0, 1), got: " + std::to_string(sigma_frac));
     if (eps_val < 0.0 || eps_val >= 1.0)
