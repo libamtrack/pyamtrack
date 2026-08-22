@@ -100,8 +100,8 @@ NB_MODULE(proton_models, m) {
         Returns
         -------
         float or numpy.ndarray
-            LET [keV/µm] at the specified depth(s). LET_d >= LET_t always; the difference
-            grows near the Bragg peak.
+            LET [keV/µm] at the specified depth(s). LET_d is generally >= LET_t up to
+            numerical precision; the difference grows near the Bragg peak.
 
         Raises
         ------
