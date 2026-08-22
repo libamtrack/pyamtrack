@@ -113,6 +113,11 @@ def test_let_wilkens_supports_string_and_enum_averaging():
         ENERGY_MEV,
         averaging="dose",
     )
+    dose_from_uppercase_string = proton_models.let_wilkens(
+        DEPTH_CM,
+        ENERGY_MEV,
+        averaging="DOSE",
+    )
     dose_from_enum = proton_models.let_wilkens(
         DEPTH_CM,
         ENERGY_MEV,
@@ -123,6 +128,11 @@ def test_let_wilkens_supports_string_and_enum_averaging():
         ENERGY_MEV,
         averaging="track",
     )
+    track_from_uppercase_string = proton_models.let_wilkens(
+        DEPTH_CM,
+        ENERGY_MEV,
+        averaging="TRACK",
+    )
     track_from_enum = proton_models.let_wilkens(
         DEPTH_CM,
         ENERGY_MEV,
@@ -130,7 +140,9 @@ def test_let_wilkens_supports_string_and_enum_averaging():
     )
 
     assert dose_from_string == pytest.approx(dose_from_enum)
+    assert dose_from_uppercase_string == pytest.approx(dose_from_string)
     assert track_from_string == pytest.approx(track_from_enum)
+    assert track_from_uppercase_string == pytest.approx(track_from_string)
     assert dose_from_string >= track_from_string
 
 

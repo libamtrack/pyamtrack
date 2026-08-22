@@ -87,9 +87,11 @@ NB_MODULE(proton_models, m) {
             pyamtrack.materials.Material object. Default: 1 (liquid water).
         averaging : str or Averaging, optional
             LET averaging convention:
-              - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution.
+              - "dose"  : dose-averaged LET (LET_d) — weighted by dose contribution
+                          (case-insensitive).
                           Standard choice for RBE calculations. Calls AT_LET_d_Wilkens_keV_um.
-              - "track" : track-averaged LET (LET_t) — plain fluence-weighted mean of stopping power.
+              - "track" : track-averaged LET (LET_t) — plain fluence-weighted mean of stopping power
+                          (case-insensitive).
                           Calls AT_LET_t_Wilkens_keV_um.
             The Averaging.DOSE / Averaging.TRACK enum members are accepted as well.
             Default: "dose".
@@ -106,7 +108,7 @@ NB_MODULE(proton_models, m) {
         Raises
         ------
         ValueError
-            If averaging is not "dose" or "track", or any depth_cm value is < 0,
+            If averaging is not a case-insensitive "dose" or "track", or any depth_cm value is < 0,
             or energy_MeV is outside [0.1, 10000.0], or energy_spread_fraction is
             outside (0, 1), or a material ID is not a known material.
         TypeError

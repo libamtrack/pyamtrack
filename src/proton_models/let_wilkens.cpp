@@ -1,5 +1,7 @@
 #include "let_wilkens.h"
 
+#include <algorithm>
+#include <cctype>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -19,6 +21,8 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
     dose_averaged = (nb::cast<Averaging>(averaging) == Averaging::Dose);
   } else if (nb::isinstance<nb::str>(averaging)) {
     std::string avg_str = nb::cast<std::string>(averaging);
+    std::transform(avg_str.begin(), avg_str.end(), avg_str.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
     if (avg_str == "dose")
       dose_averaged = true;
     else if (avg_str == "track")
