@@ -81,12 +81,6 @@ NB_MODULE(materials, m) {
             list[str]: A list of sanitized material names.
     )pbdoc");
 
-  // m.attr("valid_material_ids") = []() {
-  //   std::vector<long> ids = get_ids();
-  //   std::set<long> valid_ids(ids.begin(), ids.end());
-  //   return valid_ids;
-  // }();
-
   // Dynamically expose materials as attributes of the module
   auto names = get_names();
   auto ids = get_ids();
