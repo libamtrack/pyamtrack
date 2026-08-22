@@ -10,8 +10,8 @@ namespace nb = nanobind;
 /**
  * Compute proton dose at depth using Bortfeld analytical model.
  *
- * Supports scalar/list/numpy array inputs for z_cm (and optionally other args if you pass arrays),
- * and supports elementwise evaluation or cartesian-product evaluation.
+ * Accepts scalar and sequence inputs for z_cm and the other arguments. By default, sequence inputs
+ * are evaluated elementwise; setting cartesian_product enables Cartesian-product evaluation.
  *
  * Parameters correspond to libamtrack:
  * - z_cm: depth [cm], must be >= 0

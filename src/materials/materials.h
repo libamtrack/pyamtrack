@@ -47,7 +47,9 @@ std::vector<std::string> get_names();
  */
 inline int process_material(const nb::object& material) {
   int material_id = 0;
-  if (nb::isinstance<nb::int_>(material)) {
+  if (PyBool_Check(material.ptr())) {
+    throw nb::type_error("Material argument must be an integer (not bool) or a pyamtrack.materials.Material object");
+  } else if (nb::isinstance<nb::int_>(material)) {
     material_id = nb::cast<int>(material);
   } else {
     try {
@@ -178,6 +180,8 @@ inline void validate_material_argument(const nb::object& argument) {
   long id;
   if (nb::isinstance<Material>(argument)) {
     id = nb::cast<Material>(argument).id;
+  } else if (PyBool_Check(argument.ptr())) {
+    throw nb::type_error("material must be an int (not bool), a Material, or a list / NumPy array of either");
   } else if (nb::isinstance<nb::int_>(argument)) {
     id = nb::cast<long>(argument);
   } else {
@@ -192,6 +196,10 @@ inline void validate_material_argument(const nb::object& argument) {
 inline nb::object parse_material_argument(const nb::object& argument) {
   if (nb::isinstance<Material>(argument)) {
     return nb::cast<long>(nb::cast<Material>(argument).id);
+  }
+
+  if (PyBool_Check(argument.ptr())) {
+    throw nb::type_error("material must be an integer (not bool), Material, list, or NumPy array");
   }
 
   if (nb::isinstance<nb::int_>(argument)) {

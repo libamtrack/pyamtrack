@@ -62,8 +62,8 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
 
     const double energy_spread_MeV = spread_frac * E;
 
-    return dose_averaged ? AT_LET_d_Wilkens_keV_um_single(depth, E, energy_spread_MeV, (long)mat_id)
-                         : AT_LET_t_Wilkens_keV_um_single(depth, E, energy_spread_MeV, (long)mat_id);
+    return dose_averaged ? AT_LET_d_Wilkens_keV_um_single(depth, E, energy_spread_MeV, static_cast<long>(mat_id))
+                         : AT_LET_t_Wilkens_keV_um_single(depth, E, energy_spread_MeV, static_cast<long>(mat_id));
   };
 
   if (cartesian_product) return wrap_cartesian_product_function(let_wilkens_vector, arguments_vector);

@@ -46,7 +46,8 @@ nb::object dose_bortfeld(const nb::object& depth_cm, const nb::object& fluence_c
       throw std::invalid_argument("eps must be in [0, 1), got: " + std::to_string(eps_));
 
     const double sigma_E_MeV = energy_spread_fraction_ * energy_MeV_;
-    return AT_dose_Bortfeld_Gy_single(depth_cm_, fluence_cm2_, energy_MeV_, sigma_E_MeV, (long)material_id, eps_);
+    return AT_dose_Bortfeld_Gy_single(depth_cm_, fluence_cm2_, energy_MeV_, sigma_E_MeV, static_cast<long>(material_id),
+                                      eps_);
   };
 
   if (cartesian_product) return wrap_cartesian_product_function(dose_bortfeld_vector, arguments_vector);

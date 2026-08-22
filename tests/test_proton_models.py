@@ -104,6 +104,9 @@ def test_dose_bortfeld_rejects_invalid_material():
         proton_models.dose_bortfeld(DEPTH_CM, FLUENCE_CM2, ENERGY_MEV, material=0)
 
     with pytest.raises(TypeError):
+        proton_models.dose_bortfeld(DEPTH_CM, FLUENCE_CM2, ENERGY_MEV, material=True)
+
+    with pytest.raises(TypeError):
         proton_models.dose_bortfeld(DEPTH_CM, FLUENCE_CM2, ENERGY_MEV, material="water_liquid")
 
 
@@ -234,6 +237,9 @@ def test_let_wilkens_rejects_invalid_averaging_and_material():
 
     with pytest.raises(ValueError):
         proton_models.let_wilkens(DEPTH_CM, ENERGY_MEV, material=0)
+
+    with pytest.raises(TypeError):
+        proton_models.let_wilkens(DEPTH_CM, ENERGY_MEV, material=True)
 
 
 def test_proton_models_reject_incompatible_vector_lengths():

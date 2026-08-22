@@ -234,15 +234,15 @@ lists the currently bound functions or constructors that use the argument.
 
 - **Meaning:** Material in which the calculation is performed.
 - **Type:** A material ID, a `pyamtrack.materials.Material` object, or a
-  supported list/NumPy array of those values. Python `bool` values are also
-  accepted wherever integer IDs are accepted.
+  supported list/NumPy array of those values. Python `bool` values are not
+  accepted as material IDs.
 - **Used by:** `stopping.electron_range`,
   `proton_models.dose_bortfeld`, and `proton_models.let_wilkens`.
 - **Default:** `1` (liquid water).
 - **Rules:** IDs are validated against the material table. A `Material`
   object is converted to its `id` before calculation. Sequences are
-  validated element by element. Because `bool` is accepted as an integer,
-  `True` is treated as material ID `1`, while `False` is rejected as ID `0`.
+  validated element by element. Boolean values are rejected rather than
+  treated as integer IDs.
 
 ### `model`
 
