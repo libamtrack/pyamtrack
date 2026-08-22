@@ -49,8 +49,9 @@ For the converter functions, a list produces a list and a NumPy array
 produces a NumPy array with the corresponding shape. The multi-argument
 calculation functions (`electron_range`, `dose_bortfeld`, and `let_wilkens`)
 return a scalar when every argument is scalar. If at least one argument is a
-sequence, scalar arguments are repeated and sequence arguments are evaluated
-elementwise; sequence lengths must match.
+sequence, they return a one-dimensional NumPy array, including when the
+sequence is a Python list. Scalar arguments are repeated and sequence
+arguments are evaluated elementwise; sequence lengths must match.
 
 Set `cartesian_product=True` on the three multi-argument calculation
 functions to evaluate every combination of sequence values. The result is a
@@ -61,7 +62,8 @@ independent product dimension.
 NumPy inputs must be compatible with the wrapper:
 
 - elementwise multi-argument calls require one-dimensional arrays;
-- arrays must be C-contiguous; and
+- elementwise calls accept non-contiguous arrays, such as a strided slice;
+- cartesian-product calls require NumPy arrays to be C-contiguous; and
 - numeric arrays must be castable to the required numeric type.
 
 When adding a new binding, document accepted scalar/container types, whether
@@ -82,7 +84,7 @@ arguments exposed through nanobind.
 
 - `Material(id)` — construct from a material ID.
 - `Material(name)` — construct from a material name.
-- `get_ids()`
+- `get_ids()` — return the valid material IDs.
 - `get_long_names()`
 - `get_names()`
 
@@ -139,7 +141,8 @@ lists the currently bound functions or constructors that use the argument.
 ### `averaging`
 
 - **Meaning:** LET averaging convention.
-- **Type:** `"dose"`, `"track"`, or a `proton_models.Averaging` enum value.
+- **Type:** A case-insensitive `"dose"` or `"track"` string, or a
+  `proton_models.Averaging` enum value.
 - **Used by:** `proton_models.let_wilkens`.
 - **Default:** `"dose"`.
 - **Rules:** `"dose"` selects dose-averaged LET (`LET_d`); `"track"` selects
@@ -222,21 +225,24 @@ lists the currently bound functions or constructors that use the argument.
 - **Meaning:** Material identifier.
 - **Type:** Integer.
 - **Used by:** `materials.Material(id)`.
-- **Rules:** Use an ID from `pyamtrack.materials.valid_material_ids`.
-  Material ID `1` is liquid water and is the default for the calculation
-  functions that accept `material`.
+- **Rules:** Use an ID returned by `pyamtrack.materials.get_ids()`.
+  `valid_material_ids` is not an exposed API attribute. Material ID `1` is
+  liquid water and is the default for the calculation functions that accept
+  `material`.
 
 ### `material`
 
 - **Meaning:** Material in which the calculation is performed.
 - **Type:** A material ID, a `pyamtrack.materials.Material` object, or a
-  supported list/NumPy array of those values.
+  supported list/NumPy array of those values. Python `bool` values are also
+  accepted wherever integer IDs are accepted.
 - **Used by:** `stopping.electron_range`,
   `proton_models.dose_bortfeld`, and `proton_models.let_wilkens`.
 - **Default:** `1` (liquid water).
 - **Rules:** IDs are validated against the material table. A `Material`
   object is converted to its `id` before calculation. Sequences are
-  validated element by element.
+  validated element by element. Because `bool` is accepted as an integer,
+  `True` is treated as material ID `1`, while `False` is rejected as ID `0`.
 
 ### `model`
 
