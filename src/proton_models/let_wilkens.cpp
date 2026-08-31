@@ -55,7 +55,7 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
       throw std::invalid_argument("depth_cm must be >= 0. Negative depth has no physical meaning: got " +
                                   std::to_string(depth));
     if (E < 0.1 || E > 10000.0)
-      throw std::invalid_argument("energy_MeV must in range [0.1, 10000.0], got: " + std::to_string(E));
+      throw std::invalid_argument("energy_MeV must be in range [0.1, 10000.0], got: " + std::to_string(E));
     if (spread_frac <= 0.0 || spread_frac >= 1.0)
       throw std::invalid_argument("energy_spread_fraction must be in range (0, 1), got: " +
                                   std::to_string(spread_frac));

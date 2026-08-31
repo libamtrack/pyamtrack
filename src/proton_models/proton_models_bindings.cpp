@@ -54,7 +54,7 @@ NB_MODULE(proton_models, m) {
             If material is not an int, Material, list, or int numpy array, if material is a
             bool, or if other inputs are unsupported types.
         ValueError
-            If z_cm < 0, E_MeV outside [0.1, 10000.0], sigma_E_fraction outside (0, 1),
+            If depth_cm < 0, energy_MeV outside [0.1, 10000.0], energy_spread_fraction outside (0, 1),
             eps outside [0, 1), or a material ID is not a known material.
       )pbdoc");
 
@@ -114,6 +114,6 @@ NB_MODULE(proton_models, m) {
             If depth_cm is not a float, list, or NumPy array, or material is not
             an int, Material, list, or NumPy array, or if material is a bool.
       )pbdoc");
-	// enum constucted by chaining
+  // enum constructed by chaining
   nb::enum_<Averaging>(m, "Averaging").value("DOSE", Averaging::Dose).value("TRACK", Averaging::Track).export_values();
 }
