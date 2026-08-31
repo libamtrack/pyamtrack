@@ -5,7 +5,7 @@
 
 ## **Prerequisites**
 Ensure you have the following installed:
-- **Python 3** (with development headers, at least 3.9)
+- **Python 3** (with development headers, at least 3.10)
 - **CMake** (3.16 or later)
 - **Ninja** (recommended for faster builds)
 - **GSL** (GNU Scientific Library)

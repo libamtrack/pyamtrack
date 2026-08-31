@@ -20,7 +20,7 @@ pip install pyamtrack
 ## Ongoing Development
 
 A new version of pyamtrack is currently being developed, addressing these limitations. The new release will include:
-- Support for **Linux, Windows, and macOS** (for Python >= 3.9).
+- Support for **Linux, Windows, and macOS** (for Python >= 3.10).
 - Full documentation detailing all available functions, their usage, and example applications.
 <!-- - Planned support for free-threading in Python 3.14. -->
 
