@@ -1,9 +1,6 @@
 #include <nanobind/nanobind.h>
-#include <nanobind/stl/set.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
-
-#include <set>
 
 #include "AT_DataMaterial.h"
 #include "materials.h"

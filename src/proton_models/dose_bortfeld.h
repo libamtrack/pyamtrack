@@ -23,8 +23,8 @@ namespace nb = nanobind;
  * - eps: nuclear tail fraction in [0, 1), default 0.03
  * - cartesian_product: if true compute full cartesian product across iterable/array args
  */
-nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& fluence_cm2, const nb::object& E_MeV,
-                         const nb::object& sigma_E_fraction, const nb::object& material = nb::int_(1),
-                         const nb::object& eps = nb::float_(0.03), bool cartesian_product = false);
+nb::object dose_bortfeld(const nb::object& depth_cm, const nb::object& fluence_cm2, const nb::object& energy_MeV,
+                         const nb::object& energy_spread_fraction, const nb::object& material,
+                         const nb::object& eps, bool cartesian_product);
 
 #endif  // DOSE_BORTFELD_H
