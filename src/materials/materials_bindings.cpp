@@ -2,8 +2,6 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-#include <iostream>
-
 #include "AT_DataMaterial.h"
 #include "materials.h"
 
@@ -82,7 +80,9 @@ NB_MODULE(materials, m) {
 
   // Dynamically expose materials as attributes of the module
   auto names = get_names();
-  for (size_t i = 0; i < names.size(); ++i) {
-    m.attr(names[i].c_str()) = Material(static_cast<long>(i + 1));
+  auto ids = get_ids();
+  for (size_t i = 0; i < ids.size(); ++i) {
+    Material temp(ids[i]);
+    m.attr(names[i].c_str()) = temp;
   }
 }

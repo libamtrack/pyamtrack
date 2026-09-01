@@ -2,9 +2,11 @@
 #define MATERIALS_H
 
 #include <nanobind/nanobind.h>
+#include <nanobind/ndarray.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -45,7 +47,9 @@ std::vector<std::string> get_names();
  */
 inline int process_material(const nb::object& material) {
   int material_id = 0;
-  if (nb::isinstance<nb::int_>(material)) {
+  if (PyBool_Check(material.ptr())) {
+    throw nb::type_error("Material argument must be an integer (not bool) or a pyamtrack.materials.Material object");
+  } else if (nb::isinstance<nb::int_>(material)) {
     material_id = nb::cast<int>(material);
   } else {
     try {
@@ -147,5 +151,75 @@ class Material {
    */
   Material(const std::string& name);
 };
+
+/**
+ * @brief Validates a material argument, recursing into lists and NumPy arrays.
+ *
+ * This is the single point of material validation: callers must not re-check IDs
+ * themselves, so that the accepted set of materials is defined by the libamtrack
+ * material table alone. Material 0 ("User defined") is rejected because all of its
+ * physical properties are zero.
+ *
+ * @throws std::invalid_argument (ValueError) if a material ID is not in the material table.
+ * @throws nb::type_error if the argument is not an int, Material, list, or NumPy array.
+ */
+inline void validate_material_argument(const nb::object& argument) {
+  if (nb::isinstance<nb::list>(argument)) {
+    nb::list values = nb::cast<nb::list>(argument);
+    for (size_t i = 0; i < values.size(); ++i) {
+      validate_material_argument(values[i]);
+    }
+    return;
+  }
+
+  if (nb::isinstance<nb::ndarray<>>(argument)) {
+    validate_material_argument(argument.attr("tolist")());
+    return;
+  }
+
+  long id;
+  if (nb::isinstance<Material>(argument)) {
+    id = nb::cast<Material>(argument).id;
+  } else if (PyBool_Check(argument.ptr())) {
+    throw nb::type_error("material must be an int (not bool), a Material, or a list / NumPy array of either");
+  } else if (nb::isinstance<nb::int_>(argument)) {
+    id = nb::cast<long>(argument);
+  } else {
+    throw nb::type_error("material must be an int, a Material, or a list / NumPy array of either");
+  }
+
+  if (id < 1 || AT_material_index_from_material_number(id) < 0) {
+    throw std::invalid_argument("invalid material ID: " + std::to_string(id));
+  }
+}
+
+inline nb::object parse_material_argument(const nb::object& argument) {
+  if (nb::isinstance<Material>(argument)) {
+    return nb::cast<long>(nb::cast<Material>(argument).id);
+  }
+
+  if (PyBool_Check(argument.ptr())) {
+    throw nb::type_error("material must be an integer (not bool), Material, list, or NumPy array");
+  }
+
+  if (nb::isinstance<nb::int_>(argument)) {
+    return argument;
+  }
+
+  if (nb::isinstance<nb::list>(argument)) {
+    nb::list values = nb::cast<nb::list>(argument);
+    nb::list parsed_values;
+    for (size_t i = 0; i < values.size(); ++i) {
+      parsed_values.append(parse_material_argument(values[i]));
+    }
+    return parsed_values;
+  }
+
+  if (nb::isinstance<nb::ndarray<>>(argument)) {
+    return parse_material_argument(argument.attr("tolist")());
+  }
+
+  throw nb::type_error("material must be an integer, Material, list, or NumPy array");
+}
 
 #endif  // MATERIALS_H

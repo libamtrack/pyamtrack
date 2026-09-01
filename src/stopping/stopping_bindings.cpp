@@ -36,7 +36,8 @@ NB_MODULE(stopping, m) {
         energy_MeV : float or array_like
             The electron energy in MeV. Can be a single value, a NumPy array, or a Python list.
         material : int, Material, list[int | Material] or numpy array with int as dtype, optional
-            Either a material ID as integer or a Material object. Defaults to 1 (Liquid water).
+            Either a material ID as integer or a Material object. Boolean values are not accepted.
+            Defaults to 1 (Liquid water).
         model : str, int, list[int | str] or numpy array with int as dtype, optional
             The stopping power model to use. Can be specified either as a string name or model ID.
             Available models:
@@ -53,14 +54,14 @@ NB_MODULE(stopping, m) {
         Returns
         -------
         float or numpy.ndarray
-            The calculated electron range(s) in meters. Returns a float for a single input,
-            a NumPy array for a NumPy array input, a Python list for a list input and a NumPy array
-            when computing a cartesian product.
+            The calculated electron range(s) in meters. Returns a float when all inputs are scalar
+            and a NumPy array when any input is a list or array, including when computing a
+            cartesian product.
 
         Raises
         ------
         TypeError
-            If material argument is neither an integer nor a Material object,
+            If material argument is neither an integer nor a Material object, is a bool,
             or if model argument is neither a string nor an integer.
         ValueError
             If the input energy is negative or the model/material ID is invalid.

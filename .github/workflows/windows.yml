@@ -18,7 +18,7 @@ jobs:
   build_and_test_windows:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Fetch all history for git describe and versioning
 
@@ -31,7 +31,7 @@ jobs:
 
       - name: Restore vcpkg cache
         id: cache-vcpkg
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: vcpkg
           key: vcpkg-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: Restore vcpkg deps cache
         id: cache-vcpkg-deps
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/vcpkg_cache
           key: vcpkg-deps-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
@@ -54,7 +54,7 @@ jobs:
 
       - name: Restore vcpkg installed cache
         id: cache-vcpkg-installed
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/vcpkg_installed
           key: vcpkg-installed-${{ runner.os }}-${{ hashFiles('vcpkg.json') }}
@@ -74,9 +74,9 @@ jobs:
           VCPKG_INSTALLED_DIR: ${{ github.workspace }}/vcpkg_installed
         run: .\vcpkg\vcpkg.exe install
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
-          python-version: '>=3.9 <3.13.3 || >=3.13.5' # fix for https://github.com/spacetelescope/drizzle/pull/186
+          python-version: '>=3.10 <3.13.3 || >=3.13.5' # fix for https://github.com/spacetelescope/drizzle/pull/186
 
       - name: Install Python dependencies
         run: pip install --upgrade build

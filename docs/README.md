@@ -5,7 +5,7 @@
 
 ## **Prerequisites**
 Ensure you have the following installed:
-- **Python 3** (with development headers, at least 3.9)
+- **Python 3** (with development headers, at least 3.10)
 - **CMake** (3.16 or later)
 - **Ninja** (recommended for faster builds)
 - **GSL** (GNU Scientific Library)
@@ -92,6 +92,7 @@ Alternatively, you can use the `scripts/build_linux.sh` script to perform the sa
 ### Code Formatting and Pre-commit Hooks
 
 This project uses [pre-commit](https://pre-commit.com). More information about that can be found [here](pre-commit.md).
+The Python-bound argument conventions are documented [here](naming_convention.md).
 
 ### **Uninstallation**
 ### **Remove the Installed Package**

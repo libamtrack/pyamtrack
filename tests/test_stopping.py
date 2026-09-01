@@ -90,6 +90,9 @@ def test_arrays_with_mixed_dtypes(dtype1: type, dtype2: type):
 
 def test_material_assignment_invalid(electron_energy_MeV):
     """Test the material assignment with an invalid ID."""
+    with pytest.raises(TypeError):
+        pyamtrack.stopping.electron_range(electron_energy_MeV, True)
+
     with pytest.raises(
         RuntimeError,
         match="Material argument must be an integer or a pyamtrack.materials.Material object",

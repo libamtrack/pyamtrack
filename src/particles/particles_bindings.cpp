@@ -4,6 +4,11 @@
 
 #include "AT_DataParticle.h"
 #include "particles.h"
+#include "construct_utils.h"
+#include "ions/ions.h"
+#include "ions/ion.h"
+
+#include <iostream>
 
 namespace nb = nanobind;
 
@@ -13,106 +18,121 @@ NB_MODULE(particles, m) {
   nb::class_<Particle>(m, "Particle", R"pbdoc(
         Represents a particle with various physical properties.
 
+        Prefer using particles.from_string() to construct instances.
+        Pre-instantiated particles are available as module attributes
+        (e.g., particles.proton, particles.C, particles.He).
+
         Attributes:
-            id (int): Internal ID of the particle (row index in AT_Particle_Data).
-            Z (int): Atomic number of the particle.
-            A (int): Mass number of the particle.
-            atomic_weight (float): Atomic weight of the particle.
-            element_name (str): Name of the particle.
-            element_acronym (str): Acronym of the particle.
-            density_g_cm3 (float): Density of the particle in g/cm³.
-            I_eV_per_Z (float): Mean ionization potential per atomic number in eV/Z.
+            id (int): Internal ID (row index in AT_Particle_Data).
+            pdg (int): PDG code.
+            atomic_weight (float): Atomic weight.
+            element_name (str): Element name.
+            element_acronym (str): Element acronym.
     )pbdoc")
-      .def(nb::init<long>(), R"pbdoc(
-        Initializes a Particle object by its internal ID.
+      .def(nb::init<long long>(), R"pbdoc(
+        Create a Particle from a PDG code.
+
+        Notes:
+            PDG codes corresponding to ions raise ValueError; use
+            particles.ions.Ion(...) for ion PDG codes instead.
 
         Args:
-            id (int): The internal ID of the particle (1-based index).
-    )pbdoc")
-      .def(nb::init<const std::string&>(), R"pbdoc(
-        Initializes a Particle object by its acronym.
-
-        Args:
-            element_acronym (str): The acronym of the particle.
-    )pbdoc")
-      .def_static("from_number", &Particle::from_number, R"pbdoc(
-        Initializes a Particle object from a particle number (1000*Z + A).
-
-        A particle number encodes the atomic number (Z) and mass number (A)
-        according to the PyAmtrack convention:
-
-            particle_no = 1000 * Z + A
-
-        Example:
-            >>> particle = Particle.from_number(6012)
-            >>> particle.Z
-            6
-            >>> particle.A
-            12
-
-        Args:
-            particle_no (int): The particle number in the format 1000*Z + A.
-
-        Returns:
-            Particle: A Particle object corresponding to the given particle number.
+            pdg_code (int): PDG code.
 
         Raises:
-            ValueError: If the particle number is invalid.
-    )pbdoc")
-      .def_static("from_string", &Particle::from_string, R"pbdoc(
-        Initializes a Particle object from a string representation.
-
-        The string can be:
-            - An acronym of the element ("He", "C")
-            - An isotope notation with mass number ("3He", "14C", "238U")
-
-        Example:
-            >>> particle = Particle.from_string("14C")
-            >>> particle.Z
-            6
-            >>> particle.A
-            14
-            >>> particle.element_name
-            'Carbon'
-
-        Args:
-            name (str): The string representation of the particle.
-
-        Returns:
-            Particle: A Particle object corresponding to the given name.
-
-        Raises:
-            ValueError: If the string cannot be parsed.
+            ValueError: If the PDG code is invalid or corresponds to an ion.
       )pbdoc")
+      
+      .def("__str__", &Particle::str, "Return the element acronym (e.g., 'C').")
+      .def("__repr__", &Particle::repr, "Return a detailed, debug-friendly representation.")
       .def_ro("id", &Particle::id, "The internal ID of the particle.")
-      .def_ro("Z", &Particle::Z, "The atomic number of the particle.")
-      .def_prop_ro("A", &Particle::py_get_A,
-                   "The mass number of the particle. Available if constructed via from_number(), else None.")
       .def_ro("atomic_weight", &Particle::atomic_weight, "The atomic weight of the particle.")
       .def_ro("element_name", &Particle::element_name, "The name of the particle.")
       .def_ro("element_acronym", &Particle::element_acronym, "The acronym of the particle.")
-      .def_ro("density_g_cm3", &Particle::density_g_cm3, "The density of the particle in g/cm³.")
-      .def_ro("I_eV_per_Z", &Particle::I_eV_per_Z, "The mean ionization potential per atomic number in eV/Z.");
+      .def_ro("pdg", &Particle::pdg, "The PDG code of the particle.")
+      ;
 
-  m.def("get_names", &get_names, R"pbdoc(
-      Retrieves the names of all particles.
-
-      Returns:
-          list[str]: A list of particle names.
-  )pbdoc");
-
-  m.def("get_acronyms", &get_acronyms, R"pbdoc(
-      Retrieves the acronyms of all particles.
+    m.def("get_names", &get_names, R"pbdoc(
+      Get all particle names.
 
       Returns:
-          list[str]: A list of particle acronyms.
-  )pbdoc");
+        list[str]: Element names in data order.
+    )pbdoc");
 
-  // Dynamically expose particles as attributes of the module
-  auto names = get_names();
+    m.def("get_acronyms", &get_acronyms, R"pbdoc(
+      Get all particle acronyms.
+
+      Returns:
+        list[str]: Element acronyms in data order.
+    )pbdoc");
+
+    m.def("from_string", &from_string, R"pbdoc(
+      Create a Particle or Ion from a string label.
+
+      Accepted forms:
+        - Element acronym ("He", "C")
+        - Isotope notation ("3He", "14C", "238U")
+        - Special names "proton", "alpha", "neutron", "electron"
+
+      Example:
+        >>> ion = particles.from_string("14C")
+        >>> ion.Z, ion.A
+        (6, 14)
+
+      Args:
+        name (str): Element, isotope, or special particle label.
+
+      Returns:
+        Particle | particles.ions.Ion: The constructed object.
+
+      Raises:
+        ValueError: If the string cannot be parsed or is invalid.
+      )pbdoc");
+    m.def("from_pdg", &from_pdg, R"pbdoc(
+      Create a Particle or Ion from a PDG code (nuclear encoding).
+
+      Handles proton (2212), neutron (2112), and electron (11) explicitly.
+
+      Args:
+        pdg_code (int): PDG code.
+
+      Returns:
+        Particle | particles.ions.Ion: The constructed object.
+
+      Raises:
+        ValueError: If the PDG code is invalid.
+      )pbdoc");
+
+
+
+
+  auto ions_module = m.def_submodule("ions");
+  init_ions(ions_module);
+  m.attr("proton") = from_ZA(1,1);
+  m.attr("alpha") = from_string("alpha");
+  
+
+
   auto acronyms = get_acronyms();
-  for (size_t i = 0; i < names.size(); ++i) {
-    m.attr(names[i].c_str()) = Particle(static_cast<long>(i + 1));
-    m.attr(acronyms[i].c_str()) = Particle(static_cast<long>(i + 1));
+  for (const auto& acronym : acronyms) {
+    try {
+      m.attr(acronym.c_str()) = from_string(acronym);
+    } catch (const std::exception& e) {
+      std::cerr << "Warning: Could not create particle " << acronym << ": " << e.what() << std::endl;
+    }
   }
+
+  m.def("from_ZA", &from_ZA, nb::arg("Z"), nb::arg("A"), R"pbdoc(
+    Create an Ion from atomic number Z and mass number A.
+
+    Args:
+        Z (int): Atomic number.
+        A (int): Mass number.
+
+    Returns:
+        particles.ions.Ion: The constructed ion.
+
+    Raises:
+        ValueError: If Z/A is not a supported isotope.
+  )pbdoc");
 }
