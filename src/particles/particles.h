@@ -5,6 +5,7 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
+
 #include <optional>
 #include <string>
 #include <vector>
@@ -15,25 +16,28 @@ extern "C" {
 
 namespace nb = nanobind;
 
+// forward declaration
+class Ion;
+
 /**
- * @brief Retrieves the list of particles names.
+ * @brief Retrieve the list of particle names.
  *
  * Example:
  * >>> get_names()
  * ["Hydrogen", "Helium", "Lithium", ..., "Californium"]
  *
- * @return std::vector<std::string> A list of particle names.
+ * @return std::vector<std::string> List of particle names.
  */
 std::vector<std::string> get_names();
 
 /**
- * @brief Retrieves the list of particles acronyms.
+ * @brief Retrieve the list of particle acronyms.
  *
  * Example:
  * >>> get_acronyms()
  * ["H", "He", "Li", ..., "Cf"]
  *
- * @return std::vector<std::string> A list of particle acronyms.
+ * @return std::vector<std::string> List of particle acronyms.
  */
 std::vector<std::string> get_acronyms();
 
@@ -49,102 +53,108 @@ std::vector<std::string> get_acronyms();
  * 'Carbon'
  *
  * Attributes:
- * - id (long): The id of particle.
- * - Z (long): Atomic number of the particle.
- * - A (optional long): Mass number of the particle.
- * - atomic_weight (double): Atomic weight of the particle.
- * - element_name (std::string): Name of the particle.
- * - element_acronym (std::string): Acronym of the particle.
- * - density_g_cm3 (double): Density of the particle in g/cm³.
- * - I_eV_per_Z (double): Mean ionization potential per atomic number in eV/Z.
+ * - id (long): Internal particle ID (row index in AT_Particle_Data).
+ * - pdg (long long): PDG code.
+ * - atomic_weight (double): Atomic weight.
+ * - element_name (std::string): Element name.
+ * - element_acronym (std::string): Element acronym.
  */
 class Particle {
+
+
  public:
+   /**
+    * @brief Construct a Particle from a PDG code.
+    *
+    * For ion PDG codes, this constructor throws and advises using Ion instead.
+    *
+    * @param pdg_code PDG code.
+    * @throws std::invalid_argument If the PDG code is invalid or corresponds to an ion.
+    */
+  Particle(long long pdg_code);
+  Particle();
+
   long id;                     /**< The id of particle. */
-  long Z;                      /**< Atomic number of the particle. */
-  std::optional<long> A;       /**< Mass number of the particle. */
+  long long pdg; 
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
-  double density_g_cm3;        /**< Density of the particle in g/cm³. */
-  double I_eV_per_Z;           /**< Mean ionization potential per atomic number in eV/Z. */
-  nb::object py_get_A() const;
-  /**
-   * @brief Initializes a Particle object.
-   *
-   * Example:
-   * >>> particle = Particle(6)
-   * >>> particle.id
-   * 6
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param id The number of particle.
-   */
-  Particle(long id);
 
-  /**
-   * @brief Initializes a Particle object using its acronym.
-   *
-   * Example:
-   * >>> particle = Particle("C")
-   * >>> particle.id
-   * 6
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param acronym The acronym of the particle.
-   */
-  Particle(const std::string& acronym);
+   /**
+    * @brief Short string representation.
+    *
+    * @return std::string Element acronym.
+    */
+   std::string str() const;
 
-  /**
-   * @brief Initializes a Particle object from a particle number (1000*Z + A).
-   *
-   * A particle number encodes the atomic number (Z) and mass number (A)
-   * according to the convention:
-   *
-   *   particle_no = 1000 * Z + A
-   *
-   * where:
-   *   - Z is the atomic number (1 ≤ Z ≤ 118)
-   *   - A is the mass number (1 ≤ A ≤ 300)
-   *
-   * Example:
-   * >>> particle = Particle::from_number(6012)
-   * >>> particle.Z
-   * 6
-   * >>> particle.A
-   * 12
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param particle_no The particle number in the format 1000*Z + A.
-   * @return A Particle object corresponding to the given particle number.
-   * @throws std::invalid_argument if the particle number is invalid.
-   */
-  static Particle from_number(long particle_no);
+   /**
+    * @brief Detailed string representation.
+    *
+    * @return std::string Debug-friendly representation.
+    */
+   std::string repr() const;
 
-  /**
-   * @brief Initializes a Particle object from a string representation.
-   *
-   * The string can be:
-   *   - Just the acronym of the element: "He", "C", "U"
-   *   - An isotope notation with mass number: "3He", "4He", "12C", "238U"
-   *
-   * Example:
-   * >>> particle = Particle::from_string("14C")
-   * >>> particle.Z
-   * 6
-   * >>> particle.A
-   * 14
-   * >>> particle.element_name
-   * 'Carbon'
-   *
-   * @param name The string representation of the particle.
-   * @return A Particle object corresponding to the given name.
-   * @throws std::invalid_argument if the name cannot be parsed.
-   */
-  static Particle from_string(const std::string& name);
+
+   /**
+    * @brief Construct a Particle or Ion from a string representation.
+    *
+    * The string can be:
+    *   - Element acronym ("He", "C", "U")
+    *   - Isotope notation ("3He", "4He", "12C", "238U")
+    *   - Special names "proton", "alpha", "neutron", "electron"
+    */
 };
+
+#include "ions/ion.h"
+
+
+/**
+ * @brief Create an Ion from atomic number Z and mass number A.
+ *
+ * @param Z Atomic number.
+ * @param A Mass number.
+ * @return Ion
+ * @throws std::invalid_argument If the element or isotope is not found.
+ */
+Ion from_ZA(long long Z, long long A);
+
+
+
+/**
+ * @brief Create a Particle or Ion from a string label.
+ *
+ * @param name Element acronym, isotope label, or special name.
+ * @return nb::object Particle or Ion instance.
+ * @throws std::invalid_argument or nb::value_error on invalid input.
+ */
+nb::object from_string(const std::string& name);
+
+/**
+ * @brief Create a non-ion special particle from a name.
+ *
+ * @param name Supported names: "neutron", "electron".
+ * @return Particle
+ */
+Particle create_particle(const std::string& name);
+
+/**
+ * @brief Create an ion from an element or isotope string.
+ *
+ * @param name Element acronym/name or isotope label.
+ * @return Ion
+ * @throws nb::value_error If the element or mass number is invalid.
+ */
+Ion create_ion(const std::string& name);
+
+/**
+ * @brief Create a Particle or Ion from a PDG code.
+ *
+ * Handles proton, neutron, and electron PDG codes explicitly.
+ *
+ * @param pdg_code PDG code.
+ * @return nb::object Particle or Ion instance.
+ * @throws nb::value_error If the code is not a valid nuclear PDG encoding.
+ */
+nb::object from_pdg(long long pdg_code);
 
 #endif  // PARTICLE_H

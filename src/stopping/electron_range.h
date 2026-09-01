@@ -53,15 +53,16 @@ int get_model_id(const std::string& model_name);
  * or empirical models.
  *
  * @param energy_MeV The electron kinetic energy in MeV. Can be a single value, NumPy array, or Python list.
- * @param material Either a material ID (int) or a Material object. Defaults to 1 (Liquid water).
+ * @param material Either a material ID (int) or a Material object. Boolean values are not accepted.
+ *                 Defaults to 1 (Liquid water).
  * @param model The stopping power model to use. Can be specified as a string name or model ID.
  *             Defaults to "tabata" (ID=7).
  * @param cartesian_product Parameter that tells whether to compute the cartesian product (all possible combinations) of
  * the preceding parameters
- * @return nb::object The calculated electron range(s) in meters. Returns a float for single input,
- *                   NumPy array for array input, or Python list for list input.
+ * @return nb::object The calculated electron range(s) in meters. Returns a float when all inputs are
+ *                   scalar, or a NumPy array when any input is a list or array.
  * @throws nb::type_error If material argument is neither an integer nor a Material object,
- *                      or if model argument is neither a string nor an integer.
+ *                      is a bool, or if model argument is neither a string nor an integer.
  * @throws std::runtime_error If the model name/ID is invalid.
  */
 nb::object electron_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
