@@ -4,8 +4,7 @@ import pytest
 import pyamtrack.materials
 import pyamtrack.particles
 import pyamtrack.stopping
-import pyamtrack.materials
-import pyamtrack.particles
+from pyamtrack.stopping import StoppingPowerSource
 
 
 @pytest.fixture
@@ -112,237 +111,129 @@ def test_invalid_id(electron_energy_MeV):
         pyamtrack.stopping.electron_range(electron_energy_MeV, 1000000)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Tests for mass_stopping_power
-# ──────────────────────────────────────────────────────────────────────────────
-
-PROTON_NO = 1001  # 1000*Z + A for proton
-CARBON_NO = 6012  # 1000*Z + A for carbon-12
+PROTON_NO = 1001
+CARBON_NO = 6012
 WATER_LIQUID_ID = 1
+ENERGY_MEV_U = 100.0
 
 
-@pytest.fixture
-def proton_energy_MeV_u():
-    """Typical proton energy in MeV/u for stopping-power tests."""
-    return 100.0
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_returns_positive_scalar(func):
+    value = func(ENERGY_MEV_U)
 
-
-def test_mass_stopping_power_scalar_positive(proton_energy_MeV_u):
-    """mass_stopping_power returns a positive float for a scalar proton energy."""
-    result = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u)
-    assert isinstance(result, float)
-    assert result > 0, "Mass stopping power must be positive"
-
-
-def test_mass_stopping_power_list_input(proton_energy_MeV_u):
-    """mass_stopping_power accepts a list and returns an ndarray of the same length."""
-    energies = [proton_energy_MeV_u, 10.0, 1.0]
-    result = pyamtrack.stopping.mass_stopping_power(energies)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (3,)
-    assert np.all(result > 0), "All mass stopping power values must be positive"
-
-
-def test_mass_stopping_power_numpy_input():
-    """mass_stopping_power accepts a numpy array and returns an ndarray of the same shape."""
-    energies = np.logspace(np.log10(0.01), np.log10(500), 20)
-    result = pyamtrack.stopping.mass_stopping_power(energies)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == energies.shape
-    assert np.all(result > 0), "All mass stopping power values must be positive"
-
-
-def test_mass_stopping_power_particle_object(proton_energy_MeV_u):
-    """mass_stopping_power accepts a Particle object constructed via from_number."""
-    particle = pyamtrack.particles.Particle.from_number(PROTON_NO)
-    result_obj = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle=particle)
-    result_int = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle=PROTON_NO)
-    assert result_obj == pytest.approx(result_int)
-
-
-def test_mass_stopping_power_material_object(proton_energy_MeV_u):
-    """mass_stopping_power accepts a Material object."""
-    material = pyamtrack.materials.water_liquid
-    result_obj = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, material=material)
-    result_int = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, material=WATER_LIQUID_ID)
-    assert result_obj == pytest.approx(result_int)
-
-
-def test_mass_stopping_power_carbon(proton_energy_MeV_u):
-    """mass_stopping_power returns a higher value for carbon than proton at same energy/nucleon."""
-    msp_proton = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle=PROTON_NO)
-    msp_carbon = pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle=CARBON_NO)
-    assert msp_carbon > msp_proton, "Carbon should have higher mass stopping power than proton"
-
-
-def test_mass_stopping_power_invalid_particle(proton_energy_MeV_u):
-    """mass_stopping_power raises TypeError for an unsupported particle argument type."""
-    with pytest.raises(TypeError):
-        pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle="proton")
-
-
-def test_mass_stopping_power_particle_a_none(proton_energy_MeV_u):
-    """mass_stopping_power raises TypeError when a Particle with A=None is passed."""
-    particle = pyamtrack.particles.Particle.from_string("H")  # A is None
-    assert particle.A is None
-    with pytest.raises(Exception, match="Particle.A is None"):
-        pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, particle=particle)
-
-
-def test_mass_stopping_power_invalid_material(proton_energy_MeV_u):
-    """mass_stopping_power raises TypeError for an unsupported material argument type."""
-    with pytest.raises(TypeError):
-        pyamtrack.stopping.mass_stopping_power(proton_energy_MeV_u, material="water")
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Tests for stopping_power
-# ──────────────────────────────────────────────────────────────────────────────
-
-
-def test_stopping_power_scalar_positive(proton_energy_MeV_u):
-    """stopping_power returns a positive float for a scalar proton energy."""
-    result = pyamtrack.stopping.stopping_power(proton_energy_MeV_u)
-    assert isinstance(result, float)
-    assert result > 0, "Stopping power must be positive"
-
-
-def test_stopping_power_list_input(proton_energy_MeV_u):
-    """stopping_power accepts a list and returns an ndarray of the same length."""
-    energies = [proton_energy_MeV_u, 10.0, 1.0]
-    result = pyamtrack.stopping.stopping_power(energies)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (3,)
-    assert np.all(result > 0), "All stopping power values must be positive"
-
-
-def test_stopping_power_numpy_input():
-    """stopping_power accepts a numpy array and returns an ndarray of the same shape."""
-    energies = np.logspace(np.log10(0.01), np.log10(500), 20)
-    result = pyamtrack.stopping.stopping_power(energies)
-    assert isinstance(result, np.ndarray)
-    assert result.shape == energies.shape
-    assert np.all(result > 0), "All stopping power values must be positive"
-
-
-def test_stopping_power_particle_object(proton_energy_MeV_u):
-    """stopping_power accepts a Particle object constructed via from_number."""
-    particle = pyamtrack.particles.Particle.from_number(PROTON_NO)
-    result_obj = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=particle)
-    result_int = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=PROTON_NO)
-    assert result_obj == pytest.approx(result_int)
-
-
-def test_stopping_power_material_object(proton_energy_MeV_u):
-    """stopping_power accepts a Material object."""
-    material = pyamtrack.materials.water_liquid
-    result_obj = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, material=material)
-    result_int = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, material=WATER_LIQUID_ID)
-    assert result_obj == pytest.approx(result_int)
-
-
-def test_stopping_power_carbon(proton_energy_MeV_u):
-    """stopping_power returns a higher value for carbon than proton at same energy/nucleon."""
-    sp_proton = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=PROTON_NO)
-    sp_carbon = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=CARBON_NO)
-    assert sp_carbon > sp_proton, "Carbon should have higher stopping power than proton"
-
-
-def test_stopping_power_invalid_particle(proton_energy_MeV_u):
-    """stopping_power raises TypeError for an unsupported particle argument type."""
-    with pytest.raises(TypeError):
-        pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle="proton")
-
-
-def test_stopping_power_particle_a_none(proton_energy_MeV_u):
-    """stopping_power raises TypeError when a Particle with A=None is passed."""
-    particle = pyamtrack.particles.Particle.from_string("H")  # A is None
-    assert particle.A is None
-    with pytest.raises(Exception, match="Particle.A is None"):
-        pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=particle)
-
-
-def test_stopping_power_invalid_material(proton_energy_MeV_u):
-    """stopping_power raises TypeError for an unsupported material argument type."""
-    with pytest.raises(TypeError):
-        pyamtrack.stopping.stopping_power(proton_energy_MeV_u, material="water")
-
-
-def test_stopping_power_vectorized_particle_list(proton_energy_MeV_u):
-    """stopping_power accepts a list of particle IDs and returns an ndarray."""
-    result = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, particle=[PROTON_NO, CARBON_NO])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (2,)
-    assert np.all(result > 0)
-
-
-def test_stopping_power_vectorized_material_list(proton_energy_MeV_u):
-    """stopping_power accepts a list of material IDs and returns an ndarray."""
-    result = pyamtrack.stopping.stopping_power(proton_energy_MeV_u, material=[1, 2])
-    assert isinstance(result, np.ndarray)
-    assert result.shape == (2,)
-    assert np.all(result > 0)
-
-
-def test_mass_stopping_power_scalar_default_positive():
-    value = pyamtrack.stopping.mass_stopping_power(10.0)
-    assert np.isscalar(value)
+    assert isinstance(value, float)
+    assert np.isfinite(value)
     assert value > 0.0
 
 
-def test_stopping_power_scalar_default_positive():
-    value = pyamtrack.stopping.stopping_power(10.0)
-    assert np.isscalar(value)
-    assert value > 0.0
-
-
-def test_mass_stopping_power_vectorized_energy_shape_and_positivity():
-    energies = np.array([1.0, 10.0, 100.0], dtype=float)
-    values = pyamtrack.stopping.mass_stopping_power(energies, particle=1001, material=1)
-    assert isinstance(values, np.ndarray)
-    assert values.shape == energies.shape
-    assert np.all(values > 0.0)
-
-
-def test_stopping_power_vectorized_energy_shape_and_positivity():
-    energies = np.array([1.0, 10.0, 100.0], dtype=float)
-    values = pyamtrack.stopping.stopping_power(energies, particle=1001, material=1)
-    assert isinstance(values, np.ndarray)
-    assert values.shape == energies.shape
-    assert np.all(values > 0.0)
-
-
-def test_mass_stopping_power_accepts_particle_and_material_objects():
-    energies = np.array([5.0, 20.0], dtype=float)
-    proton = pyamtrack.particles.Particle.from_number(1001)
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_accepts_ion_and_material_objects(func):
+    proton = pyamtrack.particles.proton
     water = pyamtrack.materials.water_liquid
 
-    values = pyamtrack.stopping.mass_stopping_power(
-        energies, particle=proton, material=water
-    )
+    from_objects = func(ENERGY_MEV_U, particle=proton, material=water)
+    from_ids = func(ENERGY_MEV_U, particle=PROTON_NO, material=WATER_LIQUID_ID)
+
+    assert from_objects == pytest.approx(from_ids)
+
+
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_carbon_exceeds_proton(func):
+    proton = func(ENERGY_MEV_U, particle=pyamtrack.particles.proton)
+    carbon = func(ENERGY_MEV_U, particle=pyamtrack.particles.from_string("12C"))
+
+    assert carbon > proton
+
+
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_vectorized_energy_shape_and_positivity(func):
+    energies = np.array([1.0, 10.0, 100.0], dtype=float)
+    values = func(energies, particle=PROTON_NO, material=WATER_LIQUID_ID)
+
     assert isinstance(values, np.ndarray)
     assert values.shape == energies.shape
     assert np.all(values > 0.0)
 
 
-def test_stopping_power_accepts_particle_and_material_objects():
-    energies = np.array([5.0, 20.0], dtype=float)
-    proton = pyamtrack.particles.Particle.from_number(1001)
-    water = pyamtrack.materials.water_liquid
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_vectorized_particle_and_material_lists(func):
+    particle_values = func(ENERGY_MEV_U, particle=[PROTON_NO, CARBON_NO])
+    material_values = func(ENERGY_MEV_U, material=[1, 2])
 
-    values = pyamtrack.stopping.stopping_power(
-        energies, particle=proton, material=water
-    )
-    assert isinstance(values, np.ndarray)
-    assert values.shape == energies.shape
-    assert np.all(values > 0.0)
+    assert particle_values.shape == (2,)
+    assert material_values.shape == (2,)
+    assert np.all(particle_values > 0.0)
+    assert np.all(material_values > 0.0)
 
 
-def test_mass_stopping_power_invalid_particle_type_raises():
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_supports_string_and_enum_source(func):
+    default_from_string = func(ENERGY_MEV_U, source="default")
+    default_from_uppercase = func(ENERGY_MEV_U, source="DEFAULT")
+    default_from_enum = func(ENERGY_MEV_U, source=StoppingPowerSource.DEFAULT)
+    pstar_from_string = func(ENERGY_MEV_U, source="pstar")
+    pstar_from_enum = func(ENERGY_MEV_U, source=StoppingPowerSource.PSTAR)
+    bethe_from_string = func(ENERGY_MEV_U, source="bethe")
+    icru_from_string = func(ENERGY_MEV_U, source="icru")
+
+    assert default_from_string == pytest.approx(default_from_enum)
+    assert default_from_uppercase == pytest.approx(default_from_string)
+    assert pstar_from_string == pytest.approx(pstar_from_enum)
+    assert default_from_string == pytest.approx(pstar_from_string)
+    assert bethe_from_string > 0.0
+    assert icru_from_string > 0.0
+
+
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_default_source_falls_back_to_bethe_without_pstar(func):
+    lead_id = 24
+    default_value = func(ENERGY_MEV_U, material=lead_id)
+    bethe_value = func(ENERGY_MEV_U, material=lead_id, source="bethe")
+
+    assert default_value == pytest.approx(bethe_value)
+    with pytest.raises(ValueError, match="PSTAR"):
+        func(ENERGY_MEV_U, material=lead_id, source="pstar")
+    with pytest.raises(ValueError, match="ICRU"):
+        func(ENERGY_MEV_U, material=lead_id, source="icru")
+
+
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_cartesian_product_matches_scalar_calls(func):
+    energies = np.array([10.0, 100.0])
+    particles = [PROTON_NO, CARBON_NO]
+
+    result = func(energies, particle=particles, cartesian_product=True)
+    expected = np.array([[func(energy, particle=particle) for particle in particles] for energy in energies])
+
+    assert result.shape == (len(energies), len(particles))
+    np.testing.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize("func", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_rejects_invalid_arguments(func):
+    with pytest.raises(ValueError):
+        func(0.0)
+
+    with pytest.raises(ValueError):
+        func(ENERGY_MEV_U, source="unknown")
+
     with pytest.raises(TypeError):
-        pyamtrack.stopping.mass_stopping_power(10.0, particle="not-a-particle", material=1)
+        func(ENERGY_MEV_U, source=1)
 
+    with pytest.raises(TypeError):
+        func(ENERGY_MEV_U, particle="proton")
 
-def test_stopping_power_invalid_material_type_raises():
-    with pytest.raises(RuntimeError):
-        pyamtrack.stopping.stopping_power(10.0, particle=1001, material="not-a-material")
+    with pytest.raises(TypeError):
+        func(ENERGY_MEV_U, particle=True)
+
+    with pytest.raises(TypeError):
+        func(ENERGY_MEV_U, particle=pyamtrack.particles.from_string("neutron"))
+
+    with pytest.raises(TypeError):
+        func(ENERGY_MEV_U, material="water_liquid")
+
+    with pytest.raises(ValueError):
+        func(ENERGY_MEV_U, material=0)
+
+    with pytest.raises(ValueError, match="Incompatible lists/arrays size"):
+        func([10.0, 100.0], particle=[PROTON_NO])

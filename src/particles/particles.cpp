@@ -1,14 +1,13 @@
 #include "particles.h"
-#include "construct_utils.h"
-#include "ions/ion.h"
-#include "ions/ions.h"
 
 #include <algorithm>
 #include <cctype>
 #include <optional>
 #include <stdexcept>
 
-
+#include "construct_utils.h"
+#include "ions/ion.h"
+#include "ions/ions.h"
 
 /**
  * @brief Default constructor for Particle.
@@ -42,6 +41,9 @@ Particle::Particle(long long pdg_code) {
   }
 }
 
+long Particle::get_id() const {
+  return id;
+}
 
 /**
  * @brief Constructs a Particle from a string representation.
@@ -72,13 +74,14 @@ Particle::Particle(long long pdg_code) {
  * @throws std::invalid_argument or nb::value_error on invalid input.
  */
 nb::object from_string(const std::string& name) {
-
-  // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to support them as special particles.
+  // logic for creating either Particle or Ion. Should be changed with further development of the class hierarchy. For
+  // now, we just check for special cases of proton, neutron and electron, which are not really ions, but we want to
+  // support them as special particles.
 
   if (name == "neutron" || name == "electron") {
     return nb::cast(create_particle(name));
   }
-  
+
   return nb::cast(create_ion(name));
 }
 
@@ -93,10 +96,10 @@ Particle create_particle(const std::string& name) {
   p.element_name = name;
   p.element_acronym = name[0];
   p.pdg = pdg_for_nonions[name];
-  
+
   return p;
 }
- 
+
 /**
  * @brief Create an Ion from element or isotope string.
  *
@@ -120,7 +123,6 @@ Ion create_ion(const std::string& name) {
     A_ = 4;
   }
 
-  
   int it = -1;
   for (int i = 0; i < data.n; ++i) {
     if (to_lower_case(data.element_acronym[i]) == to_lower_case(symbol)) {
@@ -141,13 +143,14 @@ Ion create_ion(const std::string& name) {
   acronym = data.element_acronym[it];
 
   auto rng = isotope_A_range.find(acronym);
-  if (rng == isotope_A_range.end())
-      throw nb::value_error(("No isotope data for element " + acronym).c_str());
+  if (rng == isotope_A_range.end()) throw nb::value_error(("No isotope data for element " + acronym).c_str());
   auto [l, h] = rng->second;
 
   if (A_ != -1) {
     if (A_ < l || A_ > h) {
-      throw nb::value_error(("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym + " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")").c_str());
+      throw nb::value_error(("Invalid mass number A=" + std::to_string(A_) + " for element " + acronym +
+                             " (valid range: " + std::to_string(l) + "-" + std::to_string(h) + ")")
+                                .c_str());
     }
   } else if (A_ == -1) {
     A_ = most_popular_iso_A[acronym];
@@ -159,10 +162,9 @@ Ion create_ion(const std::string& name) {
   p.Z = data.Z[it];
   p.A = A_;
   p.pdg = calculatePDG(p.Z, p.A, 0, 0);
-  
+
   return p;
 }
-
 
 /**
  * @brief Create an Ion from atomic number Z and mass number A.
@@ -182,11 +184,8 @@ Ion from_ZA(long long Z, long long A) {
         Ion ion = nb::cast<Ion>(result);
         return ion;
       } catch (const nb::cast_error&) {
-        throw std::invalid_argument(
-          "Expected Ion type for Z=" + std::to_string(Z) + 
-          ", A=" + std::to_string(A) + 
-          ", but got Particle instead"
-        );
+        throw std::invalid_argument("Expected Ion type for Z=" + std::to_string(Z) + ", A=" + std::to_string(A) +
+                                    ", but got Particle instead");
       }
     }
   }
@@ -205,7 +204,7 @@ nb::object from_pdg(long long pdg_code) {
   if (pdg_code == 2212) {
     return nb::cast(from_ZA(1, 1));
   }
-  
+
   if (pdg_code == 2112) {
     return nb::cast(from_string("neutron"));
   }
@@ -214,7 +213,6 @@ nb::object from_pdg(long long pdg_code) {
   }
 
   const auto& data = AT_Particle_Data;
-
 
   if (pdg_code < 1000000000) {
     throw nb::value_error(("PDG code does not correspond to a nucleus: " + std::to_string(pdg_code)).c_str());
@@ -257,18 +255,16 @@ std::vector<std::string> get_acronyms() {
   return acronyms;
 }
 
-
 /**
  * @brief Short string representation.
  */
 std::string Particle::str() const {
-    return element_acronym;  
+  return element_acronym;
 }
 
 /**
  * @brief Detailed string representation.
  */
 std::string Particle::repr() const {
-    return "Particle(name=\"" + element_name +
-           "\", acronym=\"" + element_acronym + "\")";
+  return "Particle(name=\"" + element_name + "\", acronym=\"" + element_acronym + "\")";
 }

@@ -5,7 +5,6 @@
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
 
-
 #include <optional>
 #include <string>
 #include <vector>
@@ -60,53 +59,52 @@ std::vector<std::string> get_acronyms();
  * - element_acronym (std::string): Element acronym.
  */
 class Particle {
-
-
  public:
-   /**
-    * @brief Construct a Particle from a PDG code.
-    *
-    * For ion PDG codes, this constructor throws and advises using Ion instead.
-    *
-    * @param pdg_code PDG code.
-    * @throws std::invalid_argument If the PDG code is invalid or corresponds to an ion.
-    */
+  /**
+   * @brief Construct a Particle from a PDG code.
+   *
+   * For ion PDG codes, this constructor throws and advises using Ion instead.
+   *
+   * @param pdg_code PDG code.
+   * @throws std::invalid_argument If the PDG code is invalid or corresponds to an ion.
+   */
   Particle(long long pdg_code);
   Particle();
 
-  long id;                     /**< The id of particle. */
-  long long pdg; 
+  long id; /**< The id of particle. */
+  long long pdg;
   double atomic_weight;        /**< Atomic weight of the particle. */
   std::string element_name;    /**< Name of the particle. */
   std::string element_acronym; /**< Acronym of the particle. */
 
-   /**
-    * @brief Short string representation.
-    *
-    * @return std::string Element acronym.
-    */
-   std::string str() const;
+  /**
+   * @brief Short string representation.
+   *
+   * @return std::string Element acronym.
+   */
+  std::string str() const;
 
-   /**
-    * @brief Detailed string representation.
-    *
-    * @return std::string Debug-friendly representation.
-    */
-   std::string repr() const;
+  /**
+   * @brief Detailed string representation.
+   *
+   * @return std::string Debug-friendly representation.
+   */
+  std::string repr() const;
 
+  /**
+   * @brief Construct a Particle or Ion from a string representation.
+   *
+   * The string can be:
+   *   - Element acronym ("He", "C", "U")
+   *   - Isotope notation ("3He", "4He", "12C", "238U")
+   *   - Special names "proton", "alpha", "neutron", "electron"
+   */
 
-   /**
-    * @brief Construct a Particle or Ion from a string representation.
-    *
-    * The string can be:
-    *   - Element acronym ("He", "C", "U")
-    *   - Isotope notation ("3He", "4He", "12C", "238U")
-    *   - Special names "proton", "alpha", "neutron", "electron"
-    */
+  // helper for handling Particle arguments in functions
+  long get_id() const;
 };
 
 #include "ions/ion.h"
-
 
 /**
  * @brief Create an Ion from atomic number Z and mass number A.
@@ -117,8 +115,6 @@ class Particle {
  * @throws std::invalid_argument If the element or isotope is not found.
  */
 Ion from_ZA(long long Z, long long A);
-
-
 
 /**
  * @brief Create a Particle or Ion from a string label.

@@ -1,8 +1,11 @@
 #include "stopping_power.h"
 
-#include <functional>  // For std::function
+#include <algorithm>
+#include <cctype>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include "../materials/materials.h"
 #include "../wrapper/cartesian_product.h"
 #include "../wrapper/multi_argument.h"
 
@@ -10,119 +13,107 @@ extern "C" {
 #include "AT_StoppingPower.h"
 }
 
-using ids_getter = std::function<int(const nb::object&)>;
+namespace {
 
-// Forward declaration
-static nb::object get_id(const nb::object& object, const ids_getter& getter);
+constexpr long kPstarMaterialMin = 1;
+constexpr long kPstarMaterialMax = 9;
+constexpr long kIcruMaterialWater = 1;
+constexpr long kIcruMaterialAluminumOxide = 2;
 
-// Reuse process_material from materials.h (already available)
-// For particle: accept int or Particle object, extract particle_no
-static int process_particle(const nb::object& particle) {
-  if (nb::isinstance<nb::int_>(particle)) {
-    return nb::cast<int>(particle);
+StoppingPowerSource parse_stopping_power_source(const nb::object& source) {
+  if (nb::isinstance<StoppingPowerSource>(source)) {
+    return nb::cast<StoppingPowerSource>(source);
   }
-  // Try to treat as a Particle object with a particle_no-style encoding
-  nb::module_ pyamtrack_mod = nb::module_::import_("pyamtrack.particles");
-  nb::object ParticleType = pyamtrack_mod.attr("Particle");
-  if (nb::isinstance(particle, ParticleType)) {
-    int Z = nb::cast<int>(particle.attr("Z"));
-    nb::object A_obj = particle.attr("A");
-    if (A_obj.is_none()) {
-      throw nb::type_error(
-          "Particle.A is None. Construct particles using Particle.from_number(...) "
-          "or an isotope string (e.g. '12C').");
-    }
-    int A = nb::cast<int>(A_obj);
-    return 1000 * Z + A;
+  if (nb::isinstance<nb::str>(source)) {
+    std::string source_str = nb::cast<std::string>(source);
+    std::transform(source_str.begin(), source_str.end(), source_str.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if (source_str == "default") return StoppingPowerSource::Default;
+    if (source_str == "bethe") return StoppingPowerSource::Bethe;
+    if (source_str == "pstar") return StoppingPowerSource::PSTAR;
+    if (source_str == "icru") return StoppingPowerSource::ICRU;
+    throw std::invalid_argument("source must be \"default\", \"bethe\", \"pstar\", or \"icru\", got: " + source_str);
   }
-  throw nb::type_error("Particle argument must be an integer (particle_no) or a Particle object");
+  throw nb::type_error("source must be a StoppingPowerSource enum value or a string");
 }
 
-nb::object mass_stopping_power(const nb::object& E_MeV_u,
-                               const nb::object& particle,
-                               const nb::object& material,
-                               int source,
-                               bool cartesian_product) {
-  std::vector<nb::object> arguments_vector;
-  arguments_vector.push_back(E_MeV_u);
-  arguments_vector.push_back(get_id(particle, process_particle));
-  arguments_vector.push_back(get_id(material, process_material));
+bool has_pstar_data(long material_id) {
+  return material_id >= kPstarMaterialMin && material_id <= kPstarMaterialMax;
+}
 
-  // Capture source by value in the lambda
-  auto compute = [source](const std::vector<std::variant<double, int>>& vec) -> double {
+bool has_icru_data(long material_id) {
+  return material_id == kIcruMaterialWater || material_id == kIcruMaterialAluminumOxide;
+}
+
+long resolve_source_no(StoppingPowerSource source, long material_id) {
+  StoppingPowerSource resolved = source;
+  if (resolved == StoppingPowerSource::Default) {
+    resolved = get_default_stopping_power_source(material_id);
+  }
+
+  if (resolved == StoppingPowerSource::PSTAR && !has_pstar_data(material_id)) {
+    throw std::invalid_argument("PSTAR stopping-power data are not available for material ID " +
+                                std::to_string(material_id));
+  }
+  if (resolved == StoppingPowerSource::ICRU && !has_icru_data(material_id)) {
+    throw std::invalid_argument("ICRU stopping-power data are not available for material ID " +
+                                std::to_string(material_id));
+  }
+
+  return static_cast<long>(resolved);
+}
+
+template <typename LibStoppingFunction>
+nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle,
+                                   const nb::object& material, const nb::object& source, bool cartesian_product,
+                                   LibStoppingFunction lib_function) {
+  const StoppingPowerSource source_enum = parse_stopping_power_source(source);
+  validate_material_argument(material);
+  validate_particle_argument(particle);
+
+  std::vector<nb::object> arguments_vector;
+  arguments_vector.push_back(energy_MeV_u);
+  arguments_vector.push_back(parse_particle_argument(particle));
+  arguments_vector.push_back(parse_material_argument(material));
+
+  auto compute = [source_enum, lib_function](const std::vector<std::variant<double, int>>& vec) -> double {
     if (vec.size() < 3) {
       throw std::invalid_argument("Input vector must have at least three elements.");
     }
     double energy = variant_cast<double>(vec[0]);
-    int particle_no = variant_cast<int>(vec[1]);
-    int material_no = variant_cast<int>(vec[2]);
+    long particle_no = static_cast<long>(variant_cast<int>(vec[1]));
+    long material_no = static_cast<long>(variant_cast<int>(vec[2]));
 
-    long n = 1;
-    long part_no = static_cast<long>(particle_no);
-    long mat_no = static_cast<long>(material_no);
+    if (energy <= 0.0) {
+      throw std::invalid_argument("energy_MeV_u must be > 0, got: " + std::to_string(energy));
+    }
+
+    const long source_no = resolve_source_no(source_enum, material_no);
+    const long n = 1;
     double result = 0.0;
-
-    AT_Mass_Stopping_Power_with_no(
-        static_cast<long>(source), n, &energy, &part_no, mat_no, &result);
-
+    lib_function(source_no, n, &energy, &particle_no, material_no, &result);
     return result;
   };
 
-  if (cartesian_product)
-    return wrap_cartesian_product_function(compute, arguments_vector);
+  if (cartesian_product) return wrap_cartesian_product_function(compute, arguments_vector);
   return wrap_multiargument_function(compute, arguments_vector);
 }
 
+}  // namespace
 
-nb::object stopping_power(const nb::object& E_MeV_u,
-                               const nb::object& particle,
-                               const nb::object& material,
-                               int source,
-                               bool cartesian_product) {
-  std::vector<nb::object> arguments_vector;
-  arguments_vector.push_back(E_MeV_u);
-  arguments_vector.push_back(get_id(particle, process_particle));
-  arguments_vector.push_back(get_id(material, process_material));
-
-  // Capture source by value in the lambda
-  auto compute = [source](const std::vector<std::variant<double, int>>& vec) -> double {
-    if (vec.size() < 3) {
-      throw std::invalid_argument("Input vector must have at least three elements.");
-    }
-    double energy = variant_cast<double>(vec[0]);
-    int particle_no = variant_cast<int>(vec[1]);
-    int material_no = variant_cast<int>(vec[2]);
-
-    long n = 1;
-    long part_no = static_cast<long>(particle_no);
-    long mat_no = static_cast<long>(material_no);
-    double result = 0.0;
-
-    AT_Stopping_Power_with_no(
-        static_cast<long>(source), n, &energy, &part_no, mat_no, &result);
-
-    return result;
-  };
-
-  if (cartesian_product)
-    return wrap_cartesian_product_function(compute, arguments_vector);
-  return wrap_multiargument_function(compute, arguments_vector);
+StoppingPowerSource get_default_stopping_power_source(long material_id) {
+  if (has_pstar_data(material_id)) return StoppingPowerSource::PSTAR;
+  return StoppingPowerSource::Bethe;
 }
 
-static nb::object get_id(const nb::object& object, const ids_getter& getter) {
-  if (nb::isinstance<nb::list>(object)) {
-    auto list = nb::cast<nb::list>(object);
-    nb::list id;
-    for (int i = 0; i < nb::len(list); i++) {
-      id.append(getter(nb::cast(list[i])));
-    }
-    return nb::cast(id);
-  } else if (check_int_dtype(object)) {
-    return object;
-  } else if (nb::isinstance<nb::ndarray<>>(object)) {
-    throw nb::type_error("numpy arrays of type other than int unsupported");
-  } else {
-    int id = getter(object);
-    return nb::cast(id);
-  }
+nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+                               const nb::object& source, bool cartesian_product) {
+  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product,
+                                 AT_Mass_Stopping_Power_with_no);
+}
+
+nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+                          const nb::object& source, bool cartesian_product) {
+  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product,
+                                 AT_Stopping_Power_with_no);
 }

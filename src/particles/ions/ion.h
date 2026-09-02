@@ -1,4 +1,7 @@
 #pragma once
+#include <stdexcept>
+#include <string>
+
 #include "../particles.h"
 
 /**
@@ -18,6 +21,18 @@ class Ion : public Particle {
    */
   Ion();
 
-  long Z;  /**< Atomic number of the ion. */
-  long A;  /**< Mass number of the ion. */
+  long Z; /**< Atomic number of the ion. */
+  long A; /**< Mass number of the ion. */
+
+  /**
+   * @brief libamtrack particle number (1000*Z + A).
+   *
+   * Used when passing ions into calculation functions such as stopping power.
+   */
+  long get_particle_no() const {
+    if (Z < 1 || A < 1) {
+      throw std::invalid_argument("Ion is missing a valid Z and A");
+    }
+    return AT_particle_no_from_Z_and_A_single(Z, A);
+  }
 };
