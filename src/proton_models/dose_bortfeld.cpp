@@ -7,6 +7,7 @@
 
 #include "../wrapper/cartesian_product.h"
 #include "../wrapper/multi_argument.h"
+#include "../materials/materials.h"
 
 extern "C" {
 #include "AT_ProtonAnalyticalModels.h"  // adjust to the correct header providing AT_dose_Bortfeld_Gy_*
@@ -24,7 +25,7 @@ nb::object dose_bortfeld(const nb::object& z_cm, const nb::object& entrance_dose
   if (E < 0.1 || E > 10000.0) throw std::invalid_argument("E_MeV must be in [0.1, 10000.0]");
   if (sigma_frac <= 0.0 || sigma_frac >= 1.0) throw std::invalid_argument("sigma_E_fraction must be in (0,1)");
   if (eps_val < 0.0 || eps_val >= 1.0) throw std::invalid_argument("eps must be in [0,1)");
-  if (mat_id < 1 || mat_id > 24) throw std::invalid_argument("material ID must be in [1,24]");
+  if (mat_id < 1) throw std::invalid_argument("material ID must be correct");
   if (entrance_dose < 0.0) throw std::invalid_argument("entrance_dose_Gy must be >= 0");
 
   const double sigma_E_MeV = sigma_frac * E;
