@@ -7,4 +7,4 @@ scikit_build_core==1.0.3
 setuptools-scm==9.2.2
 pytest==9.1.1
 pre-commit==4.6.2
-clang-format==22.1.5
+clang-format==23.1.0
