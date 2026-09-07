@@ -1,5 +1,5 @@
 build==1.6.0
-cmake==4.3.2
+cmake==4.4.3
 ninja==1.13.0
 numpy==2.2.4
 nanobind==3.0.1
