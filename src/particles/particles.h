@@ -102,6 +102,10 @@ class Particle {
 
   // helper for handling Particle arguments in functions
   long get_id() const;
+
+  long get_particle_no() const {
+    throw std::invalid_argument("Particle is not an ion and does not have a particle number");
+  }
 };
 
 #include "ions/ion.h"

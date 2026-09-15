@@ -19,14 +19,6 @@ namespace nb = nanobind;
 enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
 
 /**
- * @brief Choose the default stopping-power source for a material.
- *
- * PSTAR tables exist for material IDs 1-9 (liquid water through copper).
- * Other materials fall back to the Bethe formula.
- */
-StoppingPowerSource get_default_stopping_power_source(long material_id);
-
-/**
  * @brief Calculate mass stopping power in MeV*cm2/g.
  *
  * Wraps AT_Mass_Stopping_Power_with_no from libamtrack.
@@ -60,5 +52,9 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
  */
 nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
                           const nb::object& source, bool cartesian_product);
+
+long parse_stopping_power_source(const nb::object& source);
+
+long select_stopping_power_source(long source, long material_no, long particle_no);
 
 #endif  // STOPPING_POWER_H
