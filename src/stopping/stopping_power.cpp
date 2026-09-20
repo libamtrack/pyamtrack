@@ -22,10 +22,41 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
   long material_no = nb::cast<long>(parse_material_argument(material));
   long source_id = select_stopping_power_source(parse_stopping_power_source(source), material_no, particle_no);
 
-  double energy_value = nb::cast<double>(energy_MeV_u);
-  double result;
-  AT_Mass_Stopping_Power_with_no(source_id, 1, &energy_value, &particle_no, material_no, &result);
-  return nb::cast(result);
+  std::vector<nb::object> arguments_vector;
+  arguments_vector.push_back(energy_MeV_u);
+  arguments_vector.push_back(nb::cast(particle_no));
+  arguments_vector.push_back(nb::cast(material_no));
+  arguments_vector.push_back(nb::cast(source_id));
+
+  auto stopping_power_scalar =
+    [](const std::vector<std::variant<double, int>>& values) -> double {
+      double energy = variant_cast<double>(values[0]);
+      long particle_no = variant_cast<long>(values[1]);
+      long material_no = variant_cast<long>(values[2]);
+      long source = variant_cast<long>(values[3]);
+      if (energy <= 0.0) {
+        throw std::invalid_argument("energy_MeV_u must be > 0");
+      }
+      // Must happen here because material may be an array.
+      source = select_stopping_power_source(source, material_no, particle_no);
+      double result = 0.0;
+      int status = AT_Mass_Stopping_Power_with_no(
+          source,
+          1,
+          &energy,
+          &particle_no,
+          material_no,
+          &result);
+      if (status != AT_Success) {
+        throw std::invalid_argument("Stopping-power calculation failed");
+      }
+      return result;
+    };
+  
+  if (cartesian_product) {
+    return wrap_cartesian_product_function(stopping_power_scalar, arguments_vector);
+  }
+  return wrap_multiargument_function(stopping_power_scalar, arguments_vector);
 }
 
 // nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
