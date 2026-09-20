@@ -2,10 +2,11 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cmath>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <optional>
 
 #include "../wrapper/cartesian_product.h"
 #include "../wrapper/multi_argument.h"
@@ -14,67 +15,76 @@ extern "C" {
 #include "AT_StoppingPower.h"
 }
 
-nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources) {
+using StoppingPowerFunction = int (*)(const long, const long, const double[], const long[], const long, double[]);
+
+namespace {
+// wrapper function to evaluate stopping power using the provided stopping_power_function
+// shared code between mass_stopping_power and stopping_power to avoid duplication
+nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle,
+                                   const nb::object& material, const nb::object& source, bool cartesian_product,
+                                   bool allow_multiple_sources, StoppingPowerFunction stopping_power_function) {
   validate_particle_argument(particle);
   validate_material_argument(material);
 
-  long particle_no = nb::cast<long>(parse_particle_argument(particle));
-  long material_no = nb::cast<long>(parse_material_argument(material));
-  long source_id = select_stopping_power_source(parse_stopping_power_source(source), material_no, particle_no);
+  const long requested_source = parse_stopping_power_source(source);
 
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(energy_MeV_u);
-  arguments_vector.push_back(nb::cast(particle_no));
-  arguments_vector.push_back(nb::cast(material_no));
-  arguments_vector.push_back(nb::cast(source_id));
+  arguments_vector.push_back(parse_particle_argument(particle));
+  arguments_vector.push_back(parse_material_argument(material));
+  arguments_vector.push_back(nb::cast(requested_source));
 
-  std::optional<long> choosen_source = std::nullopt;
+  auto stopping_power_scalar = [allow_multiple_sources, chosen_source = std::optional<long>{}, stopping_power_function](
+                                   const std::vector<std::variant<double, int>>& values) mutable -> double {
+    if (values.size() < 4) {
+      throw std::invalid_argument("Stopping-power input must contain energy, particle, material, and source.");
+    }
 
-  auto stopping_power_scalar =
-    [&choosen_source, allow_multiple_sources](const std::vector<std::variant<double, int>>& values) -> double {
-      double energy = variant_cast<double>(values[0]);
-      long particle_no = variant_cast<long>(values[1]);
-      long material_no = variant_cast<long>(values[2]);
-      long source = variant_cast<long>(values[3]);
-      if (energy <= 0.0) {
-        throw std::invalid_argument("energy_MeV_u must be > 0");
-      }
-      
-      source = select_stopping_power_source(source, material_no, particle_no);
-      
-      if (!allow_multiple_sources) {
-        if (choosen_source.has_value() && choosen_source.value() != source) {
-          throw std::invalid_argument("Inconsistent stopping power source selection");
-        }
-        choosen_source = source;
-      }
+    double energy = variant_cast<double>(values[0]);
+    long particle_no = variant_cast<long>(values[1]);
+    long material_no = variant_cast<long>(values[2]);
+    long source = variant_cast<long>(values[3]);
 
-      double result = 0.0;
-      int status = AT_Mass_Stopping_Power_with_no(
-          source,
-          1,
-          &energy,
-          &particle_no,
-          material_no,
-          &result);
-      if (status != AT_Success) {
-        throw std::invalid_argument("Stopping-power calculation failed");
+    if (!std::isfinite(energy) || energy <= 0.0) {
+      throw std::invalid_argument("energy_MeV_u must be > 0 and finite");
+    }
+
+    source = select_stopping_power_source(source, material_no, particle_no);
+
+    if (!allow_multiple_sources) {
+      if (chosen_source.has_value() && chosen_source.value() != source) {
+        throw std::invalid_argument("Inconsistent stopping power source selection");
       }
-      return result;
-    };
-  
+      chosen_source = source;
+    }
+
+    double result = 0.0;
+    const int status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &result);
+    if (status != AT_Success || result < 0.0) {
+      throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
+    }
+    return result;
+  };
+
   if (cartesian_product) {
     return wrap_cartesian_product_function(stopping_power_scalar, arguments_vector);
   }
   return wrap_multiargument_function(stopping_power_scalar, arguments_vector);
 }
 
-// nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-//                           const nb::object& source, bool cartesian_product) {
-//   return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product,
-//                                  AT_Stopping_Power_with_no);
-// }
+}  // namespace
+
+nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources) {
+  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_multiple_sources,
+                                 AT_Mass_Stopping_Power_with_no);
+}
+
+nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+                          const nb::object& source, bool cartesian_product, bool allow_multiple_sources) {
+  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_multiple_sources,
+                                 AT_Stopping_Power_with_no);
+}
 
 long parse_stopping_power_source(const nb::object& source) {
   if (nb::isinstance<long>(source)) {

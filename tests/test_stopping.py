@@ -1,10 +1,12 @@
-# import numpy as np
-# import pytest
+import numpy as np
+import pytest
 
-# import pyamtrack.materials
-# import pyamtrack.particles
-# import pyamtrack.stopping
-# from pyamtrack.stopping import StoppingPowerSource
+import pyamtrack.materials
+import pyamtrack.particles
+import pyamtrack.stopping
+
+PROTON_NO = 1001
+CARBON_NO = 6012
 
 
 # @pytest.fixture
@@ -237,3 +239,67 @@
 
 #     with pytest.raises(ValueError, match="Incompatible lists/arrays size"):
 #         func([10.0, 100.0], particle=[PROTON_NO])
+
+
+def test_stopping_power_functions_support_scalar_and_energy_sequences():
+    energies = np.array([1.0, 10.0, 100.0])
+
+    for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
+        scalar = function(100.0)
+        values = function(energies)
+
+        assert isinstance(scalar, float)
+        assert isinstance(values, np.ndarray)
+        assert values.shape == energies.shape
+        assert np.all(np.isfinite(values))
+        assert np.all(values > 0.0)
+
+
+def test_mass_and_linear_stopping_power_have_expected_units():
+    material = pyamtrack.materials.water_liquid
+    mass_value = pyamtrack.stopping.mass_stopping_power(100.0, material=material, source="pstar")
+    linear_value = pyamtrack.stopping.stopping_power(100.0, material=material, source="pstar")
+
+    expected_linear_value = mass_value * material.density_g_cm3 / 10.0
+    assert linear_value == pytest.approx(expected_linear_value)
+
+
+def test_allow_multiple_sources_supports_material_dependent_defaults():
+    result = pyamtrack.stopping.mass_stopping_power(
+        100.0,
+        material=[1, 24],
+        source="default",
+        allow_multiple_sources=True,
+    )
+    expected = np.array(
+        [
+            pyamtrack.stopping.mass_stopping_power(100.0, material=1, source="pstar"),
+            pyamtrack.stopping.mass_stopping_power(100.0, material=24, source="bethe"),
+        ]
+    )
+
+    assert result.shape == (2,)
+    np.testing.assert_allclose(result, expected)
+
+
+def test_allow_multiple_sources_rejects_inconsistent_defaults_by_default():
+    with pytest.raises(RuntimeError, match="Inconsistent stopping power source selection"):
+        pyamtrack.stopping.mass_stopping_power(
+            100.0,
+            material=[1, 24],
+            source="default",
+        )
+
+
+def test_stopping_power_functions_support_cartesian_products():
+    energies = np.array([10.0, 100.0])
+    particles = [PROTON_NO, CARBON_NO]
+
+    for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
+        result = function(energies, particle=particles, source="bethe", cartesian_product=True)
+        expected = np.array(
+            [[function(energy, particle=particle, source="bethe") for particle in particles] for energy in energies]
+        )
+
+        assert result.shape == (2, 2)
+        np.testing.assert_allclose(result, expected)

@@ -11,20 +11,20 @@ NB_MODULE(stopping, m) {
       "Functions for calculating stopping power of ions and protons and range of particles in "
       "materials.";
 
-//   nb::enum_<StoppingPowerSource>(m, "StoppingPowerSource")
-//       .value("DEFAULT", StoppingPowerSource::Default)
-//       .value("BETHE", StoppingPowerSource::Bethe)
-//       .value("PSTAR", StoppingPowerSource::PSTAR)
-//       .value("ICRU", StoppingPowerSource::ICRU)
-//       .export_values();
+  nb::enum_<StoppingPowerSource>(m, "StoppingPowerSource")
+      .value("DEFAULT", StoppingPowerSource::Default)
+      .value("BETHE", StoppingPowerSource::Bethe)
+      .value("PSTAR", StoppingPowerSource::PSTAR)
+      .value("ICRU", StoppingPowerSource::ICRU)
+      .export_values();
 
   // Create submodule for electron-range models
   nb::module_ models = m.def_submodule("models", "Electron range models");
 
   // Add model constants using the map
-//   for (const auto& [name, id] : STOPPING_MODELS) {
-//     models.attr(name.c_str()) = nb::int_(id);
-//   }
+  //   for (const auto& [name, id] : STOPPING_MODELS) {
+  //     models.attr(name.c_str()) = nb::int_(id);
+  //   }
 
   m.def("get_models", &get_models, "Returns list of available electron range models");
   m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
@@ -74,7 +74,8 @@ NB_MODULE(stopping, m) {
             If the input energy is negative or the model/material ID is invalid.
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001,
-        nb::arg("material") = 1, nb::arg("source") = 2, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
+        nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
+        nb::arg("allow_multiple_sources") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 
@@ -107,6 +108,9 @@ NB_MODULE(stopping, m) {
         cartesian_product : bool, optional
             If True, compute all combinations of iterable/array arguments (cartesian product).
             If False, compute elementwise. Default: False.
+        allow_multiple_sources : bool, optional
+            If True, default source selection may differ between elements. If False,
+            all elements must resolve to the same source. Default: False.
 
         Returns
         -------
@@ -123,53 +127,9 @@ NB_MODULE(stopping, m) {
             ID is invalid, or the requested source has no data for the material.
       )pbdoc");
 
-//   m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001, nb::arg("material") = 1,
-//         nb::arg("source") = "default", nb::arg("cartesian_product") = false,
-//         R"pbdoc(
-//         Calculate stopping power in keV/µm.
-//
-//         Wraps AT_Stopping_Power_with_no from libamtrack.
-//
-//         Parameters
-//         ----------
-//         energy_MeV_u : float or array_like
-//             Kinetic energy in MeV per nucleon. Must be > 0.
-//             Can be a float, a Python list, or a NumPy array.
-//         particle : int, Ion, list[int | Ion], or numpy int array, optional
-//             libamtrack particle number (1000*Z + A), or a pyamtrack.particles.ions.Ion
-//             object. Boolean values are not accepted. Elementary particles (neutron,
-//             electron) are not supported. Default: 1001 (proton).
-//         material : int, Material, list[int | Material], or numpy int array, optional
-//             Any material ID returned by pyamtrack.materials.get_ids(), or a
-//             pyamtrack.materials.Material object. Boolean values are not accepted.
-//             Default: 1 (liquid water).
-//         source : str or StoppingPowerSource, optional
-//             Stopping-power data source:
-//               - "default" : PSTAR when tabulated data exist for the material
-//                             (IDs 1-9), otherwise Bethe (case-insensitive).
-//               - "bethe"   : analytical Bethe formula (case-insensitive).
-//               - "pstar"   : NIST PSTAR tables (case-insensitive). Available for
-//                             material IDs 1-9.
-//               - "icru"    : ICRU 49/73 tables (case-insensitive). Available for
-//                             liquid water and aluminum oxide.
-//             The StoppingPowerSource.DEFAULT / BETHE / PSTAR / ICRU enum members
-//             are accepted as well. Default: "default".
-//         cartesian_product : bool, optional
-//             If True, compute all combinations of iterable/array arguments (cartesian product).
-//             If False, compute elementwise. Default: False.
-//
-//         Returns
-//         -------
-//         float or numpy.ndarray
-//             Stopping power in keV/µm.
-//
-//         Raises
-//         ------
-//         TypeError
-//             If particle or material is not an int, object, list, or int numpy array,
-//             if either is a bool, or if source is not a string or StoppingPowerSource.
-//         ValueError
-//             If energy_MeV_u is <= 0, source is not a known name, a material or particle
-//             ID is invalid, or the requested source has no data for the material.
-//       )pbdoc");
+  // If false, all elementwise evaluations must resolve to the same source.
+  // If true, the default source may be selected independently per element.
+  m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001, nb::arg("material") = 1,
+        nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
+        "Calculate density-scaled stopping power in keV/um.");
 }
