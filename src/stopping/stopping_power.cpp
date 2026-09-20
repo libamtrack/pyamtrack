@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include "../wrapper/cartesian_product.h"
 #include "../wrapper/multi_argument.h"
@@ -14,7 +15,7 @@ extern "C" {
 }
 
 nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                               const nb::object& source, bool cartesian_product) {
+                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources) {
   validate_particle_argument(particle);
   validate_material_argument(material);
 
@@ -28,8 +29,10 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
   arguments_vector.push_back(nb::cast(material_no));
   arguments_vector.push_back(nb::cast(source_id));
 
+  std::optional<long> choosen_source = std::nullopt;
+
   auto stopping_power_scalar =
-    [](const std::vector<std::variant<double, int>>& values) -> double {
+    [&choosen_source, allow_multiple_sources](const std::vector<std::variant<double, int>>& values) -> double {
       double energy = variant_cast<double>(values[0]);
       long particle_no = variant_cast<long>(values[1]);
       long material_no = variant_cast<long>(values[2]);
@@ -37,8 +40,16 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
       if (energy <= 0.0) {
         throw std::invalid_argument("energy_MeV_u must be > 0");
       }
-      // Must happen here because material may be an array.
+      
       source = select_stopping_power_source(source, material_no, particle_no);
+      
+      if (!allow_multiple_sources) {
+        if (choosen_source.has_value() && choosen_source.value() != source) {
+          throw std::invalid_argument("Inconsistent stopping power source selection");
+        }
+        choosen_source = source;
+      }
+
       double result = 0.0;
       int status = AT_Mass_Stopping_Power_with_no(
           source,

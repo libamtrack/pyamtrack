@@ -74,7 +74,7 @@ NB_MODULE(stopping, m) {
             If the input energy is negative or the model/material ID is invalid.
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001,
-        nb::arg("material") = 1, nb::arg("source") = 2, nb::arg("cartesian_product") = false,
+        nb::arg("material") = 1, nb::arg("source") = 2, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 

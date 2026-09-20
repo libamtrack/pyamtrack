@@ -35,7 +35,7 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
  * @return              Mass stopping power in MeV*cm2/g.
  */
 nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                               const nb::object& source, bool cartesian_product);
+                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources);
 
 /**
  * @brief Calculate stopping power in keV/um.
