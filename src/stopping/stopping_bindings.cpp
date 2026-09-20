@@ -75,7 +75,7 @@ NB_MODULE(stopping, m) {
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001,
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
-        nb::arg("allow_multiple_sources") = false,
+        nb::arg("allow_multiple_sources") = false, nb::arg("return_source") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 
@@ -96,8 +96,8 @@ NB_MODULE(stopping, m) {
             Default: 1 (liquid water).
         source : str or StoppingPowerSource, optional
             Stopping-power data source:
-              - "default" : PSTAR when tabulated data exist for the material
-                            (IDs 1-9), otherwise Bethe (case-insensitive).
+              - "default" : PSTAR when tabulated data cover the material and
+                            energy (IDs 1-9), otherwise Bethe (case-insensitive).
               - "bethe"   : analytical Bethe formula (case-insensitive).
               - "pstar"   : NIST PSTAR tables (case-insensitive). Available for
                             material IDs 1-9.
@@ -109,8 +109,13 @@ NB_MODULE(stopping, m) {
             If True, compute all combinations of iterable/array arguments (cartesian product).
             If False, compute elementwise. Default: False.
         allow_multiple_sources : bool, optional
-            If True, default source selection may differ between elements. If False,
-            all elements must resolve to the same source. Default: False.
+            If True, default source selection may differ between elements due to
+            material or energy coverage. If False, all elements must resolve to
+            the same source. Default: False.
+        return_source : bool, optional
+            If True, return ``(values, source_ids)``. The source IDs are the
+            resolved libamtrack sources: Bethe=1, PSTAR=2, and ICRU=3.
+            Default: False.
 
         Returns
         -------
@@ -124,12 +129,19 @@ NB_MODULE(stopping, m) {
             if either is a bool, or if source is not a string or StoppingPowerSource.
         ValueError
             If energy_MeV_u is <= 0, source is not a known name, a material or particle
-            ID is invalid, or the requested source has no data for the material.
+            ID is invalid, the requested source has no data for the material, or
+            energy_MeV_u is outside the selected source's tabulated range.
       )pbdoc");
 
-  // If false, all elementwise evaluations must resolve to the same source.
-  // If true, the default source may be selected independently per element.
   m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001, nb::arg("material") = 1,
         nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
-        "Calculate density-scaled stopping power in keV/um.");
+        nb::arg("return_source") = false,
+        R"pbdoc(
+        Calculate density-scaled stopping power in keV/µm.
+
+        The arguments accept scalar and sequence values. By default, sequence
+        values are evaluated elementwise; cartesian_product=True evaluates all
+        combinations. If return_source=True, return (values, source_ids), where
+        source_ids has the same scalar or array shape as values.
+        )pbdoc");
 }

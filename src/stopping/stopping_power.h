@@ -13,8 +13,8 @@ namespace nb = nanobind;
 /**
  * Stopping-power data source, matching libamtrack ids for Bethe / PSTAR / ICRU.
  *
- * Default is resolved per material: PSTAR when tabulated data exist (IDs 1-9),
- * otherwise the analytical Bethe formula.
+ * Default is resolved per value: PSTAR when tabulated data cover the material
+ * and energy (IDs 1-9), otherwise the analytical Bethe formula.
  */
 enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
 
@@ -34,10 +34,12 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
  * @param cartesian_product  Whether to compute cartesian product over arguments.
  * @param allow_multiple_sources  Whether default source selection may differ between
  *                                elementwise evaluations.
+ * @param return_source  Whether to return a tuple of values and resolved source IDs.
  * @return              Mass stopping power in MeV*cm2/g.
  */
 nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources);
+                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
+                               bool return_source);
 
 /**
  * @brief Calculate stopping power in keV/um.
@@ -52,10 +54,12 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
  * @param cartesian_product  Whether to compute cartesian product over arguments.
  * @param allow_multiple_sources  Whether default source selection may differ between
  *                                elementwise evaluations.
+ * @param return_source  Whether to return a tuple of values and resolved source IDs.
  * @return              Stopping power in keV/um.
  */
 nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                          const nb::object& source, bool cartesian_product, bool allow_multiple_sources);
+                          const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
+                          bool return_source);
 
 long parse_stopping_power_source(const nb::object& source);
 
