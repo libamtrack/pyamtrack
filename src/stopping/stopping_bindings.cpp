@@ -73,7 +73,7 @@ NB_MODULE(stopping, m) {
         ValueError
             If the input energy is negative or the model/material ID is invalid.
         )pbdoc");
-  m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001,
+  m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"),
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
         nb::arg("allow_multiple_sources") = false, nb::arg("return_source") = false,
         R"pbdoc(
@@ -133,7 +133,7 @@ NB_MODULE(stopping, m) {
             energy_MeV_u is outside the selected source's tabulated range.
       )pbdoc");
 
-  m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle") = 1001, nb::arg("material") = 1,
+  m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
         nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
         nb::arg("return_source") = false,
         R"pbdoc(

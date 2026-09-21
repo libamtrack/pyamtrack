@@ -7,6 +7,9 @@ import pyamtrack.stopping
 
 PROTON_NO = 1001
 CARBON_NO = 6012
+PROTON = pyamtrack.particles.proton
+CARBON = pyamtrack.particles.from_string("12C")
+HELIUM = pyamtrack.particles.He
 
 
 # @pytest.fixture
@@ -245,8 +248,8 @@ def test_stopping_power_functions_support_scalar_and_energy_sequences():
     energies = np.array([1.0, 10.0, 100.0])
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        scalar = function(100.0)
-        values = function(energies)
+        scalar = function(100.0, particle=PROTON)
+        values = function(energies, particle=PROTON)
 
         assert isinstance(scalar, float)
         assert isinstance(values, np.ndarray)
@@ -255,10 +258,16 @@ def test_stopping_power_functions_support_scalar_and_energy_sequences():
         assert np.all(values > 0.0)
 
 
+@pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
+def test_stopping_power_rejects_integer_particle_arguments(function):
+    with pytest.raises(TypeError):
+        function(100.0, particle=PROTON_NO)
+
+
 def test_mass_and_linear_stopping_power_have_expected_units():
     material = pyamtrack.materials.water_liquid
-    mass_value = pyamtrack.stopping.mass_stopping_power(100.0, material=material, source="pstar")
-    linear_value = pyamtrack.stopping.stopping_power(100.0, material=material, source="pstar")
+    mass_value = pyamtrack.stopping.mass_stopping_power(100.0, particle=PROTON, material=material, source="pstar")
+    linear_value = pyamtrack.stopping.stopping_power(100.0, particle=PROTON, material=material, source="pstar")
 
     expected_linear_value = mass_value * material.density_g_cm3 / 10.0
     assert linear_value == pytest.approx(expected_linear_value)
@@ -267,14 +276,15 @@ def test_mass_and_linear_stopping_power_have_expected_units():
 def test_allow_multiple_sources_supports_material_dependent_defaults():
     result = pyamtrack.stopping.mass_stopping_power(
         100.0,
+        particle=PROTON,
         material=[1, 24],
         source="default",
         allow_multiple_sources=True,
     )
     expected = np.array(
         [
-            pyamtrack.stopping.mass_stopping_power(100.0, material=1, source="pstar"),
-            pyamtrack.stopping.mass_stopping_power(100.0, material=24, source="bethe"),
+            pyamtrack.stopping.mass_stopping_power(100.0, particle=PROTON, material=1, source="pstar"),
+            pyamtrack.stopping.mass_stopping_power(100.0, particle=PROTON, material=24, source="bethe"),
         ]
     )
 
@@ -286,6 +296,7 @@ def test_allow_multiple_sources_rejects_inconsistent_defaults_by_default():
     with pytest.raises(RuntimeError, match="Inconsistent stopping power source selection"):
         pyamtrack.stopping.mass_stopping_power(
             100.0,
+            particle=PROTON,
             material=[1, 24],
             source="default",
         )
@@ -293,7 +304,7 @@ def test_allow_multiple_sources_rejects_inconsistent_defaults_by_default():
 
 def test_stopping_power_functions_support_cartesian_products():
     energies = np.array([10.0, 100.0])
-    particles = [PROTON_NO, CARBON_NO]
+    particles = [PROTON, CARBON]
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
         result = function(energies, particle=particles, source="bethe", cartesian_product=True)
@@ -307,7 +318,7 @@ def test_stopping_power_functions_support_cartesian_products():
 
 def test_return_source_reports_the_resolved_scalar_source():
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        values, source_id = function(100.0, source="pstar", return_source=True)
+        values, source_id = function(100.0, particle=PROTON, source="pstar", return_source=True)
 
         assert isinstance(values, float)
         assert source_id == 2
@@ -317,7 +328,7 @@ def test_return_source_matches_vector_result_shape():
     energies = np.array([1.0, 10.0, 100.0])
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        values, source_ids = function(energies, source="bethe", return_source=True)
+        values, source_ids = function(energies, particle=PROTON, source="bethe", return_source=True)
 
         assert values.shape == energies.shape
         assert source_ids.shape == energies.shape
@@ -328,6 +339,7 @@ def test_return_source_matches_vector_result_shape():
 def test_return_source_reports_material_dependent_default_sources():
     values, source_ids = pyamtrack.stopping.mass_stopping_power(
         100.0,
+        particle=PROTON,
         material=[1, 24],
         source="default",
         allow_multiple_sources=True,
@@ -344,6 +356,7 @@ def test_return_source_matches_cartesian_result_shape():
 
     values, source_ids = pyamtrack.stopping.stopping_power(
         energies,
+        particle=PROTON,
         material=materials,
         source="default",
         allow_multiple_sources=True,
@@ -360,7 +373,7 @@ def test_return_source_matches_cartesian_result_shape():
 @pytest.mark.parametrize("energy", [0.000999, 10000.001])
 def test_stopping_power_rejects_energy_outside_pstar_range(function, energy):
     with pytest.raises(ValueError, match="outside the PSTAR range"):
-        function(energy, source="pstar")
+        function(energy, particle=PROTON, source="pstar")
 
 
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
@@ -368,6 +381,7 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
     energies = [10.0, 100.0, 1_000_000_000.0]
     values, source_ids = function(
         energies,
+        particle=PROTON,
         material=pyamtrack.materials.water_liquid,
         source="default",
         allow_multiple_sources=True,
@@ -375,9 +389,9 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
     )
     expected = np.array(
         [
-            function(10.0, material=1, source="pstar"),
-            function(100.0, material=1, source="pstar"),
-            function(1_000_000_000.0, material=1, source="bethe"),
+            function(10.0, particle=PROTON, material=1, source="pstar"),
+            function(100.0, particle=PROTON, material=1, source="pstar"),
+            function(1_000_000_000.0, particle=PROTON, material=1, source="bethe"),
         ]
     )
 
@@ -388,10 +402,10 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
 def test_default_source_rejects_mixed_energy_sources_without_allow_multiple_sources(function):
     with pytest.raises(RuntimeError, match="Inconsistent stopping power source selection"):
-        function([10.0, 1_000_000_000.0], source="default")
+        function([10.0, 1_000_000_000.0], particle=PROTON, source="default")
 
 
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
 def test_icru_rejects_helium_energy_above_table_range(function):
     with pytest.raises(ValueError, match="outside the ICRU range"):
-        function(250.001, particle=2004, source="icru")
+        function(250.001, particle=HELIUM, source="icru")

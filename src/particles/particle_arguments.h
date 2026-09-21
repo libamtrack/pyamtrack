@@ -95,9 +95,9 @@ inline nb::object parse_particle_argument(const nb::object& argument) {
     throw nb::type_error("particle must be an integer (not bool), Ion, list, or NumPy array");
   }
 
-  if (nb::isinstance<nb::int_>(argument)) {
-    return argument;
-  }
+  // if (nb::isinstance<nb::int_>(argument)) {
+  //   return argument;
+  // }
 
   if (nb::isinstance<nb::list>(argument)) {
     nb::list values = nb::cast<nb::list>(argument);
