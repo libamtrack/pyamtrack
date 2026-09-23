@@ -132,11 +132,17 @@ nb::object make_source_metadata(const nb::object& values, const std::vector<long
   return nb::ndarray<long, nb::numpy>(metadata, shape.size(), shape.data(), owner).cast();
 }
 
+nb::object make_full_output_result(const nb::object& values, const nb::object& source_metadata) {
+  nb::object named_tuple_factory = nb::module_::import_("collections").attr("namedtuple");
+  nb::object result_type = named_tuple_factory("StoppingPowerResult", nb::make_tuple("value", "source_id"));
+  return result_type(values, source_metadata);
+}
+
 // wrapper function to evaluate stopping power using the provided stopping_power_function
 // shared code between mass_stopping_power and stopping_power to avoid duplication
 nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle,
                                    const nb::object& material, const nb::object& source, bool cartesian_product,
-                                   bool allow_multiple_sources, bool return_source,
+                                   bool allow_multiple_sources, bool full_output,
                                    StoppingPowerFunction stopping_power_function) {
   validate_particle_argument(particle);
   validate_material_argument(material);
@@ -151,7 +157,7 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::obj
   arguments_vector.push_back(nb::cast(requested_source));
 
   auto stopping_power_scalar =
-      [allow_multiple_sources, chosen_source = std::optional<long>{}, return_source, stopping_power_function,
+      [allow_multiple_sources, chosen_source = std::optional<long>{}, full_output, stopping_power_function,
        &resolved_sources](const std::vector<std::variant<double, int>>& values) mutable -> double {
     if (values.size() < 4) {
       throw std::invalid_argument("Stopping-power input must contain energy, particle, material, and source.");
@@ -181,7 +187,7 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::obj
     if (status != AT_Success || result < 0.0) {
       throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
     }
-    if (return_source) {
+    if (full_output) {
       resolved_sources.push_back(source);
     }
     return result;
@@ -194,26 +200,26 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::obj
     values = wrap_multiargument_function(stopping_power_scalar, arguments_vector);
   }
 
-  if (!return_source) {
+  if (!full_output) {
     return values;
   }
-  return nb::make_tuple(values, make_source_metadata(values, resolved_sources));
+  return make_full_output_result(values, make_source_metadata(values, resolved_sources));
 }
 
 }  // namespace
 
 nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
                                const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
-                               bool return_source) {
+                               bool full_output) {
   return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_multiple_sources,
-                                 return_source, AT_Mass_Stopping_Power_with_no);
+                                 full_output, AT_Mass_Stopping_Power_with_no);
 }
 
 nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
                           const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
-                          bool return_source) {
+                          bool full_output) {
   return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_multiple_sources,
-                                 return_source, AT_Stopping_Power_with_no);
+                                 full_output, AT_Stopping_Power_with_no);
 }
 
 long parse_stopping_power_source(const nb::object& source) {

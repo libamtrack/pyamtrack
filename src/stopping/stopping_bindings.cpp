@@ -75,7 +75,7 @@ NB_MODULE(stopping, m) {
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"),
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
-        nb::arg("allow_multiple_sources") = false, nb::arg("return_source") = false,
+        nb::arg("allow_multiple_sources") = false, nb::arg("full_output") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 
@@ -112,7 +112,7 @@ NB_MODULE(stopping, m) {
             If True, default source selection may differ between elements due to
             material or energy coverage. If False, all elements must resolve to
             the same source. Default: False.
-        return_source : bool, optional
+        full_output : bool, optional
             If True, return ``(values, source_ids)``. The source IDs are the
             resolved libamtrack sources: Bethe=1, PSTAR=2, and ICRU=3.
             Default: False.
@@ -135,13 +135,13 @@ NB_MODULE(stopping, m) {
 
   m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
         nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
-        nb::arg("return_source") = false,
+        nb::arg("full_output") = false,
         R"pbdoc(
         Calculate density-scaled stopping power in keV/µm.
 
         The arguments accept scalar and sequence values. By default, sequence
         values are evaluated elementwise; cartesian_product=True evaluates all
-        combinations. If return_source=True, return (values, source_ids), where
+        combinations. If full_output=True, return (values, source_ids), where
         source_ids has the same scalar or array shape as values.
         )pbdoc");
 }

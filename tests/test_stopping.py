@@ -316,19 +316,23 @@ def test_stopping_power_functions_support_cartesian_products():
         np.testing.assert_allclose(result, expected)
 
 
-def test_return_source_reports_the_resolved_scalar_source():
+def test_full_output_reports_the_resolved_scalar_source():
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        values, source_id = function(100.0, particle=PROTON, source="pstar", return_source=True)
+        result = function(100.0, particle=PROTON, source="pstar", full_output=True)
 
+        assert result._fields == ("value", "source_id")
+        values, source_id = result
         assert isinstance(values, float)
         assert source_id == 2
+        assert result.value == values
+        assert result.source_id == source_id
 
 
-def test_return_source_matches_vector_result_shape():
+def test_full_output_matches_vector_result_shape():
     energies = np.array([1.0, 10.0, 100.0])
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        values, source_ids = function(energies, particle=PROTON, source="bethe", return_source=True)
+        values, source_ids = function(energies, particle=PROTON, source="bethe", full_output=True)
 
         assert values.shape == energies.shape
         assert source_ids.shape == energies.shape
@@ -336,21 +340,21 @@ def test_return_source_matches_vector_result_shape():
         np.testing.assert_array_equal(source_ids, 1)
 
 
-def test_return_source_reports_material_dependent_default_sources():
+def test_full_output_reports_material_dependent_default_sources():
     values, source_ids = pyamtrack.stopping.mass_stopping_power(
         100.0,
         particle=PROTON,
         material=[1, 24],
         source="default",
         allow_multiple_sources=True,
-        return_source=True,
+        full_output=True,
     )
 
     assert values.shape == (2,)
     np.testing.assert_array_equal(source_ids, np.array([2, 1]))
 
 
-def test_return_source_matches_cartesian_result_shape():
+def test_full_output_matches_cartesian_result_shape():
     energies = np.array([10.0, 100.0])
     materials = [1, 24]
 
@@ -361,7 +365,7 @@ def test_return_source_matches_cartesian_result_shape():
         source="default",
         allow_multiple_sources=True,
         cartesian_product=True,
-        return_source=True,
+        full_output=True,
     )
 
     assert values.shape == (2, 2)
@@ -385,7 +389,7 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
         material=pyamtrack.materials.water_liquid,
         source="default",
         allow_multiple_sources=True,
-        return_source=True,
+        full_output=True,
     )
     expected = np.array(
         [
