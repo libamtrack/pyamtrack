@@ -27,7 +27,7 @@ class Ion : public Particle {
   /**
    * @brief internal ion number (1000*Z + A) used in the libamtrack C backend, called there `particle_no`
    *
-   * Used when passing ions into calculation functions such as stopping power.
+   * Used internally by C backend when passing ions into calculation functions such as stopping power.
    */
   long get_internal_particle_no() const {
     if (Z < 1 || A < 1) {
