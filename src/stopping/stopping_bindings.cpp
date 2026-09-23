@@ -75,7 +75,7 @@ NB_MODULE(stopping, m) {
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"),
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
-        nb::arg("allow_multiple_sources") = false, nb::arg("full_output") = false,
+        nb::arg("allow_bethe_fallback") = false, nb::arg("full_output") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 
@@ -108,10 +108,9 @@ NB_MODULE(stopping, m) {
         cartesian_product : bool, optional
             If True, compute all combinations of iterable/array arguments (cartesian product).
             If False, compute elementwise. Default: False.
-        allow_multiple_sources : bool, optional
-            If True, default source selection may differ between elements due to
-            material or energy coverage. If False, all elements must resolve to
-            the same source. Default: False.
+        allow_bethe_fallback : bool, optional
+            If True, allow fallback to the Bethe formula when the requested source has no data for the material.
+            If False, all elements must resolve to only tabular data. Default: False.
         full_output : bool, optional
             If True, return ``(values, source_ids)``. The source IDs are the
             resolved libamtrack sources: Bethe=1, PSTAR=2, and ICRU=3.
@@ -134,7 +133,7 @@ NB_MODULE(stopping, m) {
       )pbdoc");
 
   m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
-        nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_multiple_sources") = false,
+        nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_bethe_fallback") = false,
         nb::arg("full_output") = false,
         R"pbdoc(
         Calculate density-scaled stopping power in keV/µm.

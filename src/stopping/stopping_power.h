@@ -32,13 +32,12 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
  * @param source        StoppingPowerSource enum or case-insensitive name
  *                      ("default", "bethe", "pstar", "icru").
  * @param cartesian_product  Whether to compute cartesian product over arguments.
- * @param allow_multiple_sources  Whether default source selection may differ between
- *                                elementwise evaluations.
+ * @param allow_bethe_fallback  Whether to allow Bethe fallback when tabular data is requested but not available.
  * @param full_output  Whether to return a tuple of values and resolved source IDs.
  * @return              Mass stopping power in MeV*cm2/g.
  */
 nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                               const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
+                               const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                                bool full_output);
 
 /**
@@ -52,13 +51,12 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
  * @param source        StoppingPowerSource enum or case-insensitive name
  *                      ("default", "bethe", "pstar", "icru").
  * @param cartesian_product  Whether to compute cartesian product over arguments.
- * @param allow_multiple_sources  Whether default source selection may differ between
- *                                elementwise evaluations.
+ * @param allow_bethe_fallback  Whether to allow Bethe fallback when tabular data is requested but not available.
  * @param full_output  Whether to return a tuple of values and resolved source IDs.
  * @return              Stopping power in keV/um.
  */
 nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
-                          const nb::object& source, bool cartesian_product, bool allow_multiple_sources,
+                          const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                           bool full_output);
 
 long parse_stopping_power_source(const nb::object& source);

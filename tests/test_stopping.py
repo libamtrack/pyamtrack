@@ -273,18 +273,24 @@ def test_mass_and_linear_stopping_power_have_expected_units():
     assert linear_value == pytest.approx(expected_linear_value)
 
 
-def test_allow_multiple_sources_supports_material_dependent_defaults():
+def test_default_source_supports_material_dependent_defaults():
     result = pyamtrack.stopping.mass_stopping_power(
         100.0,
         particle=PROTON,
         material=[1, 24],
         source="default",
-        allow_multiple_sources=True,
+        allow_bethe_fallback=True,
     )
     expected = np.array(
         [
             pyamtrack.stopping.mass_stopping_power(100.0, particle=PROTON, material=1, source="pstar"),
-            pyamtrack.stopping.mass_stopping_power(100.0, particle=PROTON, material=24, source="bethe"),
+            pyamtrack.stopping.mass_stopping_power(
+                100.0,
+                particle=PROTON,
+                material=24,
+                source="bethe",
+                allow_bethe_fallback=True,
+            ),
         ]
     )
 
@@ -292,24 +298,26 @@ def test_allow_multiple_sources_supports_material_dependent_defaults():
     np.testing.assert_allclose(result, expected)
 
 
-def test_allow_multiple_sources_rejects_inconsistent_defaults_by_default():
-    with pytest.raises(RuntimeError, match="Inconsistent stopping power source selection"):
-        pyamtrack.stopping.mass_stopping_power(
-            100.0,
-            particle=PROTON,
-            material=[1, 24],
-            source="default",
-        )
-
-
 def test_stopping_power_functions_support_cartesian_products():
     energies = np.array([10.0, 100.0])
     particles = [PROTON, CARBON]
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        result = function(energies, particle=particles, source="bethe", cartesian_product=True)
+        result = function(
+            energies,
+            particle=particles,
+            source="bethe",
+            allow_bethe_fallback=True,
+            cartesian_product=True,
+        )
         expected = np.array(
-            [[function(energy, particle=particle, source="bethe") for particle in particles] for energy in energies]
+            [
+                [
+                    function(energy, particle=particle, source="bethe", allow_bethe_fallback=True)
+                    for particle in particles
+                ]
+                for energy in energies
+            ]
         )
 
         assert result.shape == (2, 2)
@@ -332,7 +340,13 @@ def test_full_output_matches_vector_result_shape():
     energies = np.array([1.0, 10.0, 100.0])
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        values, source_ids = function(energies, particle=PROTON, source="bethe", full_output=True)
+        values, source_ids = function(
+            energies,
+            particle=PROTON,
+            source="bethe",
+            allow_bethe_fallback=True,
+            full_output=True,
+        )
 
         assert values.shape == energies.shape
         assert source_ids.shape == energies.shape
@@ -346,7 +360,7 @@ def test_full_output_reports_material_dependent_default_sources():
         particle=PROTON,
         material=[1, 24],
         source="default",
-        allow_multiple_sources=True,
+        allow_bethe_fallback=True,
         full_output=True,
     )
 
@@ -363,7 +377,7 @@ def test_full_output_matches_cartesian_result_shape():
         particle=PROTON,
         material=materials,
         source="default",
-        allow_multiple_sources=True,
+        allow_bethe_fallback=True,
         cartesian_product=True,
         full_output=True,
     )
@@ -388,25 +402,25 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
         particle=PROTON,
         material=pyamtrack.materials.water_liquid,
         source="default",
-        allow_multiple_sources=True,
+        allow_bethe_fallback=True,
         full_output=True,
     )
     expected = np.array(
         [
             function(10.0, particle=PROTON, material=1, source="pstar"),
             function(100.0, particle=PROTON, material=1, source="pstar"),
-            function(1_000_000_000.0, particle=PROTON, material=1, source="bethe"),
+            function(
+                1_000_000_000.0,
+                particle=PROTON,
+                material=1,
+                source="bethe",
+                allow_bethe_fallback=True,
+            ),
         ]
     )
 
     np.testing.assert_array_equal(source_ids, np.array([2, 2, 1]))
     np.testing.assert_allclose(values, expected)
-
-
-@pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
-def test_default_source_rejects_mixed_energy_sources_without_allow_multiple_sources(function):
-    with pytest.raises(RuntimeError, match="Inconsistent stopping power source selection"):
-        function([10.0, 1_000_000_000.0], particle=PROTON, source="default")
 
 
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
