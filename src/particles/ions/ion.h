@@ -29,7 +29,7 @@ class Ion : public Particle {
    *
    * Used when passing ions into calculation functions such as stopping power.
    */
-  long get_particle_no() const {
+  long get_internal_particle_no() const {
     if (Z < 1 || A < 1) {
       throw std::invalid_argument("Ion is missing a valid Z and A");
     }

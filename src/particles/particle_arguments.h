@@ -38,7 +38,7 @@ inline void validate_particle_argument(const nb::object& argument) {
   }
 
   if (nb::isinstance<Ion>(argument)) {
-    nb::cast<Ion>(argument).get_particle_no();
+    nb::cast<Ion>(argument).get_internal_particle_no();
     return;
   }
 
@@ -82,7 +82,7 @@ inline void validate_particle_argument(const nb::object& argument) {
  */
 inline nb::object parse_particle_argument(const nb::object& argument) {
   if (nb::isinstance<Ion>(argument)) {
-    return nb::cast(nb::cast<Ion>(argument).get_particle_no());
+    return nb::cast(nb::cast<Ion>(argument).get_internal_particle_no());
   }
 
   if (nb::isinstance<Particle>(argument)) {
