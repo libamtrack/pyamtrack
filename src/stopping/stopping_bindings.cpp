@@ -91,7 +91,7 @@ NB_MODULE(stopping, m) {
             Any material ID returned by pyamtrack.materials.get_ids(), or a
             pyamtrack.materials.Material object. Boolean values are not accepted.
             Default: 1 (liquid water).
-        source : str or StoppingPowerSource, optional
+        source : str, int, or StoppingPowerSource, optional
             Stopping-power data source:
               - "default" : PSTAR when tabulated data cover the material and
                             energy (IDs 1-9), otherwise Bethe (case-insensitive).
@@ -100,6 +100,8 @@ NB_MODULE(stopping, m) {
                             material IDs 1-9.
               - "icru"    : ICRU 49/73 tables (case-insensitive). Available for
                             liquid water and aluminum oxide.
+            Integer source IDs are also accepted: 0=default, 1=Bethe,
+            2=PSTAR, and 3=ICRU.
             The StoppingPowerSource.DEFAULT / BETHE / PSTAR / ICRU enum members
             are accepted as well. Default: "default".
         cartesian_product : bool, optional
@@ -122,11 +124,13 @@ NB_MODULE(stopping, m) {
         ------
         TypeError
             If particle or material is not an int, object, list, or int numpy array,
-            if either is a bool, or if source is not a string or StoppingPowerSource.
+            or if either is a bool.
         ValueError
-            If energy_MeV_u is <= 0, source is not a known name, a material or particle
-            ID is invalid, the requested source has no data for the material, or
-            energy_MeV_u is outside the selected source's tabulated range.
+            If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
+            or enum value, a material or particle ID is invalid, Bethe fallback is
+            disabled for the resolved source, the requested source has no data for
+            the material, or energy_MeV_u is outside the selected source's
+            tabulated range.
       )pbdoc");
 
   m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
