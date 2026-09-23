@@ -16,12 +16,11 @@ namespace nb = nanobind;
  * @brief Validates a particle argument, recursing into lists and NumPy arrays.
  *
  * Stopping-power calculations require an ion (Z and A). Elementary particles
- * such as neutron and electron are rejected. Integer values are treated as
- * libamtrack particle numbers (1000*Z + A). Boolean values are not accepted.
+ * such as neutron and electron are rejected. Integer particle numbers are not
+ * accepted.
  *
- * @throws std::invalid_argument (ValueError) if a particle number does not
- *         correspond to a known element, or an Ion is missing Z/A.
- * @throws nb::type_error if the argument is not an int, Ion, list, or NumPy array.
+ * @throws std::invalid_argument (ValueError) if an Ion is missing Z/A.
+ * @throws nb::type_error if the argument is not an Ion, list, or NumPy array.
  */
 inline void validate_particle_argument(const nb::object& argument) {
   if (nb::isinstance<nb::list>(argument)) {
@@ -48,37 +47,14 @@ inline void validate_particle_argument(const nb::object& argument) {
         "elementary particles are not supported");
   }
 
-  long particle_no;
-  if (PyBool_Check(argument.ptr())) {
-    throw nb::type_error("particle must be an int (not bool), an Ion, or a list / NumPy array of either");
-  } else if (nb::isinstance<nb::int_>(argument)) {
-    particle_no = nb::cast<long>(argument);
-  } else {
-    throw nb::type_error("particle must be an int, an Ion, or a list / NumPy array of either");
-  }
-
-  const long Z = AT_Z_from_particle_no_single(particle_no);
-  const long A = AT_A_from_particle_no_single(particle_no);
-  if (A < 1) {
-    throw std::invalid_argument("invalid particle number: " + std::to_string(particle_no));
-  }
-  bool known_Z = false;
-  for (int i = 0; i < AT_Particle_Data.n; ++i) {
-    if (AT_Particle_Data.Z[i] == Z) {
-      known_Z = true;
-      break;
-    }
-  }
-  if (!known_Z) {
-    throw std::invalid_argument("invalid particle number: " + std::to_string(particle_no));
-  }
+  throw nb::type_error("particle must be an Ion, list, or NumPy array of Ions");
 }
 
 /**
  * @brief Convert a particle argument to libamtrack particle number(s).
  *
- * Ion objects become 1000*Z + A. Integers are passed through. Lists and
- * NumPy arrays are converted elementwise.
+ * Ion objects become 1000*Z + A. Lists and NumPy arrays are converted
+ * elementwise.
  */
 inline nb::object parse_particle_argument(const nb::object& argument) {
   if (nb::isinstance<Ion>(argument)) {
@@ -92,7 +68,7 @@ inline nb::object parse_particle_argument(const nb::object& argument) {
   }
 
   if (PyBool_Check(argument.ptr())) {
-    throw nb::type_error("particle must be an integer (not bool), Ion, list, or NumPy array");
+    throw nb::type_error("particle must be an Ion, list, or NumPy array of Ions");
   }
 
   if (nb::isinstance<nb::list>(argument)) {
@@ -108,7 +84,7 @@ inline nb::object parse_particle_argument(const nb::object& argument) {
     return parse_particle_argument(argument.attr("tolist")());
   }
 
-  throw nb::type_error("particle must be an integer, Ion, list, or NumPy array");
+  throw nb::type_error("particle must be an Ion, list, or NumPy array of Ions");
 }
 
 #endif  // PARTICLE_ARGUMENTS_H

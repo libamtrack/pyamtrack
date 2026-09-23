@@ -83,10 +83,10 @@ NB_MODULE(stopping, m) {
         energy_MeV_u : float or array_like
             Kinetic energy in MeV per nucleon. Must be > 0.
             Can be a float, a Python list, or a NumPy array.
-        particle : Ion, list[Ion].
-            libamtrack particle number (1000*Z + A), or a pyamtrack.particles.ions.Ion
-            object. Boolean values are not accepted. Elementary particles (neutron,
-            electron) are not supported. Default: 1001 (proton).
+        particle : Ion, list[Ion], or NumPy object array of Ion
+            A pyamtrack.particles.ions.Ion object or a sequence of ions.
+            Boolean values and integer particle numbers are not accepted.
+            Elementary particles (neutron, electron) are not supported.
         material : int, Material, list[int | Material], or numpy int array, optional
             Any material ID returned by pyamtrack.materials.get_ids(), or a
             pyamtrack.materials.Material object. Boolean values are not accepted.
@@ -123,8 +123,8 @@ NB_MODULE(stopping, m) {
         Raises
         ------
         TypeError
-            If particle or material is not an int, object, list, or int numpy array,
-            or if either is a bool.
+            If particle is not an Ion or a sequence of Ions, if material is not
+            an int, Material, or a supported sequence, or if either is a bool.
         ValueError
             If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
             or enum value, a material or particle ID is invalid, Bethe fallback is
@@ -146,10 +146,10 @@ NB_MODULE(stopping, m) {
         energy_MeV_u : float or array_like
             Kinetic energy in MeV per nucleon. Must be > 0.
             Can be a float, a Python list, or a NumPy array.
-        particle : Ion, list[Ion]
-            libamtrack particle number (1000*Z + A), or a pyamtrack.particles.ions.Ion
-            object. Boolean values are not accepted. Elementary particles (neutron,
-            electron) are not supported. Default: 1001 (proton).
+        particle : Ion, list[Ion], or NumPy object array of Ion
+            A pyamtrack.particles.ions.Ion object or a sequence of ions.
+            Boolean values and integer particle numbers are not accepted.
+            Elementary particles (neutron, electron) are not supported.
         material : int, Material, list[int | Material], or numpy int array, optional
             Any material ID returned by pyamtrack.materials.get_ids(), or a
             pyamtrack.materials.Material object. Boolean values are not accepted.
@@ -188,8 +188,8 @@ NB_MODULE(stopping, m) {
         Raises
         ------
         TypeError
-            If particle or material is not an int, object, list, or int NumPy array,
-            or if either is a bool.
+            If particle is not an Ion or a sequence of Ions, if material is not
+            an int, Material, or a supported sequence, or if either is a bool.
         ValueError
             If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
             or enum value, a material or particle ID is invalid, Bethe fallback is
