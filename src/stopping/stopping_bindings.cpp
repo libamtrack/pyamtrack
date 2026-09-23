@@ -139,9 +139,62 @@ NB_MODULE(stopping, m) {
         R"pbdoc(
         Calculate density-scaled stopping power in keV/µm.
 
-        The arguments accept scalar and sequence values. By default, sequence
-        values are evaluated elementwise; cartesian_product=True evaluates all
-        combinations. If full_output=True, return (values, source_ids), where
-        source_ids has the same scalar or array shape as values.
+        Wraps AT_Stopping_Power_with_no from libamtrack.
+
+        Parameters
+        ----------
+        energy_MeV_u : float or array_like
+            Kinetic energy in MeV per nucleon. Must be > 0.
+            Can be a float, a Python list, or a NumPy array.
+        particle : Ion, list[Ion]
+            libamtrack particle number (1000*Z + A), or a pyamtrack.particles.ions.Ion
+            object. Boolean values are not accepted. Elementary particles (neutron,
+            electron) are not supported. Default: 1001 (proton).
+        material : int, Material, list[int | Material], or numpy int array, optional
+            Any material ID returned by pyamtrack.materials.get_ids(), or a
+            pyamtrack.materials.Material object. Boolean values are not accepted.
+            Default: 1 (liquid water).
+        source : str, int, or StoppingPowerSource, optional
+            Stopping-power data source:
+              - "default" : PSTAR when tabulated data cover the material and
+                            energy (IDs 1-9), otherwise Bethe (case-insensitive).
+              - "bethe"   : analytical Bethe formula (case-insensitive).
+              - "pstar"   : NIST PSTAR tables (case-insensitive). Available for
+                            material IDs 1-9.
+              - "icru"    : ICRU 49/73 tables (case-insensitive). Available for
+                            liquid water and aluminum oxide.
+            Integer source IDs are also accepted: 0=default, 1=Bethe,
+            2=PSTAR, and 3=ICRU.
+            The StoppingPowerSource.DEFAULT / BETHE / PSTAR / ICRU enum members
+            are accepted as well. Default: "default".
+        cartesian_product : bool, optional
+            If True, compute all combinations of iterable/array arguments.
+            If False, compute elementwise. Default: False.
+        allow_bethe_fallback : bool, optional
+            If True, allow fallback to the Bethe formula when the resolved source
+            has no tabular data for the material or energy.
+            If False, Bethe fallback raises ValueError. Default: False.
+        full_output : bool, optional
+            If True, return ``(values, source_ids)``. The source IDs are the
+            resolved libamtrack sources: Bethe=1, PSTAR=2, and ICRU=3.
+            Default: False.
+
+        Returns
+        -------
+        float or numpy.ndarray
+            Linear stopping power in keV/µm. Returns a float when all inputs are
+            scalar and a NumPy array when any input is a list or array.
+
+        Raises
+        ------
+        TypeError
+            If particle or material is not an int, object, list, or int NumPy array,
+            or if either is a bool.
+        ValueError
+            If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
+            or enum value, a material or particle ID is invalid, Bethe fallback is
+            disabled for the resolved source, the requested source has no data for
+            the material, or energy_MeV_u is outside the selected source's
+            tabulated range.
         )pbdoc");
 }
