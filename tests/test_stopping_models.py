@@ -38,6 +38,12 @@ def test_model_id_mapping():
     assert stopping.model("scholz_new") == 8
 
 
+def test_model_constants_are_available():
+    """Test that model IDs are exposed through the models submodule."""
+    for model_name in stopping.get_models():
+        assert getattr(stopping.models, model_name) == stopping.model(model_name)
+
+
 def test_invalid_model(electron_energy_MeV):
     """Test handling of invalid model names."""
     with pytest.raises(ValueError, match="Unknown model name: invalid_model"):
