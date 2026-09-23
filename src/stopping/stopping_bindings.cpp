@@ -83,7 +83,7 @@ NB_MODULE(stopping, m) {
         energy_MeV_u : float or array_like
             Kinetic energy in MeV per nucleon. Must be > 0.
             Can be a float, a Python list, or a NumPy array.
-        particle : int, Ion, list[int | Ion], or numpy int array, optional
+        particle : Ion, list[Ion].
             libamtrack particle number (1000*Z + A), or a pyamtrack.particles.ions.Ion
             object. Boolean values are not accepted. Elementary particles (neutron,
             electron) are not supported. Default: 1001 (proton).
