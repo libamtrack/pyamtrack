@@ -18,6 +18,11 @@ NB_MODULE(stopping, m) {
       .value("ICRU", StoppingPowerSource::ICRU)
       .export_values();
 
+  nb::module_ models = m.def_submodule("models", "Electron range models");
+  for (const auto& [name, id] : STOPPING_MODELS) {
+    models.attr(name.c_str()) = nb::int_(id);
+  }
+
   m.def("get_models", &get_models, "Returns list of available electron range models");
   m.def("model", &get_model_id, nb::arg("name"), "Returns model ID for given model name");
 
