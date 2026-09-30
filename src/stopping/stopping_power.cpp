@@ -138,6 +138,7 @@ nb::object make_full_output_result(const nb::object& values, const nb::object& s
   return result_type(values, source_metadata);
 }
 
+// shared code between mass_stopping_power and stopping_power to avoid duplication
 double stopping_power_scalar(bool allow_bethe_fallback, bool full_output,
                              StoppingPowerFunction stopping_power_function, std::vector<long>& resolved_sources,
                              const std::vector<std::variant<double, int>>& values) {
@@ -162,14 +163,19 @@ double stopping_power_scalar(bool allow_bethe_fallback, bool full_output,
 
   double result = 0.0;
   const int status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &result);
+  
   if (status != AT_Success || result < 0.0) {
-    if (allow_bethe_fallback && source != static_cast<long>(StoppingPowerSource::Bethe)) {
-      source = static_cast<long>(StoppingPowerSource::Bethe);
-      const int fallback_status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &result);
-      if (fallback_status != AT_Success || result < 0.0) {
-        throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
-      }
-    } else {
+    bool can_fallback_to_bethe = allow_bethe_fallback && source != static_cast<long>(StoppingPowerSource::Bethe);
+    
+    if(!can_fallback_to_bethe) {
+      throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
+    }
+    
+    source = static_cast<long>(StoppingPowerSource::Bethe);
+    double fallback_result = 0.0;
+    const int fallback_status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &fallback_result);
+    
+    if (fallback_status != AT_Success || fallback_result < 0.0) {
       throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
     }
   }
