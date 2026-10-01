@@ -27,7 +27,7 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
  * elementwise; setting cartesian_product enables Cartesian-product evaluation.
  *
  * @param energy_MeV_u  Kinetic energy in MeV per nucleon.
- * @param particle      Particle number (1000*Z + A) or Ion object.
+ * @param particle      Particle object.
  * @param material      Material ID or Material object.
  * @param source        StoppingPowerSource enum or case-insensitive name
  *                      ("default", "bethe", "pstar", "icru").
@@ -46,7 +46,7 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
  * Wraps AT_Stopping_Power_with_no from libamtrack.
  *
  * @param energy_MeV_u  Kinetic energy in MeV per nucleon.
- * @param particle      Particle number (1000*Z + A) or Ion object.
+ * @param particle      Particle object.
  * @param material      Material ID or Material object.
  * @param source        StoppingPowerSource enum or case-insensitive name
  *                      ("default", "bethe", "pstar", "icru").
