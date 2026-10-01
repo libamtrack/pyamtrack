@@ -3,6 +3,7 @@
 #include "beta_from_energy.h"
 #include "energy_from_beta.h"
 #include "gamma_from_energy.h"
+#include "energy_from_gamma.h"
 
 namespace nb = nanobind;
 
@@ -36,6 +37,16 @@ const char* gamma_from_energy_doc = R"pbdoc(
         float | numpy.ndarray | list: The calculated gamma value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
 )pbdoc";
 
+const char* energy_from_gamma_doc = R"pbdoc(
+    Calculate energy for single value of relativistic gamma
+
+    Parameters:
+        gamma (float | int | numpy.ndarray | list): The relativistic gamma value(s). Can be a single value, a NumPy array, or a Python list.
+
+    Returns:
+        float | numpy.ndarray | list: The calculated energy value(s). Returns a float for a single input, a NumPy array for a NumPy array input, or a Python list for a list input.
+)pbdoc";
+
 
 NB_MODULE(converters, m) {
   m.doc() = "Functions for converting between different physical quantities.";
@@ -44,5 +55,7 @@ NB_MODULE(converters, m) {
   m.def("gamma_from_energy", &gamma_from_energy, nb::arg("energy_MeV_u"), gamma_from_energy_doc);
 
   m.def("energy_from_beta", &energy_from_beta, nb::arg("beta"), energy_from_beta_doc);
+
+  m.def("energy_from_gamma", &energy_from_gamma, nb::arg("gamma"), energy_from_gamma_doc);
   
 }
