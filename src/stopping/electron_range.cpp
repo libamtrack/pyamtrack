@@ -45,7 +45,7 @@ int process_model(const nb::object& model) {
   return model_id;
 }
 
-nb::object get_id(const nb::object& object, const ids_getter& getter) {
+static nb::object get_id(const nb::object& object, const ids_getter& getter) {
   if (nb::isinstance<nb::list>(object)) {
     auto list = nb::cast<nb::list>(object);
     nb::list id;
