@@ -5,9 +5,6 @@
 
 namespace nb = nanobind;
 
-nb::object dose_from_fluence(nb::object energy_MeV_u,
-                            nb::object particle,
-                            nb::object fluence_cm2,
-                            nb::object material,
-                            nb::object stopping_power_source);
+nb::object dose_from_fluence(nb::object energy_MeV_u, nb::object particle, nb::object fluence_cm2, nb::object material,
+                             nb::object stopping_power_source, bool cartesian_product);
 #endif  // DOSE_FROM_FLUENCE_H
