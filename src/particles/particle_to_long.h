@@ -20,9 +20,12 @@ extern "C" {
  * @return The C backend particle identifier.
  * @throws std::invalid_argument If the ion does not contain valid Z and A.
  */
-inline long particle_to_long(const Ion& ion) {
-  if (ion.Z < 1 || ion.A < 1) {
-    throw std::invalid_argument("Ion is missing a valid Z and A");
+inline long particle_to_internal_no(const Ion& ion) {
+  if (ion.Z < 1) {
+    throw std::invalid_argument("Ion is missing a valid Z: Z=" + std::to_string(ion.Z));
+  }
+  if (ion.A < 1) {
+    throw std::invalid_argument("Ion is missing a valid A: A=" + std::to_string(ion.A));
   }
 
   return AT_particle_no_from_Z_and_A_single(ion.Z, ion.A);
