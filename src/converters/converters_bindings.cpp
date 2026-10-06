@@ -3,8 +3,10 @@
 #include "beta_from_energy.h"
 #include "dose_from_fluence.h"
 #include "energy_from_beta.h"
+#include "energy_from_energy_per_amu.h"
 #include "energy_from_gamma.h"
 #include "energy_from_momentum.h"
+#include "fluence_from_dose.h"
 #include "gamma_from_energy.h"
 #include "momentum_from_energy.h"
 
@@ -76,6 +78,16 @@ const char* dose_from_fluence_doc = R"pbdoc(
     TODO
 )pbdoc";
 
+const char* fluence_from_dose_doc = R"pbdoc(
+    Calculate fluence in 1/cm2 for particles with given dose and energy
+
+    TODO
+)pbdoc";
+
+const char* energy_from_energy_per_amu_doc = R"pbdoc(
+    Calculate energy per nucleon from kinetic energy of particle
+)pbdoc";
+
 NB_MODULE(converters, m) {
   m.doc() = "Functions for converting between different physical quantities.";
 
@@ -91,6 +103,13 @@ NB_MODULE(converters, m) {
   m.def("energy_from_momentum", &energy_from_momentum, nb::arg("momentum"), energy_from_momentum_doc);
 
   m.def("dose_from_fluence", &dose_from_fluence, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("fluence_cm2"),
-        nb::arg("material") = 1, nb::arg("stopping_power_source") = 0, nb::arg("cartesian_product") = false,
+        nb::arg("material") = 1, nb::arg("stopping_power_source") = 1, nb::arg("cartesian_product") = false,
         dose_from_fluence_doc);
+
+  m.def("fluence_from_dose", &fluence_from_dose, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("dose"),
+        nb::arg("material") = 1, nb::arg("stopping_power_source") = 1, nb::arg("cartesian_product") = false,
+        dose_from_fluence_doc);
+
+  m.def("energy_from_energy_per_amu", &energy_from_energy_per_amu, nb::arg("energy_MeV_u"), nb::arg("particle"),
+        nb::arg("cartesian_product") = false, energy_from_energy_per_amu_doc);
 }

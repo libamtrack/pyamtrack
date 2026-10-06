@@ -25,7 +25,7 @@ nb::object dose_from_fluence(nb::object energy_MeV_u, nb::object particle, nb::o
 
   auto dose_from_fluence_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
     if (vec.size() < 5) {
-      throw std::invalid_argument("Input vector must have at least six elements.");
+      throw std::invalid_argument("Input vector must have at least five elements.");
     };
 
     double energy = variant_cast<double>(vec[0]);
