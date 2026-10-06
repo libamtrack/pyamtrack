@@ -1,6 +1,8 @@
 #include "ion.h"
-#include "../particles.h"
 
+#include <stdexcept>
+
+#include "../particles.h"
 
 Ion::Ion(long long pdg_code) {
   nb::object p;
