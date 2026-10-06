@@ -107,11 +107,11 @@ NB_MODULE(converters, m) {
 
   m.def("energy_from_momentum", &energy_from_momentum, nb::arg("momentum"), energy_from_momentum_doc);
 
-  m.def("dose_from_fluence", &dose_from_fluence, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("fluence_cm2"),
+  m.def("dose_from_fluence", &dose_from_fluence, nb::arg("energy_MeV"), nb::arg("particle"), nb::arg("fluence_cm2"),
         nb::arg("material") = 1, nb::arg("stopping_power_source") = 1, nb::arg("cartesian_product") = false,
         dose_from_fluence_doc);
 
-  m.def("fluence_from_dose", &fluence_from_dose, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("dose"),
+  m.def("fluence_from_dose", &fluence_from_dose, nb::arg("energy_MeV"), nb::arg("particle"), nb::arg("dose"),
         nb::arg("material") = 1, nb::arg("stopping_power_source") = 1, nb::arg("cartesian_product") = false,
         dose_from_fluence_doc);
 
