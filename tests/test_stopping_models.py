@@ -70,6 +70,53 @@ def test_model_consistency(electron_energy_MeV):
     assert range_by_name == range_by_id
 
 
+def test_model_enum_is_accepted(electron_energy_MeV):
+    range_by_name = stopping.electron_range(electron_energy_MeV, model="tabata")
+    range_by_enum = stopping.electron_range(electron_energy_MeV, model=stopping.ElectronRangeModel.TABATA)
+    assert range_by_enum == range_by_name
+
+
+@pytest.mark.parametrize("model_id", [-1, 0, 1, 9, 99])
+def test_invalid_model_ids_are_rejected(electron_energy_MeV, model_id):
+    with pytest.raises(ValueError, match="Invalid electron range model ID"):
+        stopping.electron_range(electron_energy_MeV, model=model_id)
+
+
+def test_boolean_model_is_rejected(electron_energy_MeV):
+    with pytest.raises(TypeError):
+        stopping.electron_range(electron_energy_MeV, model=True)
+
+
+@pytest.mark.parametrize("material", [0, 999, -1])
+def test_invalid_material_ids_are_rejected(electron_energy_MeV, material):
+    with pytest.raises(ValueError, match="invalid material ID"):
+        stopping.electron_range(electron_energy_MeV, material=material)
+
+
+@pytest.mark.parametrize("energy", [-1.0, float("nan"), float("inf"), float("-inf")])
+def test_invalid_energies_are_rejected(energy):
+    with pytest.raises(ValueError, match="energy_MeV"):
+        stopping.electron_range(energy)
+
+
+def test_mixed_model_sequences_are_normalized():
+    values = stopping.electron_range([100.0, 100.0], model=["tabata", 7])
+    expected = stopping.electron_range(100.0, model="tabata")
+    assert values.shape == (2,)
+    np.testing.assert_allclose(values, expected)
+
+
+def test_integer_model_arrays_are_supported():
+    values = stopping.electron_range(100.0, model=np.array([2, 7], dtype=np.int64))
+    expected = np.array(
+        [
+            stopping.electron_range(100.0, model="butts_katz"),
+            stopping.electron_range(100.0, model="tabata"),
+        ]
+    )
+    np.testing.assert_allclose(values, expected)
+
+
 def test_model_relative_ranges(electron_energy_MeV, models):
     """Test relative behavior of different models.
 
