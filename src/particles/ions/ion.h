@@ -18,6 +18,6 @@ class Ion : public Particle {
    */
   Ion();
 
-  long Z;  /**< Atomic number of the ion. */
-  long A;  /**< Mass number of the ion. */
+  long Z; /**< Atomic number of the ion. */
+  long A; /**< Mass number of the ion. */
 };
