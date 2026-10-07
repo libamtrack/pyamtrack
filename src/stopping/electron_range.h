@@ -27,8 +27,8 @@ enum class ElectronRangeModel : int {
  * @brief Available electron range calculation models and their corresponding IDs.
  *
  * This map serves as the single source of truth for all supported models.
- * The string key is the model name used in Python, and the integer value
- * is the corresponding model ID used in the underlying C/C++ implementation.
+ * The string key is the model name used in Python, and the enum value carries
+ * the corresponding model ID used in the underlying C/C++ implementation.
  */
 inline const std::map<std::string, ElectronRangeModel> ELECTRON_RANGE_MODELS = {
     {"butts_katz", ElectronRangeModel::ButtsKatz},
@@ -48,16 +48,18 @@ inline const std::map<std::string, ElectronRangeModel> ELECTRON_RANGE_MODELS = {
 std::vector<std::string> get_models();
 
 /**
- * @brief Convert a model name to its corresponding numerical ID.
+ * @brief Convert a model name to its corresponding typed model.
  *
  * @param model_name The name of the model as a string.
- * @return int The numerical ID of the model.
+ * @return ElectronRangeModel The selected model.
  * @throws std::invalid_argument If the model name is not found.
  */
 ElectronRangeModel parse_model_name(const std::string& model_name);
 
 /**
  * @brief Convert a model name to its corresponding numerical ID.
+ *
+ * This preserves the existing Python model(name) API.
  */
 int get_model_id(const std::string& model_name);
 
@@ -77,15 +79,14 @@ nb::object parse_model_argument(const nb::object& argument);
  * @param energy_MeV The electron kinetic energy in MeV. Can be a single value, NumPy array, or Python list.
  * @param material Either a material ID (int) or a Material object. Boolean values are not accepted.
  *                 Defaults to 1 (Liquid water).
- * @param model The stopping power model to use. Can be specified as a string name or model ID.
- *             Defaults to "tabata" (ID=7).
+ * @param model The electron range model to use. Can be specified as a string name, model ID,
+ *              or ElectronRangeModel enum. Defaults to "tabata" (ID=7).
  * @param cartesian_product Parameter that tells whether to compute the cartesian product (all possible combinations) of
  * the preceding parameters
  * @return nb::object The calculated electron range(s) in meters. Returns a float when all inputs are
  *                   scalar, or a NumPy array when any input is a list or array.
- * @throws nb::type_error If material argument is neither an integer nor a Material object,
- *                      is a bool, or if model argument is neither a string nor an integer.
- * @throws std::runtime_error If the model name/ID is invalid.
+ * @throws nb::type_error If material or model has an unsupported type, or if either is a bool.
+ * @throws std::invalid_argument If the energy is negative/non-finite, or the model/material ID is invalid.
  */
 nb::object electron_range(const nb::object& energy_MeV, const nb::object& material = nb::int_(1),
                           const nb::object& model = nb::str("tabata"), bool cartesian_product = false);

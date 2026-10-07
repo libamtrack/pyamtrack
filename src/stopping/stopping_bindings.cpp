@@ -18,9 +18,19 @@ NB_MODULE(stopping, m) {
       .value("ICRU", StoppingPowerSource::ICRU)
       .export_values();
 
+  nb::enum_<ElectronRangeModel>(m, "ElectronRangeModel")
+      .value("BUTTS_KATZ", ElectronRangeModel::ButtsKatz)
+      .value("WALIGORSKI", ElectronRangeModel::Waligorski)
+      .value("GEISS", ElectronRangeModel::Geiss)
+      .value("SCHOLZ", ElectronRangeModel::Scholz)
+      .value("EDMUND", ElectronRangeModel::Edmund)
+      .value("TABATA", ElectronRangeModel::Tabata)
+      .value("SCHOLZ_NEW", ElectronRangeModel::ScholzNew)
+      .export_values();
+
   nb::module_ models = m.def_submodule("models", "Electron range models");
-  for (const auto& [name, id] : STOPPING_MODELS) {
-    models.attr(name.c_str()) = nb::int_(id);
+  for (const auto& [name, model] : ELECTRON_RANGE_MODELS) {
+    models.attr(name.c_str()) = nb::int_(static_cast<int>(model));
   }
 
   m.def("get_models", &get_models, "Returns list of available electron range models");
@@ -42,8 +52,9 @@ NB_MODULE(stopping, m) {
         material : int, Material, list[int | Material] or numpy array with int as dtype, optional
             Either a material ID as integer or a Material object. Boolean values are not accepted.
             Defaults to 1 (Liquid water).
-        model : str, int, list[int | str] or numpy array with int as dtype, optional
-            The stopping power model to use. Can be specified either as a string name or model ID.
+        model : str, int, ElectronRangeModel, list[int | str | ElectronRangeModel] or numpy array with int as dtype, optional
+            The electron range model to use. Can be specified as a string name, model ID,
+            or ElectronRangeModel enum.
             Available models:
             - "butts_katz" (id=2): Butts & Katz model
             - "waligorski" (id=3): Waligorski model
@@ -65,10 +76,11 @@ NB_MODULE(stopping, m) {
         Raises
         ------
         TypeError
-            If material argument is neither an integer nor a Material object, is a bool,
-            or if model argument is neither a string nor an integer.
+            If material argument is neither an integer, Material, supported list, or integer NumPy array, is a bool,
+            or if model argument is neither a string, integer, ElectronRangeModel,
+            list, or integer NumPy array.
         ValueError
-            If the input energy is negative or the model/material ID is invalid.
+            If the input energy is negative or non-finite, or the model/material ID is invalid.
         )pbdoc");
   m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"),
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
