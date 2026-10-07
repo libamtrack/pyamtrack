@@ -7,10 +7,21 @@
 #include <nanobind/stl/vector.h>
 
 #include <map>
+#include <stdexcept>
 
 #include "../materials/materials.h"
 
 namespace nb = nanobind;
+
+enum class ElectronRangeModel : int {
+  ButtsKatz = 2,
+  Waligorski = 3,
+  Geiss = 4,
+  Scholz = 5,
+  Edmund = 6,
+  Tabata = 7,
+  ScholzNew = 8,
+};
 
 /**
  * @brief Available electron range calculation models and their corresponding IDs.
@@ -19,14 +30,14 @@ namespace nb = nanobind;
  * The string key is the model name used in Python, and the integer value
  * is the corresponding model ID used in the underlying C/C++ implementation.
  */
-const std::map<std::string, int> STOPPING_MODELS = {
-    {"butts_katz", 2},  // Butts & Katz model
-    {"waligorski", 3},  // Waligorski model
-    {"geiss", 4},       // Geiss model
-    {"scholz", 5},      // Scholz model
-    {"edmund", 6},      // Edmund model
-    {"tabata", 7},      // Tabata model (default)
-    {"scholz_new", 8}   // Updated Scholz model
+inline const std::map<std::string, ElectronRangeModel> ELECTRON_RANGE_MODELS = {
+    {"butts_katz", ElectronRangeModel::ButtsKatz},
+    {"waligorski", ElectronRangeModel::Waligorski},
+    {"geiss", ElectronRangeModel::Geiss},
+    {"scholz", ElectronRangeModel::Scholz},
+    {"edmund", ElectronRangeModel::Edmund},
+    {"tabata", ElectronRangeModel::Tabata},
+    {"scholz_new", ElectronRangeModel::ScholzNew},
 };
 
 /**
@@ -41,9 +52,20 @@ std::vector<std::string> get_models();
  *
  * @param model_name The name of the model as a string.
  * @return int The numerical ID of the model.
- * @throws std::runtime_error If the model name is not found in STOPPING_MODELS.
+ * @throws std::invalid_argument If the model name is not found.
+ */
+ElectronRangeModel parse_model_name(const std::string& model_name);
+
+/**
+ * @brief Convert a model name to its corresponding numerical ID.
  */
 int get_model_id(const std::string& model_name);
+
+/**
+ * @brief Validate and normalize a scalar, list, or integer NumPy-array model argument.
+ */
+void validate_model_argument(const nb::object& argument);
+nb::object parse_model_argument(const nb::object& argument);
 
 /**
  * @brief Calculate the maximum electron range in a material.

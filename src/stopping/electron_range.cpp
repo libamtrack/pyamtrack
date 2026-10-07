@@ -12,37 +12,29 @@ extern "C" {
 }
 using ids_getter = std::function<int(const nb::object&)>;
 
-std::vector<std::string> get_models() {
-  std::vector<std::string> names;
-  for (const auto& [name, id] : STOPPING_MODELS) {
-    names.push_back(name);
+std::vector<ElectronRangeModel> get_electron_range_models() {
+  std::vector<ElectronRangeModel> models;
+  for (const auto& [name, model] : ELECTRON_RANGE_MODELS) {
+    models.push_back(model);
   }
-  return names;
+  return models;
 }
 
-int get_model_id(const std::string& model_name) {
-  auto it = STOPPING_MODELS.find(model_name);
-  if (it == STOPPING_MODELS.end()) {
+ElectronRangeModel get_model_enum(const std::string& model_name) {
+  auto it = ELECTRON_RANGE_MODELS.find(model_name);
+  if (it == ELECTRON_RANGE_MODELS.end()) {
     throw std::runtime_error("Unknown model name: " + model_name);
   }
   return it->second;
 }
 
-int process_model(const nb::object& model) {
-  int model_id = 0;
-  if (nb::isinstance<nb::str>(model)) {
-    std::string model_name = nb::cast<std::string>(model);
-    try {
-      model_id = get_model_id(model_name);
-    } catch (const std::runtime_error& e) {
-      throw nb::value_error(e.what());
-    }
-  } else if (nb::isinstance<nb::int_>(model)) {
-    model_id = nb::cast<int>(model);
+ElectronRangeModel parse_electron_range_model(const nb::object& model) {
+  ElectronRangeModel model_enum;
+  if (nb::cast<ElectronRangeModel>(model, &model_enum)) {
+    return model_enum;
   } else {
-    throw nb::type_error("Model argument must be either an integer or a string");
+    throw std::runtime_error("Invalid model type. Must be an ElectronRangeModel enum.");
   }
-  return model_id;
 }
 
 static nb::object get_id(const nb::object& object, const ids_getter& getter) {
