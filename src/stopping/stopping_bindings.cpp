@@ -70,19 +70,20 @@ NB_MODULE(stopping, m) {
         ValueError
             If the input energy is negative or the model/material ID is invalid.
         )pbdoc");
-  m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"),
+  m.def("mass_stopping_power", &mass_stopping_power, nb::arg("energy_MeV"), nb::arg("particle"),
         nb::arg("material") = 1, nb::arg("source") = 0, nb::arg("cartesian_product") = false,
         nb::arg("allow_bethe_fallback") = false, nb::arg("full_output") = false,
         R"pbdoc(
         Calculate mass stopping power in MeV·cm²/g.
 
-        Wraps AT_Mass_Stopping_Power_with_no from libamtrack.
+        Wraps AT_Mass_Stopping_Power_E_MeV_single from libamtrack.
 
         Parameters
         ----------
-        energy_MeV_u : float or array_like
-            Kinetic energy in MeV per nucleon. Must be > 0.
+        energy_MeV : float or array_like
+            Total kinetic energy in MeV. Must be > 0.
             Can be a float, a Python list, or a NumPy array.
+            The corresponding energy in MeV/u is used internally for the stopping-power models.
         particle : Ion, list[Ion], or NumPy object array of Ion
             A pyamtrack.particles.ions.Ion object or a sequence of ions.
             Boolean values and integer particle numbers are not accepted.
@@ -126,26 +127,27 @@ NB_MODULE(stopping, m) {
             If particle is not an Ion or a sequence of Ions, if material is not
             an int, Material, or a supported sequence, or if either is a bool.
         ValueError
-            If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
+            If energy_MeV is <= 0, source is not a recognized string, integer ID,
             or enum value, a material or particle ID is invalid, Bethe fallback is
             disabled for the resolved source, the requested source has no data for
-            the material, or energy_MeV_u is outside the selected source's
+            the material, or energy_MeV is outside the selected source's
             tabulated range.
       )pbdoc");
 
-  m.def("stopping_power", &stopping_power, nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
+  m.def("stopping_power", &stopping_power, nb::arg("energy_MeV"), nb::arg("particle"), nb::arg("material") = 1,
         nb::arg("source") = 0, nb::arg("cartesian_product") = false, nb::arg("allow_bethe_fallback") = false,
         nb::arg("full_output") = false,
         R"pbdoc(
         Calculate density-scaled stopping power in keV/µm.
 
-        Wraps AT_Stopping_Power_with_no from libamtrack.
+        Wraps AT_Stopping_Power_E_MeV_single from libamtrack.
 
         Parameters
         ----------
-        energy_MeV_u : float or array_like
-            Kinetic energy in MeV per nucleon. Must be > 0.
+        energy_MeV : float or array_like
+            Total kinetic energy in MeV. Must be > 0.
             Can be a float, a Python list, or a NumPy array.
+            The corresponding energy in MeV/u is used internally for the stopping-power models.
         particle : Ion, list[Ion], or NumPy object array of Ion
             A pyamtrack.particles.ions.Ion object or a sequence of ions.
             Boolean values and integer particle numbers are not accepted.
@@ -191,10 +193,10 @@ NB_MODULE(stopping, m) {
             If particle is not an Ion or a sequence of Ions, if material is not
             an int, Material, or a supported sequence, or if either is a bool.
         ValueError
-            If energy_MeV_u is <= 0, source is not a recognized string, integer ID,
+            If energy_MeV is <= 0, source is not a recognized string, integer ID,
             or enum value, a material or particle ID is invalid, Bethe fallback is
             disabled for the resolved source, the requested source has no data for
-            the material, or energy_MeV_u is outside the selected source's
+            the material, or energy_MeV is outside the selected source's
             tabulated range.
         )pbdoc");
 }

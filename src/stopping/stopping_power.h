@@ -21,12 +21,13 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
 /**
  * @brief Calculate mass stopping power in MeV*cm2/g.
  *
- * Wraps AT_Mass_Stopping_Power_with_no from libamtrack.
+ * Wraps AT_Mass_Stopping_Power_E_MeV_single from libamtrack.
  *
  * Accepts scalar and sequence inputs. By default, sequence inputs are evaluated
  * elementwise; setting cartesian_product enables Cartesian-product evaluation.
  *
- * @param energy_MeV_u  Kinetic energy in MeV per nucleon.
+ * @param energy_MeV    Total kinetic energy in MeV. It is converted to MeV/u
+ *                      internally for the stopping-power models.
  * @param particle      Particle object.
  * @param material      Material ID or Material object.
  * @param source        StoppingPowerSource enum or case-insensitive name
@@ -36,16 +37,17 @@ enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
  * @param full_output  Whether to return a tuple of values and resolved source IDs.
  * @return              Mass stopping power in MeV*cm2/g.
  */
-nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+nb::object mass_stopping_power(const nb::object& energy_MeV, const nb::object& particle, const nb::object& material,
                                const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                                bool full_output);
 
 /**
  * @brief Calculate stopping power in keV/um.
  *
- * Wraps AT_Stopping_Power_with_no from libamtrack.
+ * Wraps AT_Stopping_Power_E_MeV_single from libamtrack.
  *
- * @param energy_MeV_u  Kinetic energy in MeV per nucleon.
+ * @param energy_MeV    Total kinetic energy in MeV. It is converted to MeV/u
+ *                      internally for the stopping-power models.
  * @param particle      Particle object.
  * @param material      Material ID or Material object.
  * @param source        StoppingPowerSource enum or case-insensitive name
@@ -55,7 +57,7 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
  * @param full_output  Whether to return a tuple of values and resolved source IDs.
  * @return              Stopping power in keV/um.
  */
-nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+nb::object stopping_power(const nb::object& energy_MeV, const nb::object& particle, const nb::object& material,
                           const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                           bool full_output);
 

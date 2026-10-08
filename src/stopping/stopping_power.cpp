@@ -20,7 +20,7 @@ extern AT_stopping_power_ICRU_table_struct AT_stopping_power_ICRU_table[2];
 extern PSTAR_data_struct PSTAR_data;
 }
 
-using StoppingPowerFunction = int (*)(const long, const long, const double[], const long[], const long, double[]);
+using StoppingPowerFunction = double (*)(const long, const double, const long, const long);
 
 namespace {
 
@@ -81,25 +81,27 @@ std::optional<StoppingPowerEnergyBounds> get_stopping_power_energy_bounds(long s
   }
 }
 
-void validate_stopping_power_energy(double energy, long source, long material_no, long particle_no) {
+void validate_stopping_power_energy(double energy_MeV, long source, long material_no, long particle_no) {
   const auto bounds = get_stopping_power_energy_bounds(source, material_no, particle_no);
   if (!bounds.has_value()) {
     return;
   }
 
-  if (energy < bounds->minimum || energy > bounds->maximum) {
-    throw std::invalid_argument("energy_MeV_u=" + std::to_string(energy) + " is outside the " +
+  const double energy_MeV_u = AT_E_MeV_u_from_E_MeV(energy_MeV, particle_no);
+  if (energy_MeV_u < bounds->minimum || energy_MeV_u > bounds->maximum) {
+    throw std::invalid_argument("energy_MeV=" + std::to_string(energy_MeV) +
+                                " (energy_MeV_u=" + std::to_string(energy_MeV_u) + ") is outside the " +
                                 stopping_power_source_name(source) + " range [" + std::to_string(bounds->minimum) +
                                 ", " + std::to_string(bounds->maximum) + "] MeV/u");
   }
 }
 
-long resolve_stopping_power_source(long requested_source, double energy, long material_no, long particle_no) {
+long resolve_stopping_power_source(long requested_source, double energy_MeV_u, long material_no, long particle_no) {
   const long selected_source = select_stopping_power_source(requested_source, material_no, particle_no);
   if (requested_source == static_cast<long>(StoppingPowerSource::Default) &&
       selected_source == static_cast<long>(StoppingPowerSource::PSTAR)) {
     const auto bounds = get_stopping_power_energy_bounds(selected_source, material_no, particle_no);
-    if (bounds.has_value() && (energy < bounds->minimum || energy > bounds->maximum)) {
+    if (bounds.has_value() && (energy_MeV_u < bounds->minimum || energy_MeV_u > bounds->maximum)) {
       return static_cast<long>(StoppingPowerSource::Bethe);
     }
   }
@@ -146,25 +148,25 @@ double stopping_power_scalar(bool allow_bethe_fallback, bool full_output,
     throw std::invalid_argument("Stopping-power input must contain energy, particle, material, and source.");
   }
 
-  double energy = variant_cast<double>(values[0]);
+  double energy_MeV = variant_cast<double>(values[0]);
   long particle_no = variant_cast<long>(values[1]);
   long material_no = variant_cast<long>(values[2]);
   long source = variant_cast<long>(values[3]);
 
-  if (!std::isfinite(energy) || energy <= 0.0) {
-    throw std::invalid_argument("energy_MeV_u must be > 0 and finite");
+  if (!std::isfinite(energy_MeV) || energy_MeV <= 0.0) {
+    throw std::invalid_argument("energy_MeV must be > 0 and finite");
   }
 
-  source = resolve_stopping_power_source(source, energy, material_no, particle_no);
+  const double energy_MeV_u = AT_E_MeV_u_from_E_MeV(energy_MeV, particle_no);
+  source = resolve_stopping_power_source(source, energy_MeV_u, material_no, particle_no);
   if (source == static_cast<long>(StoppingPowerSource::Bethe) && !allow_bethe_fallback) {
     throw std::invalid_argument("Bethe fallback is not allowed, but the selected source has no tabular data for the material and energy");
   }
-  validate_stopping_power_energy(energy, source, material_no, particle_no);
+  validate_stopping_power_energy(energy_MeV, source, material_no, particle_no);
 
-  double result = 0.0;
-  const int status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &result);
+  double result = stopping_power_function(source, energy_MeV, particle_no, material_no);
   
-  if (status != AT_Success || result < 0.0) {
+  if (!std::isfinite(result) || result < 0.0) {
     bool can_fallback_to_bethe = allow_bethe_fallback && source != static_cast<long>(StoppingPowerSource::Bethe);
     
     if(!can_fallback_to_bethe) {
@@ -172,12 +174,12 @@ double stopping_power_scalar(bool allow_bethe_fallback, bool full_output,
     }
     
     source = static_cast<long>(StoppingPowerSource::Bethe);
-    double fallback_result = 0.0;
-    const int fallback_status = stopping_power_function(source, 1, &energy, &particle_no, material_no, &fallback_result);
+    double fallback_result = stopping_power_function(source, energy_MeV, particle_no, material_no);
     
-    if (fallback_status != AT_Success || fallback_result < 0.0) {
+    if (!std::isfinite(fallback_result) || fallback_result < 0.0) {
       throw std::invalid_argument("Stopping-power calculation failed for the selected source and material");
     }
+    result = fallback_result;
   }
   if (full_output) {
     resolved_sources.push_back(source);
@@ -187,7 +189,7 @@ double stopping_power_scalar(bool allow_bethe_fallback, bool full_output,
 
 // wrapper function to evaluate stopping power using the provided stopping_power_function
 // shared code between mass_stopping_power and stopping_power to avoid duplication
-nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle,
+nb::object evaluate_stopping_power(const nb::object& energy_MeV, const nb::object& particle,
                                    const nb::object& material, const nb::object& source, bool cartesian_product,
                                    bool allow_bethe_fallback, bool full_output,
                                    StoppingPowerFunction stopping_power_function) {
@@ -198,7 +200,7 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::obj
   std::vector<long> resolved_sources;
 
   std::vector<nb::object> arguments_vector;
-  arguments_vector.push_back(energy_MeV_u);
+  arguments_vector.push_back(energy_MeV);
   arguments_vector.push_back(parse_particle_argument(particle));
   arguments_vector.push_back(parse_material_argument(material));
   arguments_vector.push_back(nb::cast(requested_source));
@@ -222,18 +224,18 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV_u, const nb::obj
 
 }  // namespace
 
-nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+nb::object mass_stopping_power(const nb::object& energy_MeV, const nb::object& particle, const nb::object& material,
                                const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                                bool full_output) {
-  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_bethe_fallback,
-                                 full_output, AT_Mass_Stopping_Power_with_no);
+  return evaluate_stopping_power(energy_MeV, particle, material, source, cartesian_product, allow_bethe_fallback,
+                                 full_output, AT_Mass_Stopping_Power_E_MeV_single);
 }
 
-nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
+nb::object stopping_power(const nb::object& energy_MeV, const nb::object& particle, const nb::object& material,
                           const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                           bool full_output) {
-  return evaluate_stopping_power(energy_MeV_u, particle, material, source, cartesian_product, allow_bethe_fallback,
-                                 full_output, AT_Stopping_Power_with_no);
+  return evaluate_stopping_power(energy_MeV, particle, material, source, cartesian_product, allow_bethe_fallback,
+                                 full_output, AT_Stopping_Power_E_MeV_single);
 }
 
 long parse_stopping_power_source(const nb::object& source) {

@@ -16,8 +16,8 @@ def test_stopping_power_functions_support_scalar_and_energy_sequences():
     energies = np.array([1.0, 10.0, 100.0])
 
     for function in (pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power):
-        scalar = function(100.0, particle=PROTON)
-        values = function(energies, particle=PROTON)
+        scalar = function(energy_MeV=100.0, particle=PROTON)
+        values = function(energy_MeV=energies, particle=PROTON)
 
         assert isinstance(scalar, float)
         assert isinstance(values, np.ndarray)
@@ -156,7 +156,7 @@ def test_full_output_matches_cartesian_result_shape():
 
 
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
-@pytest.mark.parametrize("energy", [0.000999, 10000.001])
+@pytest.mark.parametrize("energy", [0.000999, 100000.0])
 def test_stopping_power_rejects_energy_outside_pstar_range(function, energy):
     with pytest.raises(ValueError, match="outside the PSTAR range"):
         function(energy, particle=PROTON, source="pstar")
@@ -194,4 +194,4 @@ def test_default_source_falls_back_to_bethe_outside_pstar_range(function):
 @pytest.mark.parametrize("function", [pyamtrack.stopping.mass_stopping_power, pyamtrack.stopping.stopping_power])
 def test_icru_rejects_helium_energy_above_table_range(function):
     with pytest.raises(ValueError, match="outside the ICRU range"):
-        function(250.001, particle=HELIUM, source="icru")
+        function(250.0 * HELIUM.atomic_weight + 0.001, particle=HELIUM, source="icru")
