@@ -96,7 +96,8 @@ const char* energy_per_amu_from_energy_doc = R"pbdoc(
 NB_MODULE(converters, m) {
   m.doc() = "Functions for converting between different physical quantities.";
 
-  m.def("beta_from_energy", &beta_from_energy, nb::arg("energy_MeV_u"), beta_from_energy_doc);
+  m.def("beta_from_energy", &beta_from_energy, nb::arg("energy_MeV"), nb::arg("particle"),
+        nb::arg("cartesian_product") = false, beta_from_energy_doc);
   m.def("gamma_from_energy", &gamma_from_energy, nb::arg("energy_MeV_u"), gamma_from_energy_doc);
 
   m.def("energy_from_beta", &energy_from_beta, nb::arg("beta"), energy_from_beta_doc);
