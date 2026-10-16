@@ -17,7 +17,7 @@ nb::object energy_from_beta(const nb::object beta, const nb::object particle, co
   arguments_vector.push_back(beta);
   arguments_vector.push_back(parse_particle_argument(particle));
 
-  auto energy_from_beta = [](const std::vector<std::variant<double, int>>& vec) -> double {
+  auto energy_from_beta_vector = [](const std::vector<std::variant<double, int>>& vec) -> double {
     if (vec.size() < 2) {
       throw std::invalid_argument("Input vector must have at least two elements.");
     }
@@ -30,8 +30,8 @@ nb::object energy_from_beta(const nb::object beta, const nb::object particle, co
   };
 
   if (cartesian_product) {
-    return wrap_cartesian_product_function(energy_from_beta, arguments_vector);
+    return wrap_cartesian_product_function(energy_from_beta_vector, arguments_vector);
   }
 
-  return wrap_multiargument_function(energy_from_beta, arguments_vector);
+  return wrap_multiargument_function(energy_from_beta_vector, arguments_vector);
 }
