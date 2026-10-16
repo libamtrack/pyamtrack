@@ -37,8 +37,12 @@ def test_function_behavior(func, min_val, max_val):
 
     # Test: Function should return NaN or inf for negative numbers
     negative_input = -1 * (min_val + 1)
-    result = func(negative_input)
-    assert np.isnan(result) or np.isinf(result), f"{func.__name__} failed for negative input."
+    if func is electron_range:
+        with pytest.raises(ValueError, match="energy_MeV"):
+            func(negative_input)
+    else:
+        result = func(negative_input)
+        assert np.isnan(result) or np.isinf(result), f"{func.__name__} failed for negative input."
 
     # Test: Corner cases for non-numeric values
     with pytest.raises(TypeError):
