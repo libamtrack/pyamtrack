@@ -5,6 +5,6 @@
 
 namespace nb = nanobind;
 
-nb::object gamma_from_energy(nb::object energy_MeV_u);
+nb::object gamma_from_energy(nb::object energy_MeV, const nb::object particle, const bool cartesian_product);
 
 #endif  // GAMMA_FROM_ENERGY_H

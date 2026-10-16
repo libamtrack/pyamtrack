@@ -99,7 +99,8 @@ NB_MODULE(converters, m) {
   m.def("beta_from_energy", &beta_from_energy, nb::arg("energy_MeV"), nb::arg("particle"),
         nb::arg("cartesian_product") = false, beta_from_energy_doc);
 
-  m.def("gamma_from_energy", &gamma_from_energy, nb::arg("energy_MeV_u"), gamma_from_energy_doc);
+  m.def("gamma_from_energy", &gamma_from_energy, nb::arg("energy_MeV"), nb::arg("particle"),
+        nb::arg("cartesian_product") = false, gamma_from_energy_doc);
 
   m.def("energy_from_beta", &energy_from_beta, nb::arg("beta"), nb::arg("particle"),
         nb::arg("cartesian_product") = false, energy_from_beta_doc);
@@ -109,7 +110,8 @@ NB_MODULE(converters, m) {
 
   m.def("momentum_from_energy", &momentum_from_energy, nb::arg("energy_MeV_u"), momentum_from_energy_doc);
 
-  m.def("energy_from_momentum", &energy_from_momentum, nb::arg("momentum"), energy_from_momentum_doc);
+  m.def("energy_from_momentum", &energy_from_momentum, nb::arg("momentum"), nb::arg("particle"),
+        nb::arg("cartesian_product") = false, energy_from_momentum_doc);
 
   m.def("dose_from_fluence", &dose_from_fluence, nb::arg("energy_MeV"), nb::arg("particle"), nb::arg("fluence_cm2"),
         nb::arg("material") = 1, nb::arg("stopping_power_source") = 1, nb::arg("cartesian_product") = false,
