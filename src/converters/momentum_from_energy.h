@@ -5,6 +5,6 @@
 
 namespace nb = nanobind;
 
-nb::object momentum_from_energy(nb::object energy_MeV_u);
+nb::object momentum_from_energy(nb::object energy_MeV, const nb::object particle, const bool cartesian_product);
 
 #endif  // MOMEMTUM_FROM_ENERGY
