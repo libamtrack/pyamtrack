@@ -108,7 +108,8 @@ NB_MODULE(converters, m) {
   m.def("energy_from_gamma", &energy_from_gamma, nb::arg("gamma"), nb::arg("particle"),
         nb::arg("cartesian_product") = false, energy_from_gamma_doc);
 
-  m.def("momentum_from_energy", &momentum_from_energy, nb::arg("energy_MeV_u"), momentum_from_energy_doc);
+  m.def("momentum_from_energy", &momentum_from_energy, nb::arg("energy_MeV_u"), nb::arg("particle"),
+        nb::arg("cartesian_product") = false, momentum_from_energy_doc);
 
   m.def("energy_from_momentum", &energy_from_momentum, nb::arg("momentum"), nb::arg("particle"),
         nb::arg("cartesian_product") = false, energy_from_momentum_doc);
