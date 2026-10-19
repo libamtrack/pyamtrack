@@ -9,10 +9,6 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-#include "AT_DataParticle.h"
-}
-
 namespace nb = nanobind;
 
 // forward declaration
