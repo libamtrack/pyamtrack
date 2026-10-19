@@ -15,9 +15,6 @@ extern "C" {
 #include "AT_StoppingPower.h"
 #include "AT_StoppingPowerDataICRU.h"
 #include "AT_StoppingPowerDataPSTAR.h"
-
-extern AT_stopping_power_ICRU_table_struct AT_stopping_power_ICRU_table[2];
-extern PSTAR_data_struct PSTAR_data;
 }
 
 using StoppingPowerFunction = double (*)(const long, const double, const long, const long);
@@ -49,31 +46,29 @@ std::optional<StoppingPowerEnergyBounds> get_stopping_power_energy_bounds(long s
       return std::nullopt;
 
     case static_cast<long>(StoppingPowerSource::PSTAR): {
-      if (material_no < 0 || material_no >= N_PSTAR_MATERIALS ||
-          PSTAR_data.stopping_power_source_data[material_no] == nullptr) {
+      if (!AT_Stopping_Power_has_data(source, particle_no, material_no)) {
         throw std::invalid_argument("PSTAR data is not available for material ID " + std::to_string(material_no));
       }
-      const auto* table = PSTAR_data.stopping_power_source_data[material_no];
-      return StoppingPowerEnergyBounds{table->energy_and_stopping_power[0][0],
-                                       table->energy_and_stopping_power[N_PSTAR_DATAPOINTS - 1][0]};
+
+      const double minimum = AT_PSTAR_min_energy_MeV_u(material_no);
+      const double maximum = AT_PSTAR_max_energy_MeV_u(material_no);
+      if (minimum < 0.0 || maximum < 0.0) {
+        throw std::invalid_argument("PSTAR data is not available for material ID " + std::to_string(material_no));
+      }
+      return StoppingPowerEnergyBounds{minimum, maximum};
     }
 
     case static_cast<long>(StoppingPowerSource::ICRU): {
-      if (material_no != Water_Liquid && material_no != Aluminum_Oxide) {
+      if (!AT_Stopping_Power_has_data(source, particle_no, material_no)) {
         throw std::invalid_argument("ICRU data is not available for material ID " + std::to_string(material_no));
       }
 
-      const auto& table = AT_stopping_power_ICRU_table[material_no - 1];
-      const long atomic_number = AT_Z_from_particle_no_single(particle_no);
-      if (atomic_number > 18) {
-        throw std::invalid_argument("ICRU data is not available for particles with atomic number above 18");
+      const double minimum = AT_ICRU_min_energy_MeV_u(material_no, particle_no);
+      const double maximum = AT_ICRU_max_energy_MeV_u(material_no, particle_no);
+      if (minimum < 0.0 || maximum < 0.0) {
+        throw std::invalid_argument("ICRU data is not available for material ID " + std::to_string(material_no));
       }
-
-      double maximum = table.energy_and_stopping_power[0][table.number_of_data_points - 1];
-      if (atomic_number == 2) {
-        maximum = 250.0;
-      }
-      return StoppingPowerEnergyBounds{table.energy_and_stopping_power[0][0], maximum};
+      return StoppingPowerEnergyBounds{minimum, maximum};
     }
 
     default:
@@ -273,7 +268,7 @@ long select_stopping_power_source(long source, long material_no, long particle_n
     return source;
   }
 
-  if (material_no >= Water_Liquid && material_no <= Copper) {
+  if (AT_Stopping_Power_has_data(static_cast<long>(StoppingPowerSource::PSTAR), particle_no, material_no)) {
     return static_cast<long>(StoppingPowerSource::PSTAR);
   }
 
