@@ -40,7 +40,7 @@ jobs:
           pip show -f pyamtrack
           python -c "import pyamtrack; print(pyamtrack.__doc__); print(dir(pyamtrack));"
           python -c "import pyamtrack; print(pyamtrack.converters.beta_from_energy(150, pyamtrack.particles.proton));"
-          python -c "import pyamtrack; print(energy_from_beta(0.5, pyamtrack.particles.proton));"
+          python -c "import pyamtrack; print(pyamtrack.converters.energy_from_beta(0.5, pyamtrack.particles.proton));"
           python -c "import pyamtrack; print(pyamtrack.__version__);"
 
       - name: Install pytest and test dependencies
