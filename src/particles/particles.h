@@ -11,6 +11,10 @@
 
 namespace nb = nanobind;
 
+extern "C" {
+#include "AT_DataParticle.h"
+}
+
 // forward declaration
 class Ion;
 
