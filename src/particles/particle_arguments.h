@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "particle_to_long.h"
+#include "ions/ion.h"
 #include "particles.h"
 
 namespace nb = nanobind;
@@ -37,7 +37,7 @@ inline void validate_particle_argument(const nb::object& argument) {
   }
 
   if (nb::isinstance<Ion>(argument)) {
-    particle_to_internal_no(nb::cast<Ion>(argument));
+    nb::cast<Ion>(argument).get_internal_particle_no();
     return;
   }
 
@@ -53,12 +53,12 @@ inline void validate_particle_argument(const nb::object& argument) {
 /**
  * @brief Convert a particle argument to libamtrack particle number(s).
  *
- * Ion objects become the particle identifier expected by the C backend.
- * Lists and NumPy arrays are converted elementwise.
+ * Ion objects become 1000*Z + A. Lists and NumPy arrays are converted
+ * elementwise.
  */
 inline nb::object parse_particle_argument(const nb::object& argument) {
   if (nb::isinstance<Ion>(argument)) {
-    return nb::cast(particle_to_internal_no(nb::cast<Ion>(argument)));
+    return nb::cast(nb::cast<Ion>(argument).get_internal_particle_no());
   }
 
   if (nb::isinstance<Particle>(argument)) {

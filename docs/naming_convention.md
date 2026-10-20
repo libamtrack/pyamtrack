@@ -77,8 +77,8 @@ arguments exposed through nanobind.
 
 ### `pyamtrack.converters`
 
-- `beta_from_energy(energy_MeV_u)`
-- `energy_from_beta(beta)`
+- `beta_from_energy(energy_MeV, particle)`
+- `energy_from_beta(beta, particle)`
 
 ### `pyamtrack.materials`
 
