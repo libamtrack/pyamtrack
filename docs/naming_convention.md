@@ -114,6 +114,37 @@ arguments exposed through nanobind.
 - `let_wilkens(depth_cm, energy_MeV, energy_spread_fraction=0.01,
   material=1, averaging="dose", cartesian_product=False)`
 
+### `pyamtrack.track`
+
+- `track_width(energy_MeV, material=1, model="tabata",
+  cartesian_product=False)`
+- `katz_point`, `geiss`, `katz_site`, `cucinotta_point`,
+  `katz_extended_target`, and `cucinotta_extended_target`, each with the
+  signature `(radius_m, energy_MeV_u, particle, material=1,
+  rdd_parameters=None, electron_range_model=<model default>,
+  source="default", cartesian_product=False, allow_bethe_fallback=False)`.
+
+There is one radial dose function per radial dose distribution (RDD) model
+instead of a model selector, so the RDD model IDs are not part of the Python
+API. The libamtrack test RDD, the radical-diffusion RDD, shell-averaged doses,
+and the inverse (radius from dose) calculation are not exposed yet.
+
+| Function | `rdd_parameters` keys | Default `electron_range_model` |
+| --- | --- | --- |
+| `katz_point` | `r_min_m`, `d_min_Gy` | `"waligorski"` |
+| `geiss` | `a0_m` | `"geiss"` |
+| `katz_site` | `a0_m`, `d_min_Gy` | `"waligorski"` |
+| `cucinotta_point` | `r_min_m`, `d_min_Gy` | `"tabata"` |
+| `katz_extended_target` | `r_min_m`, `a0_m`, `d_min_Gy` | `"waligorski"` |
+| `cucinotta_extended_target` | `r_min_m`, `a0_m`, `d_min_Gy` | `"tabata"` |
+
+The radial dose functions accept `radius_m` as a scalar, list, or 1-D NumPy
+array. `energy_MeV_u`, `particle`, and `material` define the evaluated
+configurations and follow the usual elementwise or `cartesian_product`
+semantics. The result has shape `(*configuration_shape, n_radii)`; the radius
+axis is omitted for a scalar `radius_m`, and a float is returned when every
+argument is scalar.
+
 `get_ids`, `get_long_names`, `get_names`, `get_acronyms`, and `get_models`
 take no arguments. `Averaging` is an enum, not a function argument, and its
 current values are `proton_models.Averaging.DOSE` and
@@ -161,7 +192,8 @@ lists the currently bound functions or constructors that use the argument.
   possible combination.
 - **Type:** Boolean.
 - **Used by:** `stopping.electron_range`,
-  `proton_models.dose_bortfeld`, and `proton_models.let_wilkens`.
+  `proton_models.dose_bortfeld`, `proton_models.let_wilkens`, and the
+  `track` functions.
 - **Default:** `False`.
 - **Rules:** `False` evaluates values elementwise and broadcasts scalar
   arguments. `True` evaluates the Cartesian product and returns an array
@@ -184,12 +216,27 @@ lists the currently bound functions or constructors that use the argument.
 - **Units and validation:** MeV. The proton models require values in
   `[0.1, 10000.0]` MeV.
 
+### `electron_range_model`
+
+- **Meaning:** Delta-electron range model used inside a radial dose
+  distribution.
+- **Type:** A model name from `stopping.get_models()`, a model ID, or a
+  `stopping.ElectronRangeModel` value. Python `bool` values are rejected.
+- **Used by:** the `track` radial dose functions.
+- **Rules:** The Katz RDDs (`katz_point`, `katz_site`,
+  `katz_extended_target`) accept only `"butts_katz"`, `"waligorski"`, and
+  `"edmund"`; other combinations raise `ValueError` instead of returning
+  zero dose. The default is function-specific.
+
 ### `energy_MeV_u`
 
 - **Meaning:** Kinetic energy per nucleon.
 - **Type:** Scalar number, Python list, or NumPy array.
-- **Used by:** `converters.beta_from_energy`.
+- **Used by:** `converters.beta_from_energy` and the `track` radial dose
+  functions.
 - **Units:** MeV/u, where `u` is the atomic mass unit.
+- **Rules (`track`):** Must be finite, in `(0, 1e6)`, and inside the energy
+  range of the selected stopping-power source.
 
 ### `energy_spread_fraction`
 
@@ -237,7 +284,8 @@ lists the currently bound functions or constructors that use the argument.
   supported list/NumPy array of those values. Python `bool` values are not
   accepted as material IDs.
 - **Used by:** `stopping.electron_range`,
-  `proton_models.dose_bortfeld`, and `proton_models.let_wilkens`.
+  `proton_models.dose_bortfeld`, `proton_models.let_wilkens`, and the
+  `track` functions.
 - **Default:** `1` (liquid water).
 - **Rules:** IDs are validated against the material table. A `Material`
   object is converted to its `id` before calculation. Sequences are
@@ -264,6 +312,25 @@ lists the currently bound functions or constructors that use the argument.
 - **Rules:** The accepted values depend on the function: stopping-model
   names, material names, or element/isotope/special-particle labels,
   respectively. Do not use `name` for an ID or a free-form description.
+
+### `radius_m`
+
+- **Meaning:** Radial distance from the ion path.
+- **Type:** Scalar number, Python list, or 0-D/1-D NumPy array.
+- **Used by:** the `track` radial dose functions.
+- **Units and validation:** Metres; every value must be finite and
+  non-negative. A sequence forms the last axis of the result. Radii below the
+  model's lower cut-off give zero dose.
+
+### `rdd_parameters`
+
+- **Meaning:** Model-specific radial dose distribution parameters.
+- **Type:** `dict` mapping parameter names to numbers, or `None`.
+- **Used by:** the `track` radial dose functions.
+- **Default:** `None` (libamtrack defaults for the model).
+- **Rules:** Only the keys listed for the function are accepted; omitted
+  keys keep their default. `r_min_m` and `a0_m` must be positive and
+  `d_min_Gy` must be non-negative.
 
 ### `pdg_code`
 

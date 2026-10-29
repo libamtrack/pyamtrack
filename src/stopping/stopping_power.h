@@ -7,16 +7,9 @@
 
 #include "../materials/materials.h"
 #include "../particles/particle_arguments.h"
+#include "stopping_power_source.h"
 
 namespace nb = nanobind;
-
-/**
- * Stopping-power data source, matching libamtrack ids for Bethe / PSTAR / ICRU.
- *
- * Default is resolved per value: PSTAR when tabulated data cover the material
- * and energy (IDs 1-9), otherwise the analytical Bethe formula.
- */
-enum class StoppingPowerSource { Default = 0, Bethe = 1, PSTAR = 2, ICRU = 3 };
 
 /**
  * @brief Calculate mass stopping power in MeV*cm2/g.
@@ -58,9 +51,5 @@ nb::object mass_stopping_power(const nb::object& energy_MeV_u, const nb::object&
 nb::object stopping_power(const nb::object& energy_MeV_u, const nb::object& particle, const nb::object& material,
                           const nb::object& source, bool cartesian_product, bool allow_bethe_fallback,
                           bool full_output);
-
-long parse_stopping_power_source(const nb::object& source);
-
-long select_stopping_power_source(long source, long material_no, long particle_no);
 
 #endif  // STOPPING_POWER_H
