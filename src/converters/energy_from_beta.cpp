@@ -26,7 +26,7 @@ nb::object energy_from_beta(const nb::object beta, const nb::object particle, co
     const long particle_no = static_cast<long>(variant_cast<int>(vec[1]));
 
 
-    return AT_E_MeV_u_from_E_MeV(AT_E_from_beta_single(beta_vc), particle_no);
+    return AT_E_MeV_from_E_MeV_u(AT_E_from_beta_single(beta_vc), particle_no);
   };
 
   if (cartesian_product) {
