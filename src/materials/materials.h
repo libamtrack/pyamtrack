@@ -163,34 +163,27 @@ class Material {
  * @throws std::invalid_argument (ValueError) if a material ID is not in the material table.
  * @throws nb::type_error if the argument is not an int, Material, list, or NumPy array.
  */
-inline void validate_material_argument(const nb::object& argument) {
-  if (nb::isinstance<nb::list>(argument)) {
-    nb::list values = nb::cast<nb::list>(argument);
-    for (size_t i = 0; i < values.size(); ++i) {
-      validate_material_argument(values[i]);
-    }
-    return;
-  }
-
-  if (nb::isinstance<nb::ndarray<>>(argument)) {
-    validate_material_argument(argument.attr("tolist")());
-    return;
-  }
-
+inline bool validate_material_scalar(const nb::object& argument) {
   long id;
+
   if (nb::isinstance<Material>(argument)) {
     id = nb::cast<Material>(argument).id;
   } else if (PyBool_Check(argument.ptr())) {
-    throw nb::type_error("material must be an int (not bool), a Material, or a list / NumPy array of either");
+    throw nb::type_error(
+        "material must be an int (not bool), a Material, or a list / NumPy array of either");
   } else if (nb::isinstance<nb::int_>(argument)) {
     id = nb::cast<long>(argument);
   } else {
-    throw nb::type_error("material must be an int, a Material, or a list / NumPy array of either");
+    throw nb::type_error(
+        "material must be an int, a Material, or a list / NumPy array of either");
   }
 
   if (id < 1 || AT_material_index_from_material_number(id) < 0) {
-    throw std::invalid_argument("invalid material ID: " + std::to_string(id));
+    throw std::invalid_argument(
+        "invalid material ID: " + std::to_string(id));
   }
+
+  return true;
 }
 
 inline nb::object parse_material_argument(const nb::object& argument) {

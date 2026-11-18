@@ -22,23 +22,10 @@ namespace nb = nanobind;
  * @throws std::invalid_argument (ValueError) if an Ion is missing Z/A.
  * @throws nb::type_error if the argument is not an Ion, list, or NumPy array.
  */
-inline void validate_particle_argument(const nb::object& argument) {
-  if (nb::isinstance<nb::list>(argument)) {
-    nb::list values = nb::cast<nb::list>(argument);
-    for (size_t i = 0; i < values.size(); ++i) {
-      validate_particle_argument(values[i]);
-    }
-    return;
-  }
-
-  if (nb::isinstance<nb::ndarray<>>(argument)) {
-    validate_particle_argument(argument.attr("tolist")());
-    return;
-  }
-
+inline bool validate_particle_scalar(const nb::object& argument) {
   if (nb::isinstance<Ion>(argument)) {
     particle_to_internal_no(nb::cast<Ion>(argument));
-    return;
+    return true;
   }
 
   if (nb::isinstance<Particle>(argument)) {
