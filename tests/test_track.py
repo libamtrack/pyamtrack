@@ -25,6 +25,69 @@ def radial_dose_function(name):
     return getattr(track, name)
 
 
+def test_target_functions_select_the_existing_model_families():
+    np.testing.assert_allclose(
+        track.point_target(RADII_M, 100.0, PROTON, model="katz"),
+        track.katz_point(RADII_M, 100.0, PROTON),
+    )
+    np.testing.assert_allclose(
+        track.point_target(RADII_M, 100.0, PROTON, model="cucinotta"),
+        track.cucinotta_point(RADII_M, 100.0, PROTON),
+    )
+    np.testing.assert_allclose(
+        track.site_target(RADII_M, 100.0, PROTON, model="katz"),
+        track.katz_site(RADII_M, 100.0, PROTON),
+    )
+    np.testing.assert_allclose(
+        track.extended_target(RADII_M, 100.0, PROTON, model="katz"),
+        track.katz_extended_target(RADII_M, 100.0, PROTON),
+    )
+    np.testing.assert_allclose(
+        track.extended_target(RADII_M, 100.0, PROTON, model="cucinotta"),
+        track.cucinotta_extended_target(RADII_M, 100.0, PROTON),
+    )
+    np.testing.assert_allclose(
+        track.extended_target(RADII_M, 100.0, PROTON, model="geiss"),
+        track.geiss(RADII_M, 100.0, PROTON),
+    )
+
+
+def test_target_functions_reject_unimplemented_family_target_combinations():
+    with pytest.raises(NotImplementedError):
+        track.point_target(RADII_M, 100.0, PROTON, model="geiss")
+    with pytest.raises(NotImplementedError):
+        track.site_target(RADII_M, 100.0, PROTON, model="cucinotta")
+    with pytest.raises(NotImplementedError):
+        track.site_target(RADII_M, 100.0, PROTON, model="geiss")
+
+
+def test_target_functions_reject_unknown_model_families():
+    with pytest.raises(ValueError, match="Unknown track model family"):
+        track.point_target(RADII_M, 100.0, PROTON, model="unknown")
+
+
+def test_shell_averaged_target_dose_accepts_one_or_many_shells():
+    one_shell = track.point_target([1e-9, 2e-9], 100.0, PROTON, model="katz", shell_averaged=True)
+    many_shells = track.extended_target(
+        [[1e-9, 2e-9], [2e-9, 4e-9]],
+        100.0,
+        PROTON,
+        model="geiss",
+        shell_averaged=True,
+    )
+
+    assert isinstance(one_shell, float)
+    assert np.isfinite(one_shell) and one_shell > 0.0
+    assert many_shells.shape == (2,)
+    assert np.all(np.isfinite(many_shells))
+    assert np.all(many_shells >= 0.0)
+
+
+def test_shell_averaged_target_dose_validates_shell_boundaries():
+    with pytest.raises(ValueError, match="outer_m > inner_m"):
+        track.point_target([2e-9, 1e-9], 100.0, PROTON, model="katz", shell_averaged=True)
+
+
 def test_rdd_model_enum_is_not_exposed():
     assert not hasattr(track, "RadialDoseDistributionModel")
 

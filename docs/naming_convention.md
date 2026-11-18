@@ -118,16 +118,23 @@ arguments exposed through nanobind.
 
 - `track_width(energy_MeV, material=1, model="tabata",
   cartesian_product=False)`
+- `point_target`, `site_target`, and `extended_target`, each with the
+  signature `(radius_m, energy_MeV_u, particle, material=1, model=...,
+  rdd_parameters=None, electron_range_model=None, source="default",
+  cartesian_product=False, allow_bethe_fallback=False,
+  shell_averaged=False)`.
 - `katz_point`, `geiss`, `katz_site`, `cucinotta_point`,
   `katz_extended_target`, and `cucinotta_extended_target`, each with the
   signature `(radius_m, energy_MeV_u, particle, material=1,
   rdd_parameters=None, electron_range_model=<model default>,
   source="default", cartesian_product=False, allow_bethe_fallback=False)`.
 
-There is one radial dose function per radial dose distribution (RDD) model
-instead of a model selector, so the RDD model IDs are not part of the Python
-API. The libamtrack test RDD, the radical-diffusion RDD, shell-averaged doses,
-and the inverse (radius from dose) calculation are not exposed yet.
+The target-oriented functions use the RDD family as a selector. Katz and
+Cucinotta support point and extended-target calculations; Katz supports the
+site calculation; Geiss is exposed as the simplified extended-target RDD.
+Unsupported family/target combinations raise `NotImplementedError`. With
+`shell_averaged=True`, `radius_m` is either `[inner_m, outer_m]` for one shell
+or a sequence of such pairs.
 
 | Function | `rdd_parameters` keys | Default `electron_range_model` |
 | --- | --- | --- |
@@ -297,11 +304,12 @@ lists the currently bound functions or constructors that use the argument.
 - **Meaning:** Selectable calculation model.
 - **Type:** A function-specific model name (`str`), model ID (`int`), enum
   value, or supported list/NumPy array of model selectors.
-- **Used by:** `stopping.electron_range` and any future API that exposes
-  multiple calculation models.
+- **Used by:** `stopping.electron_range`, `track.point_target`,
+  `track.site_target`, and `track.extended_target`.
 - **Rules:** Accepted names, IDs, enum values, and defaults are defined by
-  each function. Use `model` when the argument selects the implementation or
-  theoretical model used for a calculation.
+  each function. Track target functions accept the family names `"katz"`,
+  `"cucinotta"`, and `"geiss"`; unsupported family/target combinations raise
+  `NotImplementedError`.
 
 ### `name`
 
@@ -316,11 +324,25 @@ lists the currently bound functions or constructors that use the argument.
 ### `radius_m`
 
 - **Meaning:** Radial distance from the ion path.
-- **Type:** Scalar number, Python list, or 0-D/1-D NumPy array.
-- **Used by:** the `track` radial dose functions.
+- **Type:** Scalar number, Python list, or 0-D/1-D NumPy array for point
+  dose; `[inner_m, outer_m]` or a sequence of such pairs when
+  `shell_averaged=True`.
+- **Used by:** the `track` radial dose and target functions.
 - **Units and validation:** Metres; every value must be finite and
   non-negative. A sequence forms the last axis of the result. Radii below the
   model's lower cut-off give zero dose.
+
+### `shell_averaged`
+
+- **Meaning:** Whether to return the area-weighted mean dose over each
+  cylindrical radial shell instead of the dose at individual radii.
+- **Type:** Boolean.
+- **Used by:** `track.point_target`, `track.site_target`, and
+  `track.extended_target`.
+- **Default:** `False`.
+- **Rules:** When `True`, `radius_m` must contain inner/outer radius pairs,
+  with every outer radius strictly greater than its corresponding inner
+  radius.
 
 ### `rdd_parameters`
 

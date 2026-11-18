@@ -12,6 +12,10 @@ namespace {
 using RadialDoseFunction = nb::object (*)(const nb::object&, const nb::object&, const nb::object&, const nb::object&,
                                           const nb::object&, const nb::object&, const nb::object&, bool, bool);
 
+using TargetDoseFunction = nb::object (*)(const nb::object&, const nb::object&, const nb::object&, const nb::object&,
+                                          const nb::object&, const nb::object&, const nb::object&, const nb::object&,
+                                          bool, bool, bool);
+
 const char* RADIAL_DOSE_COMMON_PARAMETERS = R"pbdoc(
           Parameters
           ----------
@@ -59,8 +63,49 @@ void def_radial_dose(nb::module_& m, const char* name, RadialDoseFunction functi
 
   m.def(name, function, nb::arg("radius_m"), nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
         nb::arg("rdd_parameters") = nb::none(), nb::arg("electron_range_model") = default_electron_range_model,
-        nb::arg("source") = "default", nb::arg("cartesian_product") = false,
-        nb::arg("allow_bethe_fallback") = false, docstrings.back().c_str());
+        nb::arg("source") = "default", nb::arg("cartesian_product") = false, nb::arg("allow_bethe_fallback") = false,
+        docstrings.back().c_str());
+}
+
+const char* TARGET_COMMON_PARAMETERS = R"pbdoc(
+          Parameters
+          ----------
+          radius_m : float or array_like
+              Radial distance from the ion path in meters. When
+              shell_averaged=False, a list or 1-D NumPy array forms the last
+              axis of the result. When shell_averaged=True, pass
+              [inner_m, outer_m] for one shell or a sequence of such pairs.
+          energy_MeV_u : float or array_like
+              Kinetic energy per nucleon in MeV/u. Must be finite, in
+              (0, 1e6), and inside the range of the selected stopping-power
+              table.
+          particle : Ion, list[Ion], or numpy array of Ions
+              The primary ion.
+          material : int, Material, list[int | Material], or numpy int array
+              Material ID or Material object. Default: 1 (liquid water).
+          model : {"katz", "cucinotta", "geiss"}, optional
+              RDD model family. Some family/target combinations are not
+              implemented yet and raise NotImplementedError.
+          rdd_parameters : dict, optional
+              Overrides of the defaults for the selected model family.
+)pbdoc";
+
+const char* TARGET_COMMON_OPTIONS = R"pbdoc(          shell_averaged : bool, optional
+              If True, return the area-weighted mean dose over each radial
+              shell specified by radius_m. Default: False.
+)pbdoc";
+
+void def_target(nb::module_& m, const char* name, TargetDoseFunction function, const char* default_model,
+                const char* summary, const char* target_options) {
+  static std::list<std::string> docstrings;
+  docstrings.push_back(std::string(summary) + TARGET_COMMON_PARAMETERS + target_options + RADIAL_DOSE_COMMON_OPTIONS +
+                       TARGET_COMMON_OPTIONS);
+
+  m.def(name, function, nb::arg("radius_m"), nb::arg("energy_MeV_u"), nb::arg("particle"), nb::arg("material") = 1,
+        nb::arg("model") = default_model, nb::arg("rdd_parameters") = nb::none(),
+        nb::arg("electron_range_model") = nb::none(), nb::arg("source") = "default",
+        nb::arg("cartesian_product") = false, nb::arg("allow_bethe_fallback") = false,
+        nb::arg("shell_averaged") = false, docstrings.back().c_str());
 }
 
 }  // namespace
@@ -90,6 +135,41 @@ NB_MODULE(track, m) {
           float or numpy.ndarray
               The maximum track width in meters.
       )pbdoc");
+
+  def_target(m, "point_target", &point_target, "katz",
+             R"pbdoc(
+          Point-target radial dose distribution in Gy.
+)pbdoc",
+             R"pbdoc(          Supported model families: "katz" and "cucinotta".
+              The "geiss" family is not a point-target model.
+          electron_range_model : str, int, or ElectronRangeModel, optional
+              If omitted, the default is selected from the model family:
+              "waligorski" for Katz and "tabata" for Cucinotta.
+)pbdoc");
+
+  def_target(m, "site_target", &site_target, "katz",
+             R"pbdoc(
+          Site-target radial dose distribution in Gy.
+)pbdoc",
+             R"pbdoc(          The Katz family is currently supported.
+              Cucinotta and Geiss site-target variants raise
+              NotImplementedError.
+          electron_range_model : str, int, or ElectronRangeModel, optional
+              Default: "waligorski".
+)pbdoc");
+
+  def_target(m, "extended_target", &extended_target, "katz",
+             R"pbdoc(
+          Radial dose distribution averaged over an extended target, in Gy.
+)pbdoc",
+             R"pbdoc(          Supported model families: "katz", "cucinotta", and
+              "geiss". Geiss selects libamtrack's simplified extended-target
+              RDD and accepts the parameter {"a0_m": 5e-8}.
+          electron_range_model : str, int, or ElectronRangeModel, optional
+              If omitted, the default is selected from the model family:
+              "waligorski" for Katz, "tabata" for Cucinotta, and "geiss" for
+              Geiss.
+)pbdoc");
 
   def_radial_dose(m, "katz_point", &katz_point, "waligorski",
                   R"pbdoc(

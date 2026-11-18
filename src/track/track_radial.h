@@ -6,6 +6,38 @@
 namespace nb = nanobind;
 
 /**
+ * Calculate radial dose for a point-target calculation.
+ *
+ * `model` accepts "katz" and "cucinotta". The "geiss" family is reserved for
+ * the extended-target calculation because libamtrack defines it as a
+ * simplified extended-target RDD.
+ */
+nb::object point_target(const nb::object& radius_m, const nb::object& energy_MeV_u, const nb::object& particle,
+                        const nb::object& material, const nb::object& model, const nb::object& rdd_parameters,
+                        const nb::object& electron_range_model, const nb::object& source, bool cartesian_product,
+                        bool allow_bethe_fallback, bool shell_averaged);
+
+/**
+ * Calculate radial dose for a site-target calculation.
+ *
+ * The currently implemented site-target family is Katz.
+ */
+nb::object site_target(const nb::object& radius_m, const nb::object& energy_MeV_u, const nb::object& particle,
+                       const nb::object& material, const nb::object& model, const nb::object& rdd_parameters,
+                       const nb::object& electron_range_model, const nb::object& source, bool cartesian_product,
+                       bool allow_bethe_fallback, bool shell_averaged);
+
+/**
+ * Calculate radial dose for an extended-target calculation.
+ *
+ * `model` accepts "katz", "cucinotta", and "geiss".
+ */
+nb::object extended_target(const nb::object& radius_m, const nb::object& energy_MeV_u, const nb::object& particle,
+                           const nb::object& material, const nb::object& model, const nb::object& rdd_parameters,
+                           const nb::object& electron_range_model, const nb::object& source, bool cartesian_product,
+                           bool allow_bethe_fallback, bool shell_averaged);
+
+/**
  * @brief Calculate the maximum delta-electron range (track width) in meters.
  *
  * @param energy_MeV  Kinetic energy per nucleon.
@@ -28,11 +60,11 @@ nb::object track_width(const nb::object& energy_MeV, const nb::object& material,
  * @param cartesian_product     Whether energy/particle/material are combined as a Cartesian product.
  * @param allow_bethe_fallback  Whether the default source may fall back to the Bethe formula.
  */
-#define DECLARE_RADIAL_DOSE_FUNCTION(function_name)                                                               \
-  nb::object function_name(const nb::object& radius_m, const nb::object& energy_MeV_u, const nb::object& particle, \
-                           const nb::object& material, const nb::object& rdd_parameters,                          \
-                           const nb::object& electron_range_model, const nb::object& source,                      \
-                           bool cartesian_product, bool allow_bethe_fallback);
+#define DECLARE_RADIAL_DOSE_FUNCTION(function_name)                                                                  \
+  nb::object function_name(const nb::object& radius_m, const nb::object& energy_MeV_u, const nb::object& particle,   \
+                           const nb::object& material, const nb::object& rdd_parameters,                             \
+                           const nb::object& electron_range_model, const nb::object& source, bool cartesian_product, \
+                           bool allow_bethe_fallback);
 
 DECLARE_RADIAL_DOSE_FUNCTION(katz_point)
 DECLARE_RADIAL_DOSE_FUNCTION(geiss)
