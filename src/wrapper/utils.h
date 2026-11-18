@@ -64,7 +64,11 @@ inline bool is_object_array(const nb::object& array) {
 
 
 template <typename ScalarValidatorFunc>
-inline bool validate_vectorized_argument(const nb::object& argument, const ScalarValidatorFunc& validate_scalar) {
+inline bool validate_vectorized_argument(
+        const nb::object& argument, 
+        const ScalarValidatorFunc& validate_scalar, 
+        bool check_all_values=false) {
+          
   if (nb::isinstance<nb::list>(argument)) {
     auto list_values = nb::cast<nb::list>(argument);
 
@@ -91,7 +95,7 @@ inline bool validate_vectorized_argument(const nb::object& argument, const Scala
     // Numpy array can only have elements of the same type. 
     // The exception is ndarray of type object. Such ndarray can have elements of different types
     // Type upscaling validation should be managed in scalar function
-    if (is_object_array(argument)) {
+    if (is_object_array(argument) || check_all_values == true) {
       return validate_vectorized_argument(values, validate_scalar);
     } else {
       return validate_scalar(array_values[0]);
