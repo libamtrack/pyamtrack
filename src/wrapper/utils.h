@@ -1,9 +1,11 @@
 #ifndef WRAPPER_UTILS_H
 #define WRAPPER_UTILS_H
 
+#include <nanobind/stl/string.h>
 #include <nanobind/nanobind.h>
 #include <nanobind/ndarray.h>
 
+#include <string>
 #include <variant>
 
 namespace nb = nanobind;
@@ -53,6 +55,66 @@ inline bool is_c_contiguous(const nb::ndarray<T>& arr) {
 template <typename T>
 T variant_cast(const std::variant<double, int>& v) {
   return std::visit([](auto&& arg) -> T { return static_cast<T>(arg); }, v);
+}
+
+inline bool is_object_array(const nb::object& array) {
+  return nb::cast<std::string>(
+             array.attr("dtype").attr("kind")) == "O";
+}
+
+
+template <typename ScalarValidatorFunc>
+inline bool validate_vectorized_argument(const nb::object& argument, const ScalarValidatorFunc& validate_scalar) {
+  if (nb::isinstance<nb::list>(argument)) {
+    auto list_values = nb::cast<nb::list>(argument);
+
+    if (list_values.size() == 0) return false;
+    
+    for(size_t i=0; i<list_values.size(); i++) {
+      if (!validate_scalar(list_values[i])) return false;
+    }
+    return true;
+  }
+
+  if (nb::isinstance<nb::ndarray<>>(argument)) {
+    auto array = nb::cast<nb::ndarray<>>(argument);
+    auto values = argument.attr("tolist")();
+
+    if (array.ndim() == 0) return validate_scalar(values);
+
+    if (array.ndim() != 1) return false;
+
+    auto array_values = nb::cast<nb::list>(values);
+
+    if (array_values.size() == 0) return false;
+
+    // Numpy array can only have elements of the same type. 
+    // The exception is ndarray of type object. Such ndarray can have elements of different types
+    // Type upscaling validation should be managed in scalar function
+    if (is_object_array(argument)) {
+      return validate_vectorized_argument(values, validate_scalar);
+    } else {
+      return validate_scalar(array_values[0]);
+    }
+  }
+
+  return validate_scalar(argument);
+}
+
+inline bool validate_numeric_scalar(const nb::object& argument) {
+  // bool is a subtype for int in python but it should not be treated as corrent value in this case
+  if (PyBool_Check(argument.ptr())) {
+    return false;
+  }
+  
+  if (nb::isinstance<nb::int_>(argument) ||
+      nb::isinstance<nb::float_>(argument)) {
+    return true;
+  }
+  
+  auto numpy = nb::module_::import_("numpy");
+  return nb::isinstance(argument, numpy.attr("integer")) ||
+         nb::isinstance(argument, numpy.attr("floating"));
 }
 
 #endif
