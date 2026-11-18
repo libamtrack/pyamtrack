@@ -193,7 +193,9 @@ nb::object evaluate_stopping_power(const nb::object& energy_MeV, const nb::objec
                                    const nb::object& material, const nb::object& source, bool cartesian_product,
                                    bool allow_bethe_fallback, bool full_output,
                                    StoppingPowerFunction stopping_power_function) {
-  validate_particle_argument(particle);
+  if (!validate_vectorized_argument(particle, validate_particle_scalar)) {
+    throw nb::type_error("particle must be an Ion, list, or NumPy array of Ions");
+  }
   validate_material_argument(material);
 
   const long requested_source = parse_stopping_power_source(source);
