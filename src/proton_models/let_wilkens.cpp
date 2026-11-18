@@ -8,6 +8,7 @@
 
 #include "../wrapper/cartesian_product.h"
 #include "../wrapper/multi_argument.h"
+#include "../wrapper/utils.h"
 
 extern "C" {
 #include "AT_ProtonAnalyticalModels.h"
@@ -33,7 +34,9 @@ nb::object let_wilkens(const nb::object& depth_cm, const nb::object& energy_MeV,
     throw nb::type_error("averaging must be an Averaging enum value or a string");
   }
 
-  validate_material_argument(material);
+  if (!validate_vectorized_argument(material, validate_material_scalar, true)) {
+    throw nb::type_error("material must be an int, a Material, or a list / NumPy array of either");
+  }
 
   std::vector<nb::object> arguments_vector;
   arguments_vector.push_back(depth_cm);
