@@ -50,8 +50,8 @@ std::optional<StoppingPowerEnergyBounds> get_stopping_power_energy_bounds(long s
         throw std::invalid_argument("PSTAR data is not available for material ID " + std::to_string(material_no));
       }
 
-      const double minimum = AT_PSTAR_min_energy_MeV_u(material_no);
-      const double maximum = AT_PSTAR_max_energy_MeV_u(material_no);
+      const double minimum = AT_PSTAR_E_MeV_u_min(particle_no, material_no);
+      const double maximum = AT_PSTAR_E_MeV_u_max(particle_no, material_no);
       if (minimum < 0.0 || maximum < 0.0) {
         throw std::invalid_argument("PSTAR data is not available for material ID " + std::to_string(material_no));
       }
@@ -63,8 +63,8 @@ std::optional<StoppingPowerEnergyBounds> get_stopping_power_energy_bounds(long s
         throw std::invalid_argument("ICRU data is not available for material ID " + std::to_string(material_no));
       }
 
-      const double minimum = AT_ICRU_min_energy_MeV_u(material_no, particle_no);
-      const double maximum = AT_ICRU_max_energy_MeV_u(material_no, particle_no);
+      const double minimum = AT_ICRU_E_MeV_u_min(particle_no, material_no);
+      const double maximum = AT_ICRU_E_MeV_u_max(particle_no, material_no);
       if (minimum < 0.0 || maximum < 0.0) {
         throw std::invalid_argument("ICRU data is not available for material ID " + std::to_string(material_no));
       }
