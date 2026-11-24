@@ -1,54 +1,49 @@
 import numpy as np
 import pytest
 
+import pyamtrack.particles
 from pyamtrack.converters import beta_from_energy, energy_from_beta
 from pyamtrack.stopping import electron_range
 
-# Define test parameters: function, min value, max value
+
+PROTON = pyamtrack.particles.proton
+
+
 test_cases = [
-    (beta_from_energy, 0, 1000),
-    (energy_from_beta, 0, 1),
-    (electron_range, 0, 1000),
+    (beta_from_energy, {"particle": PROTON}, 0, 1000),
+    (energy_from_beta, {"particle": PROTON}, 0, 1),
+    (electron_range, {}, 0, 1000),
 ]
 
 
-@pytest.mark.parametrize("func, min_val, max_val", test_cases)
-def test_function_behavior(func, min_val, max_val):
-    """
-    Test the behavior of the provided function for various inputs.
+@pytest.mark.parametrize("func, kwargs, min_val, max_val", test_cases)
+def test_function_behavior(func, kwargs, min_val, max_val):
+    assert func(0, **kwargs) == 0
 
-    This includes:
-    - Zero argument handling
-    - List and numpy array input handling
-    - Negative input handling
-    - Non-numeric input handling
-    - Monotonicity check
-    """
-    # Test: Function should return zero for zero argument
-    assert func(0) == 0, f"{func.__name__} failed for zero argument."
-
-    # Test: Function should accept list of floats and numpy array
     input_list = [min_val, (min_val + max_val) / 2, max_val]
     input_array = np.array(input_list)
-    output_list = func(input_list)
-    output_array = func(input_array)
-    assert np.allclose(output_list, output_array), f"{func.__name__} failed for list and numpy array."
-    assert isinstance(output_array, np.ndarray), f"{func.__name__} did not return a numpy array for numpy input."
 
-    # Test: Function should return NaN or inf for negative numbers
+    output_list = func(input_list, **kwargs)
+    output_array = func(input_array, **kwargs)
+
+    assert np.allclose(output_list, output_array)
+    assert isinstance(output_array, np.ndarray)
+
     negative_input = -1 * (min_val + 1)
-    result = func(negative_input)
-    assert np.isnan(result) or np.isinf(result), f"{func.__name__} failed for negative input."
+    result = func(negative_input, **kwargs)
 
-    # Test: Corner cases for non-numeric values
-    with pytest.raises(TypeError):
-        func("string")
-    with pytest.raises(TypeError):
-        func(None)
-    with pytest.raises(TypeError):
-        func([1, "string", 3])  # Mixture of numbers and non-numerical types
+    assert np.isnan(result) or np.isinf(result)
 
-    # Test: Function should be monotonically increasing
+    with pytest.raises(TypeError):
+        func("string", **kwargs)
+
+    with pytest.raises(TypeError):
+        func(None, **kwargs)
+
+    with pytest.raises(TypeError):
+        func([1, "string", 3], **kwargs)
+
     inputs = np.linspace(min_val, max_val, 100)
-    outputs = func(inputs)
-    assert np.all(np.diff(outputs) >= 0), f"{func.__name__} is not monotonically increasing."
+    outputs = func(inputs, **kwargs)
+
+    assert np.all(np.diff(outputs) >= 0)
