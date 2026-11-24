@@ -5,6 +5,6 @@
 
 namespace nb = nanobind;
 
-nb::object energy_from_beta(nb::object beta);
+nb::object energy_from_beta(nb::object beta,  nb::object particle, bool cartesian_product);
 
 #endif  // ENERGY_FROM_BETA_H
