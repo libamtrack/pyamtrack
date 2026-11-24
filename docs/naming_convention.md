@@ -246,13 +246,14 @@ lists the currently bound functions or constructors that use the argument.
 
 ### `model`
 
-- **Meaning:** Stopping-power model.
-- **Type:** A model name (`str`), model ID (`int`), or a supported list/NumPy
-  array of names and IDs.
-- **Used by:** `stopping.electron_range`.
-- **Default:** `"tabata"` (model ID `7`).
-- **Current names:** `"butts_katz"`, `"waligorski"`, `"geiss"`, `"scholz"`,
-  `"edmund"`, `"tabata"`, and `"scholz_new"`.
+- **Meaning:** Selectable calculation model.
+- **Type:** A function-specific model name (`str`), model ID (`int`), enum
+  value, or supported list/NumPy array of model selectors.
+- **Used by:** `stopping.electron_range` and any future API that exposes
+  multiple calculation models.
+- **Rules:** Accepted names, IDs, enum values, and defaults are defined by
+  each function. Use `model` when the argument selects the implementation or
+  theoretical model used for a calculation.
 
 ### `name`
 

@@ -216,7 +216,10 @@ inline nb::object parse_material_argument(const nb::object& argument) {
   }
 
   if (nb::isinstance<nb::ndarray<>>(argument)) {
-    return parse_material_argument(argument.attr("tolist")());
+    // Keep the original array so Cartesian-product evaluation preserves its
+    // dimensions. Validation above still checks every element recursively.
+    validate_material_argument(argument);
+    return argument;
   }
 
   throw nb::type_error("material must be an integer, Material, list, or NumPy array");
